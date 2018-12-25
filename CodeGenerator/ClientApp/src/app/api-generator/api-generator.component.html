@@ -1,0 +1,11 @@
+<div style="margin-top: 15px; margin-bottom: 15px;">
+  <input type="button" class="btn btn-primary" value="get models" (click)="generate(GenerateRequest('GetModels'))" />
+  <input type="button" class="btn btn-primary" value="get model" (click)="generate('GetModel')" />
+  <input type="button" class="btn btn-primary" value="create model" (click)="generate('CreateModel')" />
+  <input type="button" class="btn btn-primary" value="update model" (click)="generate('UpdateModel')" />
+  <input type="button" class="btn btn-primary" value="delete model" (click)="generate('DeleteModel')" />
+</div>
+
+<pre>
+{{generateResponse.result}}
+</pre>

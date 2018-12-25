@@ -1,0 +1,3 @@
+﻿{{Summary}}
+{{Attributes}}
+public {{Class}} {{PropertyName}} { get; set; }
