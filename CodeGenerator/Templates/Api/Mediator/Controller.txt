@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HelpersForCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace {{ProjectName}}.Controllers.{{Plural}}
         public async Task<ActionResult<Get{{Plural}}.Response>> Get{{Plural}}([FromQuery] Get{{Plural}}.Request request)
         {
             Get{{Plural}}.Response response = await this.mediator.Send(request);
-            return new OkObjectResult(response);
+            return response.Ok();
         }
 
         [HttpGet("{id:int}")]
@@ -30,14 +31,14 @@ namespace {{ProjectName}}.Controllers.{{Plural}}
         {
             Get{{Singular}}.Request request = new Get{{Singular}}.Request() { Id = id };
             Get{{Singular}}.Response response = await this.mediator.Send(request);
-            return new OkObjectResult(response);
+            return response.Ok();
         }
 
         [HttpPost("")]
         public async Task<ActionResult<Create{{Singular}}.Response>> Create{{Singular}}([FromBody] Create{{Singular}}.Request request)
         {
             Create{{Singular}}.Response response = await this.mediator.Send(request);
-            return new OkObjectResult(response);
+            return response.Ok();
         }
 
         [HttpPut("{id:int}")]
@@ -45,7 +46,7 @@ namespace {{ProjectName}}.Controllers.{{Plural}}
         {
             request.Id = id;
             Update{{Singular}}.Response response = await this.mediator.Send(request);
-            return new OkObjectResult(response);
+            return response.Ok();
         }
 
         [HttpDelete("{id:int}")]

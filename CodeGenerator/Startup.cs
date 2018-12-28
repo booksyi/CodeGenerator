@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSwag.AspNetCore;
-using Pluralize.NET.Core;
 
 namespace CodeGenerator
 {
@@ -23,7 +22,7 @@ namespace CodeGenerator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<Pluralizer>();
+            services.AddScoped<Pluralize.NET.Core.Pluralizer>();
             services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("DatabaseContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMediatR();

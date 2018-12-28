@@ -1,29 +1,18 @@
-import { Component, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
+import { Component, OnInit } from '@angular/core';
+import { ApiGeneratorService } from './api-generator.service';
 @Component({
   selector: 'app-api-generator',
   templateUrl: './api-generator.component.html'
 })
-export class ApiGeneratorComponent {
+export class ApiGeneratorComponent implements OnInit {
+  constructor(
+    private apiGeneratorService: ApiGeneratorService
+  ) { }
 
-  constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
-
-  public generateResponse: GenerateResponse;
-  generate(request: GenerateRequest) {
-    this.http.get<GenerateResponse>(this.baseUrl + 'api/ApiGenerator/Generate' + '?actionName=' + request.actionName).subscribe(result => {
-      this.generateResponse = result;
-    }, error => console.error(error));
+  public result: string;
+  generateModel(actionName: string) {
+    this.apiGeneratorService.generateModel({ actionName }).subscribe(
+      result => { this.result = result.value }
+    );
   }
-}
-
-class GenerateRequest {
-  actionName: string;
-  constructor(actionName: string) {
-    this.actionName = actionName;
-  }
-}
-
-interface GenerateResponse {
-  result: string;
 }

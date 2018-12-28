@@ -5,17 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using {{ProjectName}}.Models;
+using {{ProjectName}}.Data.Models;
 
 namespace {{ProjectName}}.Controllers.{{Plural}}.Actions
 {
     public class Create{{Singular}}
     {
-        public class Request : IRequest<Response>
-        {
-        }
+        {{Request}}
         
-        public class Response : ResponseBase<{{Singular}}>
+        public class Response : SingleResponse<{{Singular}}>
         {
             public Response({{Singular}} result) : base(result)
             {

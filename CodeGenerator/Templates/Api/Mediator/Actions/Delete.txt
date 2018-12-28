@@ -5,26 +5,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using {{ProjectName}}.Models;
+using {{ProjectName}}.Data.Models;
 
 namespace {{ProjectName}}.Controllers.{{Plural}}.Actions
 {
     public class Delete{{Singular}}
     {
-        public class Request : IRequest<ResponseBase<bool>>
-        {
-        }
+        {{Request}}
         
-        public class Handler : IRequestHandler<Request, ResponseBase<bool>>
+        public class Handler : IRequestHandler<Request, SingleResponse<bool>>
         {
             public Handler()
             {
             }
 			
-            public async Task<IResponse<bool>> Handle(Request request, CancellationToken token)
+            public async Task<SingleResponse<bool>> Handle(Request request, CancellationToken token)
             {
                 // TODO: Delete Data
-                return new ResponseBase<bool>(true);
+                return new SingleResponse<bool>(true);
             }
         }
     }

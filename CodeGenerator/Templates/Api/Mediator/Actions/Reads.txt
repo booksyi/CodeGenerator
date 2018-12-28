@@ -5,15 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using {{ProjectName}}.Models;
+using {{ProjectName}}.Data.Models;
 
 namespace {{ProjectName}}.Controllers.{{Plural}}.Actions
 {
     public class Get{{Plural}}
     {
-        public class Request : IRequest<Response>
-        {
-        }
+        {{Request}}
         
         public class Response : MultiResponse<{{Singular}}>
         {

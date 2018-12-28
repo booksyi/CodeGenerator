@@ -1,6 +1,0 @@
-﻿{{Declares}}
-
-public {{Class}}({{ConstructorParameters}})
-{
-	{{Constructor}}
-}
