@@ -31,8 +31,6 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\app\api-generator\api-generator.component.ts" />
-    <None Remove="ClientApp\src\app\api-generator\api-generator.service.ts" />
-    <None Remove="ClientApp\src\app\app.service.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,13 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\app\api-generator\api-generator.component.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\api-generator\api-generator.service.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\app.service.ts" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <TypeScriptCompile Include="ClientApp\src\app\api-generator\api-generator.component.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
