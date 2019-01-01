@@ -1,0 +1,39 @@
+﻿using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using {{# ProjectName }}.Data.Models;
+
+namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
+{
+    public class Create{{# ModelName }}
+    {
+        public class Request : IRequest<Response>
+        {
+            {{# Properties , @@Endline }}
+        }
+
+        public class Response
+        {
+            {{# Properties , @@Endline }}
+
+            {{# Constructor }}
+        }
+
+        public class Handler : IRequestHandler<Request, Response>
+        {
+            {{# DependencyInjection }}
+
+            public async Task<Response> Handle(Request request, CancellationToken token)
+            {
+                {{# ModelName }} {{# ModelObjectName }} = new {{# ModelName }}();
+                {{# SetValues , @@Endline }}
+                await context.AddAsync({{# ModelObjectName }});
+                await context.SaveChangesAsync();
+                return new Response({{# ModelObjectName }});
+            }
+        }
+    }
+}

@@ -26,7 +26,9 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\MethodParameter.html");
+                string template = string.IsNullOrWhiteSpace(request.Prefix) ?
+                    await File.ReadAllTextAsync(@"Templates\CSharp\MethodParameterWithoutPrefix.html") :
+                    await File.ReadAllTextAsync(@"Templates\CSharp\MethodParameter.html");
                 GenerateNode node = new GenerateNode(template);
                 node.AppendChild("Prefix", request.Prefix);
                 node.AppendChild("TypeName", request.TypeName);

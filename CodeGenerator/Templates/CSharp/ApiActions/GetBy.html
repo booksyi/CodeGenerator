@@ -1,0 +1,43 @@
+﻿using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using {{# ProjectName }}.Data.Models;
+
+namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
+{
+    public class Get{{# ModelName }}By{{# By}}
+    {
+        public class Request : IRequest<Response>
+        {
+            {{# RequestProperties , @@Endline }}
+            
+            {{# RequestConstructor }}
+        }
+
+        public class Response
+        {
+            {{# ResponseProperties , @@Endline }}
+
+            {{# ResponseConstructor }}
+        }
+
+        public class Handler : IRequestHandler<Request, Response>
+        {
+            {{# DependencyInjection }}
+
+            public async Task<Response> Handle(Request request, CancellationToken token)
+            {
+                {{# ModelName }} {{# ModelObjectName }} = await context.{{# PluralModelName }}
+                    .FirstOrDefaultAsync(x => {{# FindFilter , && }});
+                if ({{# ModelObjectName }} == null)
+                {
+                    // Not Found
+                }
+                return new Response({{# ModelObjectName }});
+            }
+        }
+    }
+}

@@ -38,7 +38,7 @@ namespace CodeGenerator.Handlers
                         })).Rename("Summary");
                 }
                 node.AppendChild("Attributes", request.Field.ForCs.EFAttributes);
-                node.AppendChild("Class", request.Field.ForCs.TypeName);
+                node.AppendChild("TypeName", request.Field.ForCs.TypeName);
                 node.AppendChild("PropertyName", request.Field.Name);
                 return node;
             }
