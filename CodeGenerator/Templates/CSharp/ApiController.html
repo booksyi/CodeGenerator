@@ -1,0 +1,98 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions;
+
+namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}
+{
+    [Route("api/[controller]")]
+    public class {{# PluralModelName }}Controller : Controller
+    {
+        {{# DependencyInjection }}
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        [HttpPost("")]
+        public async Task<ActionResult<Create{{# ModelName }}.Response>> Create{{# ModelName }}([FromBody] Create{{# ModelName }}.Request request)
+        {
+            Create{{# ModelName }}.Response response = await this.mediator.Send(request);
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 搜尋
+        /// </summary>
+        [HttpGet("")]
+        public async Task<ActionResult<Get{{# PluralModelName }}.Response>> Get{{# PluralModelName }}([FromQuery] Get{{# PluralModelName }}.Request request)
+        {
+            Get{{# PluralModelName }}.Response response = await this.mediator.Send(request);
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 取得單筆資料 (依流水號)
+        /// </summary>
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Get{{# ModelName }}ById.Response>> Get{{# ModelName }}ById(int id)
+        {
+            Get{{# ModelName }}ById.Response response = await this.mediator.Send(new Get{{# ModelName }}ById.Request() { {{# IdentityFieldName }} = id });
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 取得單筆資料 (依主鍵)
+        /// </summary>
+        [HttpGet("Key")]
+        public async Task<ActionResult<Get{{# ModelName }}ByKey.Response>> Get{{# ModelName }}ByKey([FromQuery] Get{{# ModelName }}ByKey.Request request)
+        {
+            Get{{# ModelName }}ByKey.Response response = await this.mediator.Send(request);
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 修改單筆資料 (依流水號)
+        /// </summary>
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<Edit{{# ModelName }}ById.Response>> Edit{{# ModelName }}ById(int id, [FromBody] Edit{{# ModelName }}ById.Request request)
+        {
+            request.{{# IdentityFieldName }} = id;
+            Edit{{# ModelName }}ById.Response response = await this.mediator.Send(request);
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 修改單筆資料 (依主鍵)
+        /// </summary>
+        [HttpPut("Key")]
+        public async Task<ActionResult<Edit{{# ModelName }}ByKey.Response>> Edit{{# ModelName }}ByKey([FromBody] Edit{{# ModelName }}ByKey.Request request)
+        {
+            Edit{{# ModelName }}ByKey.Response response = await this.mediator.Send(request);
+            return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// 刪除單筆資料 (依流水號)
+        /// </summary>
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete{{# ModelName }}ById(int id)
+        {
+            Delete{{# ModelName }}ById.Response response = await this.mediator.Send(new Delete{{# ModelName }}ById.Request() { {{# IdentityFieldName }} = id });
+            return NoContent();
+        }
+
+        /// <summary>
+        /// 刪除單筆資料 (依主鍵)
+        /// </summary>
+        [HttpDelete("Key")]
+        public async Task<ActionResult> Delete{{# ModelName }}ByKey([FromQuery] Delete{{# ModelName }}ByKey.Request request)
+        {
+            Delete{{# ModelName }}ByKey.Response response = await this.mediator.Send(request);
+            return NoContent();
+        }
+    }
+}

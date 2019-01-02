@@ -17,7 +17,6 @@ namespace CodeGenerator.Handlers.ApiActions
             public DbTableSchema TableSchema { get; set; }
 
             public string ProjectName { get; set; }
-            public string ModelName { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, GenerateNode>
@@ -36,9 +35,9 @@ namespace CodeGenerator.Handlers.ApiActions
                 string template = await File.ReadAllTextAsync(@"Templates\CSharp\ApiActions\Create.html");
                 GenerateNode node = new GenerateNode(template);
                 node.AppendChild("ProjectName", request.ProjectName);
-                node.AppendChild("ModelName", request.ModelName);
-                node.AppendChild("ModelObjectName", request.ModelName.LowerFirst());
-                node.AppendChild("PluralModelName", pluralizer.Pluralize(request.ModelName));
+                node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
+                node.AppendChild("ModelObjectName", request.TableSchema.ForCs.ModelName.LowerFirst());
+                node.AppendChild("PluralModelName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName));
 
                 node.AppendChild("Properties", request.TableSchema.Fields
                     .Where(x => x.IsIdentity == false)
@@ -48,10 +47,10 @@ namespace CodeGenerator.Handlers.ApiActions
                     new GenerateConstructor.Request()
                     {
                         TypeName = "Response",
-                        Parameters = new string[] { $"{request.ModelName} {request.ModelName.LowerFirst()}" },
+                        Parameters = new string[] { $"{request.TableSchema.ForCs.ModelName} {request.TableSchema.ForCs.ModelName.LowerFirst()}" },
                         InnerCodes = request.TableSchema.Fields
                             .Where(x => x.IsIdentity == false)
-                            .Select(x => $"this.{x.Name} = {request.ModelName.LowerFirst()}.{x.Name};")
+                            .Select(x => $"this.{x.Name} = {request.TableSchema.ForCs.ModelName.LowerFirst()}.{x.Name};")
                     })).Rename("Constructor");
 
                 node.AppendChild(await mediator.Send(
@@ -67,7 +66,7 @@ namespace CodeGenerator.Handlers.ApiActions
                 
                 node.AppendChild("SetValues", request.TableSchema.Fields
                     .Where(x => x.IsIdentity == false)
-                    .Select(x => $"{request.ModelName.LowerFirst()}.{x.Name} = request.{x.Name};"));
+                    .Select(x => $"{request.TableSchema.ForCs.ModelName.LowerFirst()}.{x.Name} = request.{x.Name};"));
                 return node;
             }
         }

@@ -1,9 +1,11 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using {{# ProjectName }}.Data;
 using {{# ProjectName }}.Data.Models;
 
 namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
@@ -13,8 +15,6 @@ namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
         public class Request : IRequest<Response>
         {
             {{# RequestProperties , @@Endline }}
-            
-            {{# RequestConstructor }}
         }
 
         public class Response

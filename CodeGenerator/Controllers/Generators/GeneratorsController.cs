@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeGenerator.Handlers;
@@ -57,93 +58,139 @@ namespace CodeGenerator.Controllers.Generators
         [HttpGet("[action]")]
         public async Task<ActionResult> Test()
         {
-            string output = @"D:\temp\output";
+            string projectName = "CoreWebFuntions";
+            string connectionString = @"Server=LAPTOP-RD9P71LP\SQLEXPRESS;Database=TIP_TEST;UID=sa;PWD=1234;";
+            string[] tableNames = new string[] { "Article", "Epaper", "Member" };
 
-            string connectionString = @"Server=DESKTOP-RO8TCIK\SQLEXPRESS;Database=TIP_TEST;UID=sa;PWD=1234;";
-            string tableName = "Article";
-            string modelName = "Article";
+            IEnumerable<DbTableSchema> tableSchemas = CodingHelper.GetDbTableSchema(connectionString, tableNames);
 
-            string projectName = "Unknow";
-            DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(connectionString, tableName);
+            foreach (DbTableSchema tableSchema in tableSchemas)
+            {
+                string outputController = $@"D:\Workspace\{projectName}\{projectName}\Controllers\{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}";
+                string outputActions = $@"D:\Workspace\{projectName}\{projectName}\Controllers\{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}\Actions";
+                string outputModels = $@"D:\Workspace\{projectName}\{projectName}\Data\Models";
 
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Create{modelName}.cs"),
-                (await this.mediator.Send(new GenerateCreate.Request()
+                if (Directory.Exists(outputController) == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName
-                })).Generate());
-
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Delete{modelName}ById.cs"),
-                (await this.mediator.Send(new GenerateDeleteBy.Request()
+                    Directory.CreateDirectory(outputController);
+                }
+                if (Directory.Exists(outputActions) == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Id
-                })).Generate());
-
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Delete{modelName}ByKey.cs"),
-                (await this.mediator.Send(new GenerateDeleteBy.Request()
+                    Directory.CreateDirectory(outputActions);
+                }
+                if (Directory.Exists(outputModels) == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Key
-                })).Generate());
+                    Directory.CreateDirectory(outputModels);
+                }
 
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Get{modelName}ById.cs"),
-                (await this.mediator.Send(new GenerateGetBy.Request()
+                bool useIdentityAsPrimaryKey =
+                    tableSchema.PrimaryKeys.Count() == 1
+                    && tableSchema.PrimaryKeys.First().Name == tableSchema.Identity.Name;
+
+                #region Model
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputModels, $"{tableSchema.ForCs.ModelName}.cs"),
+                    (await this.mediator.Send(new GenerateModel.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        ModelName = tableSchema.ForCs.ModelName
+                    })).Generate());
+                #endregion
+
+                #region Controller
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputController, $"{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}Controller.cs"),
+                    (await this.mediator.Send(new GenerateApiController.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName
+                    })).Generate());
+
+                #endregion
+
+                #region Actions
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputActions, $"Create{tableSchema.ForCs.ModelName}.cs"),
+                    (await this.mediator.Send(new GenerateCreate.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName
+                    })).Generate());
+
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputActions, $"Delete{tableSchema.ForCs.ModelName}ById.cs"),
+                    (await this.mediator.Send(new GenerateDeleteBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Id
+                    })).Generate());
+
+                if (useIdentityAsPrimaryKey == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Id
-                })).Generate());
+                    await System.IO.File.WriteAllTextAsync(
+                        Path.Combine(outputActions, $"Delete{tableSchema.ForCs.ModelName}ByKey.cs"),
+                        (await this.mediator.Send(new GenerateDeleteBy.Request()
+                        {
+                            TableSchema = tableSchema,
+                            ProjectName = projectName,
+                            By = Data.FindBy.Key
+                        })).Generate());
+                }
 
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Get{modelName}ByKey.cs"),
-                (await this.mediator.Send(new GenerateGetBy.Request()
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputActions, $"Get{tableSchema.ForCs.ModelName}ById.cs"),
+                    (await this.mediator.Send(new GenerateGetBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Id
+                    })).Generate());
+
+                if (useIdentityAsPrimaryKey == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Key
-                })).Generate());
+                    await System.IO.File.WriteAllTextAsync(
+                        Path.Combine(outputActions, $"Get{tableSchema.ForCs.ModelName}ByKey.cs"),
+                        (await this.mediator.Send(new GenerateGetBy.Request()
+                        {
+                            TableSchema = tableSchema,
+                            ProjectName = projectName,
+                            By = Data.FindBy.Key
+                        })).Generate());
+                }
 
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Edit{modelName}ById.cs"),
-                (await this.mediator.Send(new GenerateUpdateBy.Request()
+
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputActions, $"Edit{tableSchema.ForCs.ModelName}ById.cs"),
+                    (await this.mediator.Send(new GenerateUpdateBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Id
+                    })).Generate());
+
+                if (useIdentityAsPrimaryKey == false)
                 {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Id
-                })).Generate());
+                    await System.IO.File.WriteAllTextAsync(
+                        Path.Combine(outputActions, $"Edit{tableSchema.ForCs.ModelName}ByKey.cs"),
+                        (await this.mediator.Send(new GenerateUpdateBy.Request()
+                        {
+                            TableSchema = tableSchema,
+                            ProjectName = projectName,
+                            By = Data.FindBy.Key
+                        })).Generate());
+                }
 
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Edit{modelName}ByKey.cs"),
-                (await this.mediator.Send(new GenerateUpdateBy.Request()
-                {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName,
-                    By = Data.FindBy.Key
-                })).Generate());
-
-            await System.IO.File.WriteAllTextAsync(
-                System.IO.Path.Combine(output, $"Get{pluralizer.Pluralize(modelName)}.cs"),
-                (await this.mediator.Send(new GenerateGet.Request()
-                {
-                    TableSchema = tableSchema,
-                    ProjectName = projectName,
-                    ModelName = modelName
-                })).Generate());
-
+                await System.IO.File.WriteAllTextAsync(
+                    Path.Combine(outputActions, $"Get{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}.cs"),
+                    (await this.mediator.Send(new GenerateGet.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName
+                    })).Generate());
+                #endregion
+            }
             return Ok();
         }
     }

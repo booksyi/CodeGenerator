@@ -8,14 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Handlers.ApiActions
+namespace CodeGenerator.Handlers
 {
-    public class GenerateGet
+    public class GenerateApiController
     {
         public class Request : IRequest<GenerateNode>
         {
             public DbTableSchema TableSchema { get; set; }
-
             public string ProjectName { get; set; }
         }
 
@@ -32,36 +31,26 @@ namespace CodeGenerator.Handlers.ApiActions
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\ApiActions\Get.html");
+                bool useIdentityAsPrimaryKey =
+                    request.TableSchema.PrimaryKeys.Count() == 1
+                    && request.TableSchema.PrimaryKeys.First().Name == request.TableSchema.Identity.Name;
+                string template = useIdentityAsPrimaryKey ?
+                    await File.ReadAllTextAsync(@"Templates\CSharp\ApiControllerWithoutByKey.html") :
+                    await File.ReadAllTextAsync(@"Templates\CSharp\ApiController.html");
                 GenerateNode node = new GenerateNode(template);
                 node.AppendChild("ProjectName", request.ProjectName);
                 node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
                 node.AppendChild("PluralModelName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName));
-                node.AppendChild("PluralModelObjectName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName).LowerFirst());
-
-                node.AppendChild("Properties", request.TableSchema.Fields
-                    .Select(x => $"public {x.ForCs.TypeName} {x.Name} {{ get; set; }}"));
-
-                node.AppendChild(await mediator.Send(
-                    new GenerateConstructor.Request()
-                    {
-                        TypeName = "Row",
-                        Parameters = new string[] { $"{request.TableSchema.ForCs.ModelName} {request.TableSchema.ForCs.ModelName.LowerFirst()}" },
-                        InnerCodes = request.TableSchema.Fields
-                            .Select(x => $"this.{x.Name} = {request.TableSchema.ForCs.ModelName.LowerFirst()}.{x.Name};")
-                    })).Rename("Constructor");
-
+                node.AppendChild("IdentityFieldName", request.TableSchema.Identity.Name);
                 node.AppendChild(await mediator.Send(
                     new GenerateClassDependencyInjection.Request()
                     {
-                        ClassName = "Handler",
+                        ClassName = $"{pluralizer.Pluralize(request.TableSchema.ForCs.ModelName)}Controller",
                         Fields = new List<KeyValuePair<string, string>>
                         {
-                            new KeyValuePair<string, string>("IMediator", "mediator"),
-                            new KeyValuePair<string, string>("DatabaseContext", "context")
+                            new KeyValuePair<string, string>("IMediator", "mediator")
                         }
                     })).Rename("DependencyInjection");
-
                 return node;
             }
         }

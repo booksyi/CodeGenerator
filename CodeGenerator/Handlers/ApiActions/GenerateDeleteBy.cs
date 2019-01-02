@@ -18,7 +18,6 @@ namespace CodeGenerator.Handlers.ApiActions
             public DbTableSchema TableSchema { get; set; }
 
             public string ProjectName { get; set; }
-            public string ModelName { get; set; }
             public FindBy By { get; set; }
         }
 
@@ -38,46 +37,22 @@ namespace CodeGenerator.Handlers.ApiActions
                 string template = await File.ReadAllTextAsync(@"Templates\CSharp\ApiActions\DeleteBy.html");
                 GenerateNode node = new GenerateNode(template);
                 node.AppendChild("ProjectName", request.ProjectName);
-                node.AppendChild("ModelName", request.ModelName);
-                node.AppendChild("ModelObjectName", request.ModelName.LowerFirst());
-                node.AppendChild("PluralModelName", pluralizer.Pluralize(request.ModelName));
+                node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
+                node.AppendChild("ModelObjectName", request.TableSchema.ForCs.ModelName.LowerFirst());
+                node.AppendChild("PluralModelName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName));
                 node.AppendChild("By", request.By.ToString());
 
                 if (request.By == FindBy.Id)
                 {
                     node.AppendChild("Properties", request.TableSchema.Fields
                         .Where(x => x.IsIdentity)
-                        .Select(x => $"public {x.ForCs.TypeName} {x.Name} {{ get; set; }}"));
-
-                    node.AppendChild(await mediator.Send(
-                        new GenerateConstructor.Request()
-                        {
-                            TypeName = "Request",
-                            Parameters = request.TableSchema.Fields
-                                .Where(x => x.IsIdentity)
-                                .Select(x => $"{x.TypeName} {x.Name.LowerFirst()}"),
-                            InnerCodes = request.TableSchema.Fields
-                                .Where(x => x.IsIdentity)
-                                .Select(x => $"this.{x.Name} = {x.Name.LowerFirst()};")
-                        })).Rename("Constructor");
+                        .Select(x => $"internal {x.ForCs.TypeName} {x.Name} {{ get; set; }}"));
                 }
                 else if (request.By == FindBy.Key)
                 {
                     node.AppendChild("Properties", request.TableSchema.Fields
                         .Where(x => x.IsPrimaryKey)
                         .Select(x => $"public {x.ForCs.TypeName} {x.Name} {{ get; set; }}"));
-
-                    node.AppendChild(await mediator.Send(
-                        new GenerateConstructor.Request()
-                        {
-                            TypeName = "Request",
-                            Parameters = request.TableSchema.Fields
-                                .Where(x => x.IsPrimaryKey)
-                                .Select(x => $"{x.TypeName} {x.Name.LowerFirst()}"),
-                            InnerCodes = request.TableSchema.Fields
-                                .Where(x => x.IsPrimaryKey)
-                                .Select(x => $"this.{x.Name} = {x.Name.LowerFirst()};")
-                        })).Rename("Constructor");
                 }
 
                 node.AppendChild(await mediator.Send(

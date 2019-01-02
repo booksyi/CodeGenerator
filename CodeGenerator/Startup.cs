@@ -26,6 +26,16 @@ namespace CodeGenerator
             services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("DatabaseContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMediatR();
+            services.AddSwaggerDocument(configure =>
+            {
+                configure.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "CodeGenerator API";
+                    document.Info.Description = "ASP.NET Core Web API";
+                };
+            });
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -39,27 +49,8 @@ namespace CodeGenerator
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger(configure =>
-                {
-                    configure.PostProcess = (document, requset) =>
-                    {
-                        document.Info.Version = "v0";
-                        document.Info.Title = "監察院公開查閱平台";
-                        document.Info.Description = "API Endpoint documentation for 監察院公開查閱平台, which includes user management, groups management, boards and subboards management, threads management, tags management and more to come";
-                        document.Info.TermsOfService = "None";
-                        document.Info.Contact = new NSwag.SwaggerContact
-                        {
-                            Name = "Derrick Yen",
-                            Email = "derrickyen@universal.com.tw",
-                            Url = System.String.Empty
-                        };
-                        document.Info.License = new NSwag.SwaggerLicense
-                        {
-                            Name = "Commercial",
-                            Url = "https://www.universal.com.tw/software-solutions/license"
-                        };
-                    };
-                });
+                app.UseSwagger();
+                app.UseSwaggerUi3();
             }
             else
             {
@@ -71,10 +62,6 @@ namespace CodeGenerator
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "swagger",
-                    template: "swagger/{*path}"
-                );
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");

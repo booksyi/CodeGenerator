@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using {{# ProjectName }}.Data;
 using {{# ProjectName }}.Data.Models;
 
 namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
@@ -44,11 +45,11 @@ namespace {{# ProjectName }}.Controllers.{{# PluralModelName }}.Actions
                 // Some Filters
 
                 int count = {{# PluralModelObjectName }}.Count();
-                if (count > 0)
+                if (count > 0 && request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
                     {{# PluralModelObjectName }} = {{# PluralModelObjectName }}
-                        .Skip((request.PageNumber - 1) * request.PageSize)
-                        .Take(request.PageSize);
+                        .Skip((request.PageNumber.Value - 1) * request.PageSize.Value)
+                        .Take(request.PageSize.Value);
                 }
 
                 List<Row> rows = {{# PluralModelObjectName }}
