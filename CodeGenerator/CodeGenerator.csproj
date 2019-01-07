@@ -37,7 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\app\api-generator\api-generator.component.ts" />
+    <None Remove="ClientApp\src\app\code-generator\generate-cs-api\generate-cs-api.component.ts" />
+    <None Remove="ClientApp\src\app\lib\index.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\app\api-generator\api-generator.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\code-generator\generate-cs-api\generate-cs-api.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\lib\index.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

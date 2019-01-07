@@ -32,8 +32,7 @@ namespace CodeGenerator.Handlers.ApiActions
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\ApiActions\Get.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\ApiActions\Get.html" };
                 node.AppendChild("ProjectName", request.ProjectName);
                 node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
                 node.AppendChild("PluralModelName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName));
@@ -49,7 +48,7 @@ namespace CodeGenerator.Handlers.ApiActions
                         Parameters = new string[] { $"{request.TableSchema.ForCs.ModelName} {request.TableSchema.ForCs.ModelName.LowerFirst()}" },
                         InnerCodes = request.TableSchema.Fields
                             .Select(x => $"this.{x.Name} = {request.TableSchema.ForCs.ModelName.LowerFirst()}.{x.Name};")
-                    })).Rename("Constructor");
+                    })).ChangeKey("Constructor");
 
                 node.AppendChild(await mediator.Send(
                     new GenerateClassDependencyInjection.Request()
@@ -60,7 +59,7 @@ namespace CodeGenerator.Handlers.ApiActions
                             new KeyValuePair<string, string>("IMediator", "mediator"),
                             new KeyValuePair<string, string>("DatabaseContext", "context")
                         }
-                    })).Rename("DependencyInjection");
+                    })).ChangeKey("DependencyInjection");
 
                 return node;
             }

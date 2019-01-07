@@ -28,8 +28,7 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\DependencyInjection.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\DependencyInjection.html" };
 
                 GenerateNode constructorNode = node.AppendChild(await mediator.Send(
                     new GenerateConstructor.Request()
@@ -37,7 +36,7 @@ namespace CodeGenerator.Handlers
                         TypeName = request.ClassName,
                         Parameters = null,
                         InnerCodes = null
-                    })).Rename("Constructor");
+                    })).ChangeKey("Constructor");
 
                 foreach (var field in request.Fields)
                 {
@@ -46,14 +45,14 @@ namespace CodeGenerator.Handlers
                         {
                             TypeName = field.Key,
                             ObjectName = field.Value,
-                        })).Rename("Parameters");
+                        })).ChangeKey("Parameters");
 
                     constructorNode.AppendChild(await mediator.Send(
                         new GenerateConstructorSetValue.Request()
                         {
                             Accept = field.Value,
                             Deliver = field.Value,
-                        })).Rename("InnerCodes");
+                        })).ChangeKey("InnerCodes");
 
                     node.AppendChild(await mediator.Send(
                         new GenerateDeclareField.Request()
@@ -61,7 +60,7 @@ namespace CodeGenerator.Handlers
                             Prefix = "private readonly",
                             TypeName = field.Key,
                             ObjectName = field.Value,
-                        })).Rename("Declares");
+                        })).ChangeKey("Declares");
                 }
 
                 return node;

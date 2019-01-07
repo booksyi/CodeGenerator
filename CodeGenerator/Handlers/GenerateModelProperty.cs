@@ -27,15 +27,14 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\DeclareProperty.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\DeclareProperty.html" };
                 if (string.IsNullOrWhiteSpace(request.Field.Description) == false)
                 {
                     node.AppendChild(await mediator.Send(
                         new GenerateModelPropertySummary.Request()
                         {
                             Text = request.Field.Description
-                        })).Rename("Summary");
+                        })).ChangeKey("Summary");
                 }
                 node.AppendChild("Attributes", request.Field.ForCs.EFAttributes);
                 node.AppendChild("TypeName", request.Field.ForCs.TypeName);

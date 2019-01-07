@@ -34,8 +34,7 @@ namespace CodeGenerator.Handlers.ApiActions
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\ApiActions\DeleteBy.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\ApiActions\DeleteBy.html" };
                 node.AppendChild("ProjectName", request.ProjectName);
                 node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
                 node.AppendChild("ModelObjectName", request.TableSchema.ForCs.ModelName.LowerFirst());
@@ -64,7 +63,7 @@ namespace CodeGenerator.Handlers.ApiActions
                             new KeyValuePair<string, string>("IMediator", "mediator"),
                             new KeyValuePair<string, string>("DatabaseContext", "context")
                         }
-                    })).Rename("DependencyInjection");
+                    })).ChangeKey("DependencyInjection");
 
                 if (request.By == FindBy.Id)
                 {

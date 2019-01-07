@@ -26,10 +26,10 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = string.IsNullOrWhiteSpace(request.Prefix) ?
-                    await File.ReadAllTextAsync(@"Templates\CSharp\MethodParameterWithoutPrefix.html") :
-                    await File.ReadAllTextAsync(@"Templates\CSharp\MethodParameter.html");
-                GenerateNode node = new GenerateNode(template);
+                string path = string.IsNullOrWhiteSpace(request.Prefix) ?
+                    @"Templates\CSharp\MethodParameterWithoutPrefix.html" :
+                    @"Templates\CSharp\MethodParameter.html";
+                GenerateNode node = new GenerateNode() { ApplyFilePath = path };
                 node.AppendChild("Prefix", request.Prefix);
                 node.AppendChild("TypeName", request.TypeName);
                 node.AppendChild("ObjectName", request.ObjectName);

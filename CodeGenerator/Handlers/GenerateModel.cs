@@ -29,8 +29,7 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\EntityFrameworkModel.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\EntityFrameworkModel.html" };
                 node.AppendChild("ProjectName", request.ProjectName);
                 node.AppendChild("TableName", request.TableSchema.TableName);
                 node.AppendChild("ModelName", request.ModelName);
@@ -40,7 +39,7 @@ namespace CodeGenerator.Handlers
                         new GenerateModelProperty.Request()
                         {
                             Field = field
-                        })).Rename("Properties");
+                        })).ChangeKey("Properties");
                 }
                 return node;
             }

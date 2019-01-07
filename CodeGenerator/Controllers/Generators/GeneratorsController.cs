@@ -44,14 +44,117 @@ namespace CodeGenerator.Controllers.Generators
 
 
             DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(connectionString, tableName);
-            string code = (await mediator.Send(new GenerateModel.Request()
+            string code = await (await mediator.Send(new GenerateModel.Request()
             {
                 ProjectName = projectName,
                 TableSchema = tableSchema,
                 ModelName = modelName
-            })).Generate();
+            })).GenerateAsync();
 
             return new OkObjectResult(code);
+        }
+
+        // /api/Generators/Test
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GenerateCsApi(
+            string projectName,
+            string connectionString,
+            string[] tableNames)
+        {
+            List<GenerateNode> nodes = new List<GenerateNode>();
+
+            IEnumerable<DbTableSchema> tableSchemas = CodingHelper.GetDbTableSchema(connectionString, tableNames);
+            foreach (DbTableSchema tableSchema in tableSchemas)
+            {
+                bool useIdentityAsPrimaryKey =
+                    tableSchema.PrimaryKeys.Count() == 1
+                    && tableSchema.PrimaryKeys.First().Name == tableSchema.Identity.Name;
+
+                #region Model
+                nodes.Add(await this.mediator.Send(new GenerateModel.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName,
+                    ModelName = tableSchema.ForCs.ModelName
+                }));
+                #endregion
+
+                #region Controller
+                nodes.Add(await this.mediator.Send(new GenerateApiController.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName
+                }));
+                #endregion
+
+                #region Actions
+                nodes.Add(await this.mediator.Send(new GenerateCreate.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName
+                }));
+
+                nodes.Add(await this.mediator.Send(new GenerateDeleteBy.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName,
+                    By = Data.FindBy.Id
+                }));
+
+                if (useIdentityAsPrimaryKey == false)
+                {
+                    nodes.Add(await this.mediator.Send(new GenerateDeleteBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Key
+                    }));
+                }
+
+                nodes.Add(await this.mediator.Send(new GenerateGetBy.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName,
+                    By = Data.FindBy.Id
+                }));
+
+                if (useIdentityAsPrimaryKey == false)
+                {
+                    nodes.Add(await this.mediator.Send(new GenerateGetBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Key
+                    }));
+                }
+
+                nodes.Add(await this.mediator.Send(new GenerateUpdateBy.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName,
+                    By = Data.FindBy.Id
+                }));
+
+                if (useIdentityAsPrimaryKey == false)
+                {
+                    nodes.Add(await this.mediator.Send(new GenerateUpdateBy.Request()
+                    {
+                        TableSchema = tableSchema,
+                        ProjectName = projectName,
+                        By = Data.FindBy.Key
+                    }));
+                }
+
+                nodes.Add(await this.mediator.Send(new GenerateGet.Request()
+                {
+                    TableSchema = tableSchema,
+                    ProjectName = projectName
+                }));
+                #endregion
+            }
+
+            Dictionary<string, object>[] array = await Task.WhenAll(nodes.Select(async x => await x.ToDictionaryAsync()));
+            return new OkObjectResult(array);
         }
 
         // /api/Generators/Test
@@ -90,105 +193,105 @@ namespace CodeGenerator.Controllers.Generators
                 #region Model
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputModels, $"{tableSchema.ForCs.ModelName}.cs"),
-                    (await this.mediator.Send(new GenerateModel.Request()
+                    await (await this.mediator.Send(new GenerateModel.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         ModelName = tableSchema.ForCs.ModelName
-                    })).Generate());
+                    })).GenerateAsync());
                 #endregion
 
                 #region Controller
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputController, $"{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}Controller.cs"),
-                    (await this.mediator.Send(new GenerateApiController.Request()
+                    await (await this.mediator.Send(new GenerateApiController.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName
-                    })).Generate());
+                    })).GenerateAsync());
 
                 #endregion
 
                 #region Actions
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputActions, $"Create{tableSchema.ForCs.ModelName}.cs"),
-                    (await this.mediator.Send(new GenerateCreate.Request()
+                    await (await this.mediator.Send(new GenerateCreate.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName
-                    })).Generate());
+                    })).GenerateAsync());
 
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputActions, $"Delete{tableSchema.ForCs.ModelName}ById.cs"),
-                    (await this.mediator.Send(new GenerateDeleteBy.Request()
+                    await (await this.mediator.Send(new GenerateDeleteBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Id
-                    })).Generate());
+                    })).GenerateAsync());
 
                 if (useIdentityAsPrimaryKey == false)
                 {
                     await System.IO.File.WriteAllTextAsync(
                         Path.Combine(outputActions, $"Delete{tableSchema.ForCs.ModelName}ByKey.cs"),
-                        (await this.mediator.Send(new GenerateDeleteBy.Request()
+                        await (await this.mediator.Send(new GenerateDeleteBy.Request()
                         {
                             TableSchema = tableSchema,
                             ProjectName = projectName,
                             By = Data.FindBy.Key
-                        })).Generate());
+                        })).GenerateAsync());
                 }
 
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputActions, $"Get{tableSchema.ForCs.ModelName}ById.cs"),
-                    (await this.mediator.Send(new GenerateGetBy.Request()
+                    await (await this.mediator.Send(new GenerateGetBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Id
-                    })).Generate());
+                    })).GenerateAsync());
 
                 if (useIdentityAsPrimaryKey == false)
                 {
                     await System.IO.File.WriteAllTextAsync(
                         Path.Combine(outputActions, $"Get{tableSchema.ForCs.ModelName}ByKey.cs"),
-                        (await this.mediator.Send(new GenerateGetBy.Request()
+                        await (await this.mediator.Send(new GenerateGetBy.Request()
                         {
                             TableSchema = tableSchema,
                             ProjectName = projectName,
                             By = Data.FindBy.Key
-                        })).Generate());
+                        })).GenerateAsync());
                 }
 
 
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputActions, $"Edit{tableSchema.ForCs.ModelName}ById.cs"),
-                    (await this.mediator.Send(new GenerateUpdateBy.Request()
+                    await (await this.mediator.Send(new GenerateUpdateBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Id
-                    })).Generate());
+                    })).GenerateAsync());
 
                 if (useIdentityAsPrimaryKey == false)
                 {
                     await System.IO.File.WriteAllTextAsync(
                         Path.Combine(outputActions, $"Edit{tableSchema.ForCs.ModelName}ByKey.cs"),
-                        (await this.mediator.Send(new GenerateUpdateBy.Request()
+                        await (await this.mediator.Send(new GenerateUpdateBy.Request()
                         {
                             TableSchema = tableSchema,
                             ProjectName = projectName,
                             By = Data.FindBy.Key
-                        })).Generate());
+                        })).GenerateAsync());
                 }
 
                 await System.IO.File.WriteAllTextAsync(
                     Path.Combine(outputActions, $"Get{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}.cs"),
-                    (await this.mediator.Send(new GenerateGet.Request()
+                    await (await this.mediator.Send(new GenerateGet.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName
-                    })).Generate());
+                    })).GenerateAsync());
                 #endregion
             }
             return Ok();

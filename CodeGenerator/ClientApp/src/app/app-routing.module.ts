@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ApiGeneratorComponent } from './api-generator/api-generator.component';
+import { GenerateCsApiComponent } from './code-generator/generate-cs-api/generate-cs-api.component';
 
 const routes: Routes = [
-  { path: 'api-generator', component: ApiGeneratorComponent },
+  { path: 'generate-cs-api', component: GenerateCsApiComponent },
 ];
 
 @NgModule({

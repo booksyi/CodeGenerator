@@ -1,0 +1,12 @@
+<div>
+  <input type="text" [(ngModel)]="request.projectName" />
+</div>
+<div>
+  <input type="text" [(ngModel)]="request.connectionString" />
+</div>
+<div *ngFor="let tableName of request.tableNames;">
+  <input type="text" [(ngModel)]="tableName">
+</div>
+<input type="button" value="+" (click)="addTableNameClick()" /><br />
+<input type="button" value="Generate" (click)="generateCsApiClick()" /><br />
+<textarea>{{jsonResponse}}</textarea>

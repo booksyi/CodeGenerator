@@ -34,10 +34,10 @@ namespace CodeGenerator.Handlers
                 bool useIdentityAsPrimaryKey =
                     request.TableSchema.PrimaryKeys.Count() == 1
                     && request.TableSchema.PrimaryKeys.First().Name == request.TableSchema.Identity.Name;
-                string template = useIdentityAsPrimaryKey ?
-                    await File.ReadAllTextAsync(@"Templates\CSharp\ApiControllerWithoutByKey.html") :
-                    await File.ReadAllTextAsync(@"Templates\CSharp\ApiController.html");
-                GenerateNode node = new GenerateNode(template);
+                string path = useIdentityAsPrimaryKey ?
+                    @"Templates\CSharp\ApiControllerWithoutByKey.html" :
+                    @"Templates\CSharp\ApiController.html";
+                GenerateNode node = new GenerateNode() { ApplyFilePath = path };
                 node.AppendChild("ProjectName", request.ProjectName);
                 node.AppendChild("ModelName", request.TableSchema.ForCs.ModelName);
                 node.AppendChild("PluralModelName", pluralizer.Pluralize(request.TableSchema.ForCs.ModelName));
@@ -50,7 +50,7 @@ namespace CodeGenerator.Handlers
                         {
                             new KeyValuePair<string, string>("IMediator", "mediator")
                         }
-                    })).Rename("DependencyInjection");
+                    })).ChangeKey("DependencyInjection");
                 return node;
             }
         }

@@ -28,8 +28,7 @@ namespace CodeGenerator.Handlers
 
             public async Task<GenerateNode> Handle(Request request, CancellationToken token)
             {
-                string template = await File.ReadAllTextAsync(@"Templates\CSharp\ConstructorSetValue.html");
-                GenerateNode node = new GenerateNode(template);
+                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\ConstructorSetValue.html" };
                 node.AppendChild("Accept", request.Accept);
                 node.AppendChild("Deliver", request.Deliver);
                 return node;
