@@ -16,11 +16,15 @@ export class GenerateCsApiComponent implements OnInit {
   request: GenerateCsApiRequest = {
     projectName: "CoreWebFuntions",
     connectionString: "Server=LAPTOP-RD9P71LP\\SQLEXPRESS;Database=TIP_TEST;UID=sa;PWD=1234;",
-    tableNames: ["Article", "Epaper", "Member"]
+    tableNames: ["Article", "Epaper", "Member"],
   };
 
-  response: any[];
-  jsonResponse: string;
+  identify(index, item) {
+    return item.name;
+  }
+
+  resources: GenerateCsApiResource[];
+  jsonResources: string;
 
   addTableNameClick() {
     this.request.tableNames.push("");
@@ -31,13 +35,19 @@ export class GenerateCsApiComponent implements OnInit {
   }
 
   generateCsApi(query: GenerateCsApiRequest) {
-    this.http.get<any[]>(
+    this.http.get<GenerateCsApiResource[]>(
       '/api/generators/generateCsApi' + buildQueryParams(query)
     ).subscribe(res =>
       {
-        this.response = res;
-        this.jsonResponse = JSON.stringify(res);
+      this.resources = res;
+      this.jsonResources = JSON.stringify(res);
       });
+  }
+
+  openResource(path: string) {
+    this.resources.filter(function (e, i) {
+      return e.savePath === path;
+    })[0].open = true;
   }
 }
 
@@ -47,8 +57,8 @@ export class GenerateCsApiRequest {
   tableNames: string[];
 }
 
-export class GeneratorsResource {
-  name: string;
-  text: string;
-  children: GeneratorsResource[];
+export class GenerateCsApiResource {
+  savePath: string;
+  tree: any;
+  open: boolean = false;
 }

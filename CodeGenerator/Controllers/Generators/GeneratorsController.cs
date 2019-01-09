@@ -61,7 +61,7 @@ namespace CodeGenerator.Controllers.Generators
             string connectionString,
             string[] tableNames)
         {
-            List<GenerateNode> nodes = new List<GenerateNode>();
+            List<GeneratorsResource> resources = new List<GeneratorsResource>();
 
             IEnumerable<DbTableSchema> tableSchemas = CodingHelper.GetDbTableSchema(connectionString, tableNames);
             foreach (DbTableSchema tableSchema in tableSchemas)
@@ -71,90 +71,89 @@ namespace CodeGenerator.Controllers.Generators
                     && tableSchema.PrimaryKeys.First().Name == tableSchema.Identity.Name;
 
                 #region Model
-                nodes.Add(await this.mediator.Send(new GenerateModel.Request()
+                resources.Add(await new GeneratorsResource($"{tableSchema.ForCs.ModelName}.cs").BuildTree(await this.mediator.Send(new GenerateModel.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName,
                     ModelName = tableSchema.ForCs.ModelName
-                }));
+                })));
                 #endregion
 
                 #region Controller
-                nodes.Add(await this.mediator.Send(new GenerateApiController.Request()
+                resources.Add(await new GeneratorsResource($"{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}Controller.cs").BuildTree(await this.mediator.Send(new GenerateApiController.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName
-                }));
+                })));
                 #endregion
 
                 #region Actions
-                nodes.Add(await this.mediator.Send(new GenerateCreate.Request()
+                resources.Add(await new GeneratorsResource($"Create{tableSchema.ForCs.ModelName}.cs").BuildTree(await this.mediator.Send(new GenerateCreate.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName
-                }));
+                })));
 
-                nodes.Add(await this.mediator.Send(new GenerateDeleteBy.Request()
+                resources.Add(await new GeneratorsResource($"Delete{tableSchema.ForCs.ModelName}ById.cs").BuildTree(await this.mediator.Send(new GenerateDeleteBy.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName,
                     By = Data.FindBy.Id
-                }));
+                })));
 
                 if (useIdentityAsPrimaryKey == false)
                 {
-                    nodes.Add(await this.mediator.Send(new GenerateDeleteBy.Request()
+                    resources.Add(await new GeneratorsResource($"Delete{tableSchema.ForCs.ModelName}ByKey.cs").BuildTree(await this.mediator.Send(new GenerateDeleteBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Key
-                    }));
+                    })));
                 }
 
-                nodes.Add(await this.mediator.Send(new GenerateGetBy.Request()
+                resources.Add(await new GeneratorsResource($"Get{tableSchema.ForCs.ModelName}ById.cs").BuildTree(await this.mediator.Send(new GenerateGetBy.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName,
                     By = Data.FindBy.Id
-                }));
+                })));
 
                 if (useIdentityAsPrimaryKey == false)
                 {
-                    nodes.Add(await this.mediator.Send(new GenerateGetBy.Request()
+                    resources.Add(await new GeneratorsResource($"Get{tableSchema.ForCs.ModelName}ByKey.cs").BuildTree(await this.mediator.Send(new GenerateGetBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Key
-                    }));
+                    })));
                 }
 
-                nodes.Add(await this.mediator.Send(new GenerateUpdateBy.Request()
+                resources.Add(await new GeneratorsResource($"Edit{tableSchema.ForCs.ModelName}ById.cs").BuildTree(await this.mediator.Send(new GenerateUpdateBy.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName,
                     By = Data.FindBy.Id
-                }));
+                })));
 
                 if (useIdentityAsPrimaryKey == false)
                 {
-                    nodes.Add(await this.mediator.Send(new GenerateUpdateBy.Request()
+                    resources.Add(await new GeneratorsResource($"Edit{tableSchema.ForCs.ModelName}ByKey.cs").BuildTree(await this.mediator.Send(new GenerateUpdateBy.Request()
                     {
                         TableSchema = tableSchema,
                         ProjectName = projectName,
                         By = Data.FindBy.Key
-                    }));
+                    })));
                 }
 
-                nodes.Add(await this.mediator.Send(new GenerateGet.Request()
+                resources.Add(await new GeneratorsResource($"Get{pluralizer.Pluralize(tableSchema.ForCs.ModelName)}.cs").BuildTree(await this.mediator.Send(new GenerateGet.Request()
                 {
                     TableSchema = tableSchema,
                     ProjectName = projectName
-                }));
+                })));
                 #endregion
             }
 
-            Dictionary<string, object>[] array = await Task.WhenAll(nodes.Select(async x => await x.ToDictionaryAsync()));
-            return new OkObjectResult(array);
+            return new OkObjectResult(resources);
         }
 
         // /api/Generators/Test
