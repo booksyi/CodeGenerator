@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CodeGenerator.Data.Models;
 using CodeGenerator.Handlers;
 using CodeGenerator.Handlers.ApiActions;
 using HelpersForCore;
@@ -24,6 +25,28 @@ namespace CodeGenerator.Controllers.Generators
             this.pluralizer = pluralizer;
         }
 
+        // /api/Generators/GenerateText
+        [HttpPost("[action]")]
+        public async Task<ActionResult> GenerateText([FromBody] GenerateNode node)
+        {
+            return new OkObjectResult(await node.GenerateAsync());
+        }
+
+        // /api/Generators/GenerateNode
+        [HttpPost("[action]")]
+        public async Task<ActionResult> GenerateNode([FromQuery] string path)
+        {
+            GenerateNode node = new GenerateNode() { ApplyFilePath = path };
+            foreach (var input in Request.Form)
+            {
+                foreach (string value in input.Value)
+                {
+                    node.AppendChild(input.Key, value);
+                }
+            }
+            return new OkObjectResult(node);
+        }
+
         // /api/Generators/GenerateModel
         [HttpGet("[action]")]
         public async Task<ActionResult> GenerateModel(string connectionString, string tableName, string modelName, string projectName)
@@ -31,7 +54,7 @@ namespace CodeGenerator.Controllers.Generators
             // For test
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                connectionString = @"Server=DESKTOP-RO8TCIK\SQLEXPRESS;Database=TIP_TEST;UID=sa;PWD=1234;";
+                connectionString = @"Server=LAPTOP-RD9P71LP\SQLEXPRESS;Database=TIP_TEST;UID=sa;PWD=1234;";
             }
             if (string.IsNullOrWhiteSpace(tableName))
             {
@@ -42,19 +65,18 @@ namespace CodeGenerator.Controllers.Generators
                 modelName = "Article";
             }
 
-
             DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(connectionString, tableName);
-            string code = await (await mediator.Send(new GenerateModel.Request()
+            var node = await mediator.Send(new GenerateModel.Request()
             {
                 ProjectName = projectName,
                 TableSchema = tableSchema,
                 ModelName = modelName
-            })).GenerateAsync();
+            });
 
-            return new OkObjectResult(code);
+            return new OkObjectResult(node);
         }
 
-        // /api/Generators/Test
+        // /api/Generators/GenerateCsApi
         [HttpGet("[action]")]
         public async Task<ActionResult> GenerateCsApi(
             string projectName,
