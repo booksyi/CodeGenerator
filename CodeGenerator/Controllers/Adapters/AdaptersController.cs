@@ -18,58 +18,65 @@ namespace CodeGenerator.Controllers.Adapters
 {
     public class QQ
     {
-        public async Task<IEnumerable<KeyValuePair<string, string>>> GetAdapter(Adapter adapter, Dictionary<string, IEnumerable<KeyValuePair<string, string>>> adapters, IEnumerable<KeyValuePair<string, string>> request)
+        public async Task<object> ToAdapter(AdapterNode adapterNode, Dictionary<string, object> request, Dictionary<string, Dictionary<string, object>> requestAdapters)
         {
-            List<KeyValuePair<string, string>> adapterRequest = new List<KeyValuePair<string, string>>();
-            foreach (var a in adapter.Request)
+            Dictionary<string, object> adapterRequest = new Dictionary<string, object>();
+            //List<KeyValuePair<string, string>> adapterRequest = new List<KeyValuePair<string, string>>();
+            foreach (var nodeRequest in adapterNode.Request)
             {
-                if (a.Value.Type == RequestType.Request)
+                if (nodeRequest.Value.Type == RequestType.Request)
                 {
-                    if (a.Value.Key.Contains("->"))
+                    IEnumerable<KeyValuePair<string, object>> temp;
+                    // get request values from http or adapters
+                    if (nodeRequest.Value.Key.Contains("->"))
                     {
-                        string name = a.Value.Key.Remove(a.Value.Key.IndexOf("->"));
-                        string key = a.Value.Key.Substring(a.Value.Key.IndexOf("->") + "->".Length);
-                        adapterRequest.AddRange(adapters[name]
+                        string name = nodeRequest.Value.Key.Remove(nodeRequest.Value.Key.IndexOf("->"));
+                        string key = nodeRequest.Value.Key.Substring(nodeRequest.Value.Key.IndexOf("->") + "->".Length);
+                        temp = requestAdapters[name]
                             .Where(x => x.Key == key)
-                            .Select(x => new KeyValuePair<string, string>(a.Key, x.Value)));
+                            .Select(x => new KeyValuePair<string, object>(nodeRequest.Key, x.Value)));
                     }
                     else
                     {
-                        adapterRequest.AddRange(request
-                            .Where(x => x.Key == a.Value.Key)
-                            .Select(x => new KeyValuePair<string, string>(a.Key, x.Value)));
+                        temp = request
+                            .Where(x => x.Key == nodeRequest.Value.Key)
+                            .Select(x => new KeyValuePair<string, object>(nodeRequest.Key, x.Value)));
+                    }
+                    // unification or separation
+                    if (nodeRequest.Value.Mode == GenerateMode.Unification)
+                    {
+                        adapterRequest = temp.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray() as object);
+                    }
+                    else if (nodeRequest.Value.Mode == GenerateMode.Separation)
+                    {
+                        // TODO:
                     }
                 }
             }
 
-            Dictionary<string, object> dic = adapterRequest.GroupBy(x => x.Key).ToDictionary(x => x.Key, x =>
-            {
-                if (x.Count() == 1 || x.Key == "fieldName")
-                {
-                    return x.First().Value as object;
-                }
-                return x.Select(y => y.Value).ToArray() as object;
-            });
-
             HttpClient client = new HttpClient();
-            var response = await client.PostAsJsonAsync(adapter.Url, dic);
+            var response = await client.PostAsJsonAsync(adapterNode.Url, adapterRequest);
             var json = await response.Content.ReadAsStringAsync();
-            IEnumerable<KeyValuePair<string, string>> result = JsonConvert.DeserializeObject<IEnumerable<KeyValuePair<string, string>>>(json);
-            return result;
+            if (json.Trim().StartsWith("[")
+                && json.Trim().EndsWith("]"))
+            {
+                return JsonConvert.DeserializeObject<IEnumerable<Dictionary<string, object>>>(json);
+            }
+            return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
         }
 
-        public async Task<IEnumerable<GenerateNode>> ToGenerateNode(RequestNode root, Dictionary<string, IEnumerable<KeyValuePair<string, string>>> adapters, IEnumerable<KeyValuePair<string, string>> request)
+        public async Task<IEnumerable<GenerateNode>> ToGenerateNode(RequestNode requestNode, Dictionary<string, object> request, Dictionary<string, Dictionary<string, object>> requestAdapters)
         {
             if (adapters == null)
             {
                 adapters = new Dictionary<string, IEnumerable<KeyValuePair<string, string>>>();
             }
 
-            if (root.Adapters != null)
+            if (requestNode.AdapterNodes != null)
             {
-                foreach (var a in root.Adapters)
+                foreach (var adapterNode in requestNode.AdapterNodes)
                 {
-                    adapters.Add(a.Key, await GetAdapter(a.Value, adapters, request));
+                    adapters.Add(adapterNode.Key, await GetAdapter(adapterNode.Value, adapters, request));
                 }
             }
 

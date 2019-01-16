@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using HelpersForCore;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,27 @@ namespace CodeGenerator.Controllers.Adapters.Actions
 {
     public class DbTableInfo
     {
-        public class Request : IRequest<IEnumerable<KeyValuePair<string, string>>>
+        public class Request : IRequest<object>
         {
             public string ConnectionString { get; set; }
             public string TableName { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<KeyValuePair<string, string>>>
+        public class Handler : IRequestHandler<Request, object>
         {
             public Handler()
             {
             }
 
-            public async Task<IEnumerable<KeyValuePair<string, string>>> Handle(Request request, CancellationToken token)
+            public async Task<object> Handle(Request request, CancellationToken token)
             {
-                List<KeyValuePair<string, string>> result = new List<KeyValuePair<string, string>>();
-                return result;
+                DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(request.ConnectionString, request.TableName);
+                var primaryKeys = tableSchema.PrimaryKeys.Select(x => x.Name).ToArray();
+                return new
+                {
+                    Identity = tableSchema.Identity,
+                    PrimaryKeys = primaryKeys
+                };
             }
         }
     }

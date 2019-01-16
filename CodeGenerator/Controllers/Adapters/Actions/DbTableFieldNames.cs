@@ -10,27 +10,26 @@ namespace CodeGenerator.Controllers.Adapters.Actions
 {
     public class DbTableFieldNames
     {
-        public class Request : IRequest<IEnumerable<KeyValuePair<string, string>>>
+        public class Request : IRequest<object>
         {
             public string ConnectionString { get; set; }
             public string TableName { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<KeyValuePair<string, string>>>
+        public class Handler : IRequestHandler<Request, object>
         {
             public Handler()
             {
             }
 
-            public async Task<IEnumerable<KeyValuePair<string, string>>> Handle(Request request, CancellationToken token)
+            public async Task<object> Handle(Request request, CancellationToken token)
             {
-                List<KeyValuePair<string, string>> result = new List<KeyValuePair<string, string>>();
                 DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(request.ConnectionString, request.TableName);
-                foreach (var field in tableSchema.Fields)
+                var fieldNames = tableSchema.Fields.Select(x => x.Name).ToArray();
+                return new
                 {
-                    result.Add(new KeyValuePair<string, string>("FieldNames", field.Name));
-                }
-                return result;
+                    FieldNames = fieldNames
+                };
             }
         }
     }

@@ -11,18 +11,17 @@ namespace CodeGenerator.Data.Models
         public string Key { get; set; }
         public Dictionary<string, RequestNode> Parameters { get; set; }
 
-        public Dictionary<string, Adapter> Adapters { get; set; }
+        public Dictionary<string, AdapterNode> AdapterNodes { get; set; }
         public GenerateMode Mode { get; set; } = GenerateMode.Unification;
 
         public RequestNode() { }
         public RequestNode(string key) { Key = key; }
     }
 
-    public class Adapter
+    public class AdapterNode
     {
         public string Url { get; set; }
         public Dictionary<string, RequestNode> Request { get; set; }
-        public string[] GroupBy { get; set; }
     }
 
     public enum RequestType

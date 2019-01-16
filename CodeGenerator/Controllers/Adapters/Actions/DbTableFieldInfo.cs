@@ -10,32 +10,31 @@ namespace CodeGenerator.Controllers.Adapters.Actions
 {
     public class DbTableFieldInfo
     {
-        public class Request : IRequest<IEnumerable<KeyValuePair<string, string>>>
+        public class Request : IRequest<object>
         {
             public string ConnectionString { get; set; }
             public string TableName { get; set; }
             public string FieldName { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<KeyValuePair<string, string>>>
+        public class Handler : IRequestHandler<Request, object>
         {
             public Handler()
             {
             }
 
-            public async Task<IEnumerable<KeyValuePair<string, string>>> Handle(Request request, CancellationToken token)
+            public async Task<object> Handle(Request request, CancellationToken token)
             {
-                List<KeyValuePair<string, string>> result = new List<KeyValuePair<string, string>>();
                 DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(request.ConnectionString, request.TableName);
                 DbTableSchema.Field field = tableSchema.Fields.FirstOrDefault(x => x.Name == request.FieldName);
-                result.Add(new KeyValuePair<string, string>("Description", field.Description));
-                foreach (string attribute in field.ForCs.EFAttributes)
+                var attributes = field.ForCs.EFAttributes.ToArray();
+                return new
                 {
-                    result.Add(new KeyValuePair<string, string>("Attributes", attribute));
-                }
-                result.Add(new KeyValuePair<string, string>("TypeName", field.ForCs.TypeName));
-                result.Add(new KeyValuePair<string, string>("PropertyName", field.Name));
-                return result;
+                    Description = field.Description,
+                    Attributes = attributes,
+                    TypeName = field.ForCs.TypeName,
+                    PropertyName = field.Name
+                };
             }
         }
     }
