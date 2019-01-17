@@ -18,97 +18,183 @@ namespace CodeGenerator.Controllers.Adapters
 {
     public class QQ
     {
-        public async Task<object> ToAdapter(AdapterNode adapterNode, Dictionary<string, object> request, Dictionary<string, Dictionary<string, object>> requestAdapters)
+        public void SetRequest(RequestNode node)
         {
-            Dictionary<string, object> adapterRequest = new Dictionary<string, object>();
-            //List<KeyValuePair<string, string>> adapterRequest = new List<KeyValuePair<string, string>>();
-            foreach (var nodeRequest in adapterNode.Request)
+            foreach (var adapterNode in node.AdapterNodes)
             {
-                if (nodeRequest.Value.Type == RequestType.Request)
+                foreach (var adapterRequestNode in adapterNode.Value.Request)
                 {
-                    IEnumerable<KeyValuePair<string, object>> temp;
-                    // get request values from http or adapters
-                    if (nodeRequest.Value.Key.Contains("->"))
-                    {
-                        string name = nodeRequest.Value.Key.Remove(nodeRequest.Value.Key.IndexOf("->"));
-                        string key = nodeRequest.Value.Key.Substring(nodeRequest.Value.Key.IndexOf("->") + "->".Length);
-                        temp = requestAdapters[name]
-                            .Where(x => x.Key == key)
-                            .Select(x => new KeyValuePair<string, object>(nodeRequest.Key, x.Value)));
-                    }
-                    else
-                    {
-                        temp = request
-                            .Where(x => x.Key == nodeRequest.Value.Key)
-                            .Select(x => new KeyValuePair<string, object>(nodeRequest.Key, x.Value)));
-                    }
-                    // unification or separation
-                    if (nodeRequest.Value.Mode == GenerateMode.Unification)
-                    {
-                        adapterRequest = temp.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray() as object);
-                    }
-                    else if (nodeRequest.Value.Mode == GenerateMode.Separation)
-                    {
-                        // TODO:
-                    }
+                    adapterRequestNode.Value.Request = node.Request;
                 }
             }
+            if (node.Parameters != null)
+            {
+                foreach (var parameter in node.Parameters)
+                {
+                    parameter.Value.Request = node.Request;
+                    SetRequest(parameter.Value);
+                }
+            }
+        }
 
+        public void SetAdapter(RequestNode node)
+        {
+            foreach (var adapterNode in node.AdapterNodes)
+            {
+                foreach (var adapterRequestNode in adapterNode.Value.Request)
+                {
+                    adapterRequestNode.Value.Adapters = node.Adapters;
+                }
+            }
+            if (node.Parameters != null)
+            {
+                foreach (var parameter in node.Parameters)
+                {
+                    parameter.Value.Adapters = node.Adapters;
+                    SetAdapter(parameter.Value);
+                }
+            }
+        }
+
+
+        public Dictionary<string, object> ToHttpRequest(Dictionary<string, RequestNode> nodes)
+        {
+            return nodes.ToDictionary(
+                x => x.Key,
+                x =>
+                {
+                    if (x.Value.From == RequestFrom.Request)
+                    {
+                        return x.Value.Request[x.Value.Key];
+                    }
+                    else if (x.Value.From == RequestFrom.Adapter)
+                    {
+                        return x.Value.Adapters[x.Value.AdapterName][x.Value.Key];
+                    }
+                    return null;
+                });
+        }
+
+        public async Task<object> ToAdapter(AdapterNode node)
+        {
             HttpClient client = new HttpClient();
-            var response = await client.PostAsJsonAsync(adapterNode.Url, adapterRequest);
+            var response = await client.PostAsJsonAsync(node.Url, ToHttpRequest(node.Request));
             var json = await response.Content.ReadAsStringAsync();
             if (json.Trim().StartsWith("[")
                 && json.Trim().EndsWith("]"))
             {
-                return JsonConvert.DeserializeObject<IEnumerable<Dictionary<string, object>>>(json);
+                return JsonConvert.DeserializeObject<Dictionary<string, object>[]>(json);
             }
             return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
         }
 
-        public async Task<IEnumerable<GenerateNode>> ToGenerateNode(RequestNode requestNode, Dictionary<string, object> request, Dictionary<string, Dictionary<string, object>> requestAdapters)
+        public async Task<IEnumerable<RequestNode>> Expand(RequestNode requestNode)
         {
-            if (adapters == null)
+            #region requestNode.AdapterNodes to Adapters
+            if (requestNode.AdapterNodes.Any())
             {
-                adapters = new Dictionary<string, IEnumerable<KeyValuePair<string, string>>>();
-            }
-
-            if (requestNode.AdapterNodes != null)
-            {
-                foreach (var adapterNode in requestNode.AdapterNodes)
+                var adapterNode = requestNode.AdapterNodes.First();
+                requestNode.AdapterNodes.Remove(adapterNode.Key);
+                object adapterValue = await ToAdapter(adapterNode.Value);
+                if (adapterValue is Dictionary<string, object> value)
                 {
-                    adapters.Add(adapterNode.Key, await GetAdapter(adapterNode.Value, adapters, request));
-                }
-            }
-
-            List<GenerateNode> generateNodes = new List<GenerateNode>();
-            GenerateNode generateNode = new GenerateNode();
-            if (root.Type == RequestType.Template)
-            {
-                generateNode.ApplyFilePath = $@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\{root.Key}.html";
-                foreach (var a in root.Parameters)
-                {
-                    var temps = await ToGenerateNode(a.Value, adapters, request);
-                    foreach (var b in temps)
+                    if (adapterNode.Value.Type == AdapterType.Separation)
                     {
-                        generateNode.AppendChild(b).ChangeKey(a.Key);
+                        if (value.Count == 1 && value.First().Value.GetType().IsArray)
+                        {
+                            List<RequestNode> nodes = new List<RequestNode>();
+                            Dictionary<string, object>[] innerValues = value.First().Value.JsonConvertTo<Dictionary<string, object>[]>();
+                            foreach (var _value in innerValues)
+                            {
+                                RequestNode clone = requestNode.JsonConvertTo<RequestNode>();
+                                clone.Adapters.Add(adapterNode.Key, _value);
+                                SetAdapter(clone);
+                                nodes.AddRange(await Expand(clone));
+                            }
+                            return nodes;
+                        }
+                    }
+                    requestNode.Adapters.Add(adapterNode.Key, value);
+                    SetAdapter(requestNode);
+                    return await Expand(requestNode);
+                }
+                else if (adapterValue is Dictionary<string, object>[] values)
+                {
+                    if (adapterNode.Value.Type == AdapterType.Unification)
+                    {
+                        requestNode.Adapters.Add(
+                            adapterNode.Key,
+                            values
+                                .SelectMany(x => x)
+                                .GroupBy(x => x.Key)
+                                .ToDictionary(
+                                    x => x.Key,
+                                    x => x.Select(y => y.Value) as object));
+                        SetAdapter(requestNode);
+                        return await Expand(requestNode);
+                    }
+                    else if (adapterNode.Value.Type == AdapterType.Separation)
+                    {
+                        List<RequestNode> nodes = new List<RequestNode>();
+                        foreach (var _value in values)
+                        {
+                            RequestNode clone = requestNode.JsonConvertTo<RequestNode>();
+                            clone.Adapters.Add(adapterNode.Key, _value);
+                            SetAdapter(clone);
+                            nodes.AddRange(await Expand(clone));
+                        }
+                        return nodes;
                     }
                 }
             }
-            else if (root.Type == RequestType.Request)
+            #endregion
+
+            #region Deep
+            if (requestNode.Parameters.Any())
             {
-                if (root.Key.Contains("->"))
+                string[] keys = requestNode.Parameters.Keys.ToArray();
+                foreach (var key in keys)
                 {
-                    string name = root.Key.Remove(root.Key.IndexOf("->"));
-                    string key = root.Key.Substring(root.Key.IndexOf("->") + "->".Length);
-                    return adapters[name].Where(x => x.Key == key).Select(x => new GenerateNode() { ApplyValue = x.Value }).ToArray();
-                }
-                else
-                {
-                    return request.Where(x => x.Key == root.Key).Select(x => new GenerateNode() { ApplyValue = x.Value }).ToArray();
+                    if (requestNode.Parameters[key].From == RequestFrom.Template)
+                    {
+                        requestNode.Parameters[key] = (await Expand(requestNode.Parameters[key])).FirstOrDefault();
+                    }
                 }
             }
-            generateNodes.Add(generateNode);
-            return generateNodes;
+            #endregion
+            return new RequestNode[] { requestNode };
+        }
+
+        public async Task<GenerateNode> ToGenerateNode(RequestNode requestNode)
+        {
+            GenerateNode generateNode = new GenerateNode();
+            if (requestNode.From == RequestFrom.Template)
+            {
+                generateNode.ApplyFilePath = $@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\{requestNode.Key}.html";
+                foreach (var parameter in requestNode.Parameters)
+                {
+                    generateNode
+                        .AppendChild(await ToGenerateNode(parameter.Value))
+                        .ChangeKey(parameter.Key);
+                }
+            }
+            else if (requestNode.From == RequestFrom.Request)
+            {
+                generateNode.AppendChild(
+                    requestNode.Key,
+                    requestNode.Request
+                        .Where(x => x.Key == requestNode.Key)
+                        .Select(x => Convert.ToString(x.Value)));
+            }
+            else if (requestNode.From == RequestFrom.Adapter)
+            {
+                generateNode.AppendChild(
+                    requestNode.Key,
+                    requestNode.Adapters[requestNode.AdapterName]
+                        .Where(x => x.Key == requestNode.AdapterName)
+                        .Select(x => Convert.ToString(x.Value)));
+            }
+            return generateNode;
         }
     }
 
@@ -150,12 +236,13 @@ namespace CodeGenerator.Controllers.Adapters
             return new OkObjectResult(await mediator.Send(request));
         }
 
+        // /api/Adapters/Test
         [HttpPost("[action]")]
-        public async Task<ActionResult> Test([FromBody] Dictionary<string, string[]> rr)
+        public async Task<ActionResult> Test([FromBody] Dictionary<string, object> rr)
         {
             RequestNode node = new RequestNode()
             {
-                Type = RequestType.Template,
+                From = RequestFrom.Template,
                 Key = "EntityFrameworkModel",
                 Parameters = new Dictionary<string, RequestNode>
                 {
@@ -165,30 +252,31 @@ namespace CodeGenerator.Controllers.Adapters
                     {
                         "Properties", new RequestNode()
                         {
-                            Type = RequestType.Template,
+                            From = RequestFrom.Template,
                             Key = "DeclareProperty",
-                            Adapters = new Dictionary<string, Adapter>
+                            AdapterNodes = new Dictionary<string, AdapterNode>
                             {
                                 {
-                                    "Adapter1", new Adapter()
+                                    "Adapter1", new AdapterNode()
                                     {
                                         Url = "http://localhost:4967/api/Adapters/DbTableFieldNames",
                                         Request = new Dictionary<string, RequestNode>
                                         {
                                             { "connectionString", new RequestNode("connectionString") },
                                             { "tableName", new RequestNode("tableName") },
-                                        }
+                                        },
+                                        Type = AdapterType.Separation
                                     }
                                 },
                                 {
-                                    "Adapter2", new Adapter()
+                                    "Adapter2", new AdapterNode()
                                     {
                                         Url = "http://localhost:4967/api/Adapters/DbTableFieldInfo",
                                         Request = new Dictionary<string, RequestNode>
                                         {
                                             { "connectionString", new RequestNode("connectionString") },
                                             { "tableName", new RequestNode("tableName") },
-                                            { "fieldName", new RequestNode("Adapter1->FieldNames") { Mode = GenerateMode.Separation } },
+                                            { "fieldName", new RequestNode("Adapter1", "FieldNames") },
                                         }
                                     }
                                 }
@@ -198,23 +286,24 @@ namespace CodeGenerator.Controllers.Adapters
                                 {
                                     "Summary", new RequestNode()
                                     {
-                                        Type = RequestType.Template,
+                                        From = RequestFrom.Template,
                                         Key = "Summary",
                                         Parameters = new Dictionary<string, RequestNode>
                                         {
-                                            { "Text", new RequestNode("Adapter2->Description") }
+                                            { "Text", new RequestNode("Adapter2", "Description") }
                                         }
                                     }
                                 },
-                                { "Attributes", new RequestNode("Adapter2->Attributes") },
-                                { "TypeName", new RequestNode("Adapter2->TypeName") },
-                                { "PropertyName", new RequestNode("Adapter2->PropertyName") }
+                                { "Attributes", new RequestNode("Adapter2", "Attributes") },
+                                { "TypeName", new RequestNode("Adapter2", "TypeName") },
+                                { "PropertyName", new RequestNode("Adapter2", "PropertyName") }
                             }
                         }
                     }
                 }
             };
 
+            /*
             List<KeyValuePair<string, string>> request = new List<KeyValuePair<string, string>>();
 
             foreach (var a in rr)
@@ -224,11 +313,17 @@ namespace CodeGenerator.Controllers.Adapters
                     request.Add(new KeyValuePair<string, string>(a.Key, b));
                 }
             }
+            */
+
+            node.Request = rr;
+            
+
 
             QQ qQ = new QQ();
-            //GenerateNode generateNode = await qQ.ToGenerateNode(node, null, request);
-            GenerateNode generateNode = (await qQ.ToGenerateNode(node, null, request)).FirstOrDefault();
-            return new OkObjectResult(generateNode);
+            qQ.SetRequest(node);
+            RequestNode[] nodes = (await qQ.Expand(node)).ToArray();
+            GenerateNode[] generateNodes = await Task.WhenAll(nodes.Select(async x => await qQ.ToGenerateNode(x)));
+            return new OkObjectResult(generateNodes);
         }
 
         /*

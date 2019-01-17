@@ -7,36 +7,52 @@ namespace CodeGenerator.Data.Models
 {
     public class RequestNode
     {
-        public RequestType Type { get; set; } = RequestType.Request;
+        public Dictionary<string, object> Request { get; set; }
+        public Dictionary<string, AdapterNode> AdapterNodes { get; set; } = new Dictionary<string, AdapterNode>();
+        public Dictionary<string, Dictionary<string, object>> Adapters { get; set; } = new Dictionary<string, Dictionary<string, object>>();
+        public RequestFrom From { get; set; } = RequestFrom.Request;
+        public string AdapterName { get; set; }
         public string Key { get; set; }
         public Dictionary<string, RequestNode> Parameters { get; set; }
 
-        public Dictionary<string, AdapterNode> AdapterNodes { get; set; }
-        public GenerateMode Mode { get; set; } = GenerateMode.Unification;
-
         public RequestNode() { }
-        public RequestNode(string key) { Key = key; }
+        public RequestNode(string key)
+        {
+            From = RequestFrom.Request;
+            Key = key;
+        }
+        public RequestNode(string adapterName, string key)
+        {
+            From = RequestFrom.Adapter;
+            AdapterName = adapterName;
+            Key = key;
+        }
     }
 
     public class AdapterNode
     {
         public string Url { get; set; }
         public Dictionary<string, RequestNode> Request { get; set; }
+        public AdapterType Type { get; set; }
     }
 
-    public enum RequestType
+    public enum RequestFrom
     {
         /// <summary>
         /// 請求
         /// </summary>
         Request,
         /// <summary>
+        /// 中繼資料
+        /// </summary>
+        Adapter,
+        /// <summary>
         /// 樣板
         /// </summary>
         Template
     }
 
-    public enum GenerateMode
+    public enum AdapterType
     {
         /// <summary>
         /// 統一
