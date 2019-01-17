@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace CodeGenerator.Data.Models
     {
         public Dictionary<string, object> Request { get; set; }
         public Dictionary<string, AdapterNode> AdapterNodes { get; set; } = new Dictionary<string, AdapterNode>();
-        public Dictionary<string, Dictionary<string, object>> Adapters { get; set; } = new Dictionary<string, Dictionary<string, object>>();
+        public Dictionary<string, JToken> Adapters { get; set; } = new Dictionary<string, JToken>();
         public RequestFrom From { get; set; } = RequestFrom.Request;
         public string AdapterName { get; set; }
         public string Key { get; set; }

@@ -12,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Pluralize.NET.Core;
 
 namespace CodeGenerator.Controllers.Adapters
@@ -56,36 +57,31 @@ namespace CodeGenerator.Controllers.Adapters
             }
         }
 
-
-        public Dictionary<string, object> ToHttpRequest(Dictionary<string, RequestNode> nodes)
+        public JObject ToHttpRequest(Dictionary<string, RequestNode> nodes)
         {
-            return nodes.ToDictionary(
-                x => x.Key,
-                x =>
+            JObject jObject = new JObject();
+            foreach (var node in nodes)
+            {
+                object value = null;
+                if (node.Value.From == RequestFrom.Request)
                 {
-                    if (x.Value.From == RequestFrom.Request)
-                    {
-                        return x.Value.Request[x.Value.Key];
-                    }
-                    else if (x.Value.From == RequestFrom.Adapter)
-                    {
-                        return x.Value.Adapters[x.Value.AdapterName][x.Value.Key];
-                    }
-                    return null;
-                });
+                    value = node.Value.Request[node.Value.Key];
+                }
+                else if (node.Value.From == RequestFrom.Adapter)
+                {
+                    value = (node.Value.Adapters[node.Value.AdapterName] as JObject).Property(node.Value.Key, StringComparison.CurrentCultureIgnoreCase).Value;
+                }
+                jObject.Add(node.Key, JToken.FromObject(value));
+            }
+            return jObject;
         }
 
-        public async Task<object> ToAdapter(AdapterNode node)
+        public async Task<JToken> ToAdapter(AdapterNode node)
         {
             HttpClient client = new HttpClient();
             var response = await client.PostAsJsonAsync(node.Url, ToHttpRequest(node.Request));
             var json = await response.Content.ReadAsStringAsync();
-            if (json.Trim().StartsWith("[")
-                && json.Trim().EndsWith("]"))
-            {
-                return JsonConvert.DeserializeObject<Dictionary<string, object>[]>(json);
-            }
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return JToken.FromObject(JsonConvert.DeserializeObject(json));
         }
 
         public async Task<IEnumerable<RequestNode>> Expand(RequestNode requestNode)
@@ -95,51 +91,51 @@ namespace CodeGenerator.Controllers.Adapters
             {
                 var adapterNode = requestNode.AdapterNodes.First();
                 requestNode.AdapterNodes.Remove(adapterNode.Key);
-                object adapterValue = await ToAdapter(adapterNode.Value);
-                if (adapterValue is Dictionary<string, object> value)
+                JToken adapterValue = await ToAdapter(adapterNode.Value);
+                if (adapterValue is JObject jObject)
                 {
                     if (adapterNode.Value.Type == AdapterType.Separation)
                     {
-                        if (value.Count == 1 && value.First().Value.GetType().IsArray)
+                        if (jObject.Properties().Count() == 1 && jObject.Properties().First().Value is JArray jArray)
                         {
                             List<RequestNode> nodes = new List<RequestNode>();
-                            Dictionary<string, object>[] innerValues = value.First().Value.JsonConvertTo<Dictionary<string, object>[]>();
-                            foreach (var _value in innerValues)
+                            foreach (var value in jArray)
                             {
+                                JObject jValue = new JObject();
+                                jValue.Add(jObject.Properties().First().Name, value);
                                 RequestNode clone = requestNode.JsonConvertTo<RequestNode>();
-                                clone.Adapters.Add(adapterNode.Key, _value);
+                                clone.Adapters.Add(adapterNode.Key, jValue);
                                 SetAdapter(clone);
                                 nodes.AddRange(await Expand(clone));
                             }
                             return nodes;
                         }
                     }
-                    requestNode.Adapters.Add(adapterNode.Key, value);
+                    requestNode.Adapters.Add(adapterNode.Key, jObject);
                     SetAdapter(requestNode);
                     return await Expand(requestNode);
                 }
-                else if (adapterValue is Dictionary<string, object>[] values)
+                else if (adapterValue is JArray values)
                 {
                     if (adapterNode.Value.Type == AdapterType.Unification)
                     {
-                        requestNode.Adapters.Add(
-                            adapterNode.Key,
-                            values
-                                .SelectMany(x => x)
-                                .GroupBy(x => x.Key)
-                                .ToDictionary(
-                                    x => x.Key,
-                                    x => x.Select(y => y.Value) as object));
+                        // TODO: FIX
+                        JArray jArray = new JArray();
+                        foreach (JToken value in values)
+                        {
+                            jArray.Add(value);
+                        }
+                        requestNode.Adapters.Add(adapterNode.Key, jArray);
                         SetAdapter(requestNode);
                         return await Expand(requestNode);
                     }
                     else if (adapterNode.Value.Type == AdapterType.Separation)
                     {
                         List<RequestNode> nodes = new List<RequestNode>();
-                        foreach (var _value in values)
+                        foreach (var value in values)
                         {
                             RequestNode clone = requestNode.JsonConvertTo<RequestNode>();
-                            clone.Adapters.Add(adapterNode.Key, _value);
+                            clone.Adapters.Add(adapterNode.Key, value);
                             SetAdapter(clone);
                             nodes.AddRange(await Expand(clone));
                         }
@@ -157,6 +153,7 @@ namespace CodeGenerator.Controllers.Adapters
                 {
                     if (requestNode.Parameters[key].From == RequestFrom.Template)
                     {
+                        // TODO: remove first, 向外擴展
                         requestNode.Parameters[key] = (await Expand(requestNode.Parameters[key])).FirstOrDefault();
                     }
                 }
@@ -188,11 +185,18 @@ namespace CodeGenerator.Controllers.Adapters
             }
             else if (requestNode.From == RequestFrom.Adapter)
             {
-                generateNode.AppendChild(
-                    requestNode.Key,
-                    requestNode.Adapters[requestNode.AdapterName]
-                        .Where(x => x.Key == requestNode.AdapterName)
-                        .Select(x => Convert.ToString(x.Value)));
+                if (requestNode.Adapters[requestNode.AdapterName] is JObject jObject)
+                {
+                    generateNode.AppendChild(
+                        requestNode.Key,
+                        Convert.ToString(jObject));
+                }
+                else if (requestNode.Adapters[requestNode.AdapterName] is JArray jArray)
+                {
+                    generateNode.AppendChild(
+                        requestNode.Key,
+                        jArray.Select(x => Convert.ToString(x)));
+                }
             }
             return generateNode;
         }
