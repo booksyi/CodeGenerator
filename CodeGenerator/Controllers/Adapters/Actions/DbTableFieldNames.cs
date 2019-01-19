@@ -10,23 +10,28 @@ namespace CodeGenerator.Controllers.Adapters.Actions
 {
     public class DbTableFieldNames
     {
-        public class Request : IRequest<object>
+        public class Request : IRequest<Response>
         {
             public string ConnectionString { get; set; }
             public string TableName { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, object>
+        public class Response
+        {
+            public string[] FieldNames { get; set; }
+        }
+
+        public class Handler : IRequestHandler<Request, Response>
         {
             public Handler()
             {
             }
 
-            public async Task<object> Handle(Request request, CancellationToken token)
+            public async Task<Response> Handle(Request request, CancellationToken token)
             {
                 DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(request.ConnectionString, request.TableName);
                 var fieldNames = tableSchema.Fields.Select(x => x.Name).ToArray();
-                return new
+                return new Response()
                 {
                     FieldNames = fieldNames
                 };

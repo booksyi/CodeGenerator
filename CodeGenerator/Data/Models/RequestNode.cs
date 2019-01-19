@@ -15,6 +15,7 @@ namespace CodeGenerator.Data.Models
         public string AdapterName { get; set; }
         public string Key { get; set; }
         public Dictionary<string, RequestNode> Parameters { get; set; }
+        public Dictionary<string, RequestNode[]> ExpandParameters { get; set; } = new Dictionary<string, RequestNode[]>();
 
         public RequestNode() { }
         public RequestNode(string key)

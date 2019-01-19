@@ -10,21 +10,26 @@ namespace CodeGenerator.Controllers.Adapters.Actions
 {
     public class DbTableNames
     {
-        public class Request : IRequest<object>
+        public class Request : IRequest<Response>
         {
             public string ConnectionString { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, object>
+        public class Response
+        {
+            public string[] TableNames { get; set; }
+        }
+
+        public class Handler : IRequestHandler<Request, Response>
         {
             public Handler()
             {
             }
 
-            public async Task<object> Handle(Request request, CancellationToken token)
+            public async Task<Response> Handle(Request request, CancellationToken token)
             {
                 var tableNames = CodingHelper.GetDbTableNames(request.ConnectionString).ToArray();
-                return new
+                return new Response()
                 {
                     TableNames = tableNames
                 };

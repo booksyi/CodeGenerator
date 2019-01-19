@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web;
 using CodeGenerator.Controllers.Adapters.Actions;
 using CodeGenerator.Data.Models;
-using CodeGenerator.Handlers;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -153,8 +152,12 @@ namespace CodeGenerator.Controllers.Adapters
                 {
                     if (requestNode.Parameters[key].From == RequestFrom.Template)
                     {
-                        // TODO: remove first, 向外擴展
-                        requestNode.Parameters[key] = (await Expand(requestNode.Parameters[key])).FirstOrDefault();
+                        var expandNodes = await Expand(requestNode.Parameters[key]);
+                        requestNode.ExpandParameters.Add(key, expandNodes.ToArray());
+                    }
+                    else
+                    {
+                        requestNode.ExpandParameters.Add(key, new RequestNode[] { requestNode.Parameters[key] });
                     }
                 }
             }
@@ -162,43 +165,73 @@ namespace CodeGenerator.Controllers.Adapters
             return new RequestNode[] { requestNode };
         }
 
-        public async Task<GenerateNode> ToGenerateNode(RequestNode requestNode)
+        public async Task<IEnumerable<GenerateNode>> ToGenerateNode(RequestNode requestNode)
         {
-            GenerateNode generateNode = new GenerateNode();
             if (requestNode.From == RequestFrom.Template)
             {
-                generateNode.ApplyFilePath = $@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\{requestNode.Key}.html";
-                foreach (var parameter in requestNode.Parameters)
+                GenerateNode generateNode = new GenerateNode();
+                generateNode.ApplyApi = $@"https://codegeneratoradapters.azurewebsites.net/api/GetTemplate?code=jzG4qdc0Lo3Hp5TiPkFiaRoMlDXGHQNWCmNrr59KZFTabesbOAgJUg==&name={requestNode.Key}";
+                foreach (var parameter in requestNode.ExpandParameters)
                 {
-                    generateNode
-                        .AppendChild(await ToGenerateNode(parameter.Value))
-                        .ChangeKey(parameter.Key);
+                    foreach (var node in parameter.Value)
+                    {
+                        var children = await ToGenerateNode(node);
+                        foreach (var child in children)
+                        {
+                            generateNode
+                                .AppendChild(child)
+                                .ChangeKey(parameter.Key);
+                        }
+                    }
                 }
+                return new GenerateNode[] { generateNode };
             }
             else if (requestNode.From == RequestFrom.Request)
             {
-                generateNode.AppendChild(
-                    requestNode.Key,
-                    requestNode.Request
-                        .Where(x => x.Key == requestNode.Key)
-                        .Select(x => Convert.ToString(x.Value)));
+                List<GenerateNode> generateNodes = new List<GenerateNode>();
+                var values = requestNode.Request
+                    .Where(x => x.Key == requestNode.Key)
+                    .Select(x => Convert.ToString(x.Value)).ToArray();
+                foreach (var value in values)
+                {
+                    generateNodes.Add(new GenerateNode(requestNode.Key, value));
+                }
+                return generateNodes;
             }
             else if (requestNode.From == RequestFrom.Adapter)
             {
-                if (requestNode.Adapters[requestNode.AdapterName] is JObject jObject)
+                List<GenerateNode> generateNodes = new List<GenerateNode>();
+                var value =
+                    (requestNode.Adapters[requestNode.AdapterName] as JObject)?
+                    .Property(requestNode.Key, StringComparison.CurrentCultureIgnoreCase)?
+                    .Value;
+                if (value != null)
                 {
-                    generateNode.AppendChild(
-                        requestNode.Key,
-                        Convert.ToString(jObject));
+                    if (value is JValue jValue)
+                    {
+                        generateNodes.Add(new GenerateNode(
+                            requestNode.Key,
+                            Convert.ToString(jValue)));
+                    }
+                    else if (value is JObject jObject)
+                    {
+                        generateNodes.Add(new GenerateNode(
+                            requestNode.Key,
+                            Convert.ToString(jObject)));
+                    }
+                    else if (value is JArray jArray)
+                    {
+                        foreach (var jv in jArray)
+                        {
+                            generateNodes.Add(new GenerateNode(
+                                requestNode.Key,
+                                Convert.ToString(jv)));
+                        }
+                    }
                 }
-                else if (requestNode.Adapters[requestNode.AdapterName] is JArray jArray)
-                {
-                    generateNode.AppendChild(
-                        requestNode.Key,
-                        jArray.Select(x => Convert.ToString(x)));
-                }
+                return generateNodes;
             }
-            return generateNode;
+            return new GenerateNode[0];
         }
     }
 
@@ -306,71 +339,17 @@ namespace CodeGenerator.Controllers.Adapters
                     }
                 }
             };
-
-            /*
-            List<KeyValuePair<string, string>> request = new List<KeyValuePair<string, string>>();
-
-            foreach (var a in rr)
-            {
-                foreach (var b in a.Value)
-                {
-                    request.Add(new KeyValuePair<string, string>(a.Key, b));
-                }
-            }
-            */
-
             node.Request = rr;
-            
-
 
             QQ qQ = new QQ();
             qQ.SetRequest(node);
             RequestNode[] nodes = (await qQ.Expand(node)).ToArray();
-            GenerateNode[] generateNodes = await Task.WhenAll(nodes.Select(async x => await qQ.ToGenerateNode(x)));
+            List<GenerateNode> generateNodes = new List<GenerateNode>();
+            foreach (var rnode in nodes)
+            {
+                generateNodes.AddRange(await qQ.ToGenerateNode(rnode));
+            }
             return new OkObjectResult(generateNodes);
         }
-
-        /*
-        [HttpPost("[action]")]
-        public async Task<ActionResult> GetNode(string path, [FromBody] IEnumerable<KeyValuePair<string, string>> values)
-        {
-            GenerateNode node = new GenerateNode();
-            node.ApplyFilePath = path;
-            foreach (var value in values)
-            {
-                node.AppendChild(value.Key, value.Value);
-            }
-            return new OkObjectResult(node);
-        }
-        */
-        /*
-        // /api/Adapters/Adapter2
-        [HttpPost("[action]")]
-        public async Task<ActionResult> Adapter2(string connectionString, string tableName)
-        {
-            DbTableSchema tableSchema = CodingHelper.GetDbTableSchema(connectionString, tableName);
-
-            List<GenerateNode> nodes = new List<GenerateNode>();
-            foreach (var field in tableSchema.Fields)
-            {
-                GenerateNode node = new GenerateNode() { ApplyFilePath = @"Templates\CSharp\DeclareProperty.html" };
-                if (string.IsNullOrWhiteSpace(field.Description) == false)
-                {
-                    node.AppendChild(await mediator.Send(
-                        new GenerateModelPropertySummary.Request()
-                        {
-                            Text = field.Description
-                        })).ChangeKey("Summary");
-                }
-                node.AppendChild("Attributes", field.ForCs.EFAttributes);
-                node.AppendChild("TypeName", field.ForCs.TypeName);
-                node.AppendChild("PropertyName", field.Name);
-
-                nodes.Add(node);
-            }
-
-            return new OkObjectResult(nodes);
-        }
-        */
     }
 }

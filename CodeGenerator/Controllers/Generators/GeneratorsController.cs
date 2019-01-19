@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CodeGenerator.Data.Models;
-using CodeGenerator.Handlers;
-using CodeGenerator.Handlers.ApiActions;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -25,28 +24,44 @@ namespace CodeGenerator.Controllers.Generators
             this.pluralizer = pluralizer;
         }
 
-        // /api/Generators/GenerateText
+        // /api/Generators/GenerateByNode
         [HttpPost("[action]")]
-        public async Task<ActionResult> GenerateText([FromBody] GenerateNode node)
+        public async Task<ActionResult> GenerateByNode([FromBody] GenerateNode node)
         {
             return new OkObjectResult(await node.GenerateAsync());
         }
 
-        // /api/Generators/GenerateNode
-        [HttpPost("[action]")]
-        public async Task<ActionResult> GenerateNode([FromQuery] string path)
+        [HttpGet("[action]")]
+        public async Task<ActionResult> SetTemplates()
         {
-            GenerateNode node = new GenerateNode() { ApplyFilePath = path };
-            foreach (var input in Request.Form)
+            Dictionary<string, string> templates = new Dictionary<string, string>();
+            templates.Add(
+                "EntityFrameworkModel",
+                await System.IO.File.ReadAllTextAsync(@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\EntityFrameworkModel.html"));
+            templates.Add(
+                "DeclareProperty",
+                await System.IO.File.ReadAllTextAsync(@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\DeclareProperty.html"));
+            templates.Add(
+                "Summary",
+                await System.IO.File.ReadAllTextAsync(@"D:\Workspace\CodeGenerator\CodeGenerator\Templates\CSharp\Summary.html"));
+
+            HttpClient client = new HttpClient();
+            foreach (var template in templates)
             {
-                foreach (string value in input.Value)
+                await client.PostAsJsonAsync("https://codegeneratoradapters.azurewebsites.net/api/CreateTemplate?code=eDS/47PgojVczevD5XJE/Q5G5FNoMLlv9oBwiLkGuhc1lA63SrXVbw==",
+                new
                 {
-                    node.AppendChild(input.Key, value);
-                }
+                    name = template.Key,
+                    template = template.Value
+                });
             }
-            return new OkObjectResult(node);
+            return new OkObjectResult("Success!");
         }
 
+
+
+
+        /*
         // /api/Generators/GenerateModel
         [HttpGet("[action]")]
         public async Task<ActionResult> GenerateModel(string connectionString, string tableName, string modelName, string projectName)
@@ -75,7 +90,7 @@ namespace CodeGenerator.Controllers.Generators
 
             return new OkObjectResult(node);
         }
-
+        
         // /api/Generators/GenerateCsApi
         [HttpGet("[action]")]
         public async Task<ActionResult> GenerateCsApi(
@@ -317,5 +332,6 @@ namespace CodeGenerator.Controllers.Generators
             }
             return Ok();
         }
+        */
     }
 }
