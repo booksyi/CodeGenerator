@@ -1,4 +1,5 @@
 ﻿using HelpersForCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace CodeGenerator.Controllers.Generators
     public class GeneratorsResource
     {
         public string SavePath { get; set; }
-        public Dictionary<string, object> Tree { get; private set; }
+        public JToken Tree { get; private set; }
 
         public GeneratorsResource(string savePath)
         {
@@ -18,7 +19,7 @@ namespace CodeGenerator.Controllers.Generators
 
         public async Task<GeneratorsResource> BuildTree(GenerateNode node)
         {
-            Tree = await node.ToDictionaryAsync();
+            Tree = await node.ToJTokenAsync();
             return this;
         }
     }

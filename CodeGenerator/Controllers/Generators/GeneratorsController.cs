@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using CodeGenerator.Data.Models;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +29,18 @@ namespace CodeGenerator.Controllers.Generators
         {
             return new OkObjectResult(await node.GenerateAsync());
         }
+
+        // /api/Generators/GenerateNodeTree
+        [HttpPost("[action]")]
+        public async Task<ActionResult> GenerateNodeTree([FromBody] GenerateNode node)
+        {
+            return new OkObjectResult(await node.ToJTokenAsync());
+        }
+
+
+
+
+
 
         [HttpGet("[action]")]
         public async Task<ActionResult> SetTemplates()
