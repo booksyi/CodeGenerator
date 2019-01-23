@@ -42,7 +42,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                                  @Owner) ",
                     new SqlParameter("@Name", request.Template.Name),
                     new SqlParameter("@Description", request.Template.Description),
-                    new SqlParameter("@Context", request.Template.Context),
+                    new SqlParameter("@Context", request.Template.Context.Replace("\r\n", "\n").Replace("\n", "\r\n")),
                     new SqlParameter("@Author", request.Template.Author),
                     new SqlParameter("@Owner", request.Template.Owner)));
                 return id;

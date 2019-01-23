@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { buildQueryParams } from '@app/lib';
 
 @Component({
   selector: 'app-templates-create',

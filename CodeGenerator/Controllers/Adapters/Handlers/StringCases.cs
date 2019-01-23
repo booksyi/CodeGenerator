@@ -44,23 +44,57 @@ namespace CodeGenerator.Controllers.Adapters.Handlers
 
             public async Task<Response> Handle(Request request, CancellationToken token)
             {
+                Func<string, string[]> separate = (sender) =>
+                {
+                    string engWithNum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+                    string uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    string lowers = "abcdefghijklmnopqrstuvwxyz";
+                    List<string> words = new List<string>();
+                    string word = "";
+                    foreach (char c in sender)
+                    {
+                        char lastC = word.LastOrDefault();
+                        if (engWithNum.Contains(c) == false)
+                        {
+                            words.Add(word);
+                            word = "";
+                        }
+                        else if (lowers.Contains(lastC) && uppers.Contains(c))
+                        {
+                            words.Add(word);
+                            word = $"{c}";
+                        }
+                        else
+                        {
+                            word = $"{word}{c}";
+                        }
+                    }
+                    words.Add(word);
+                    return words.Where(x => string.IsNullOrEmpty(x) == false).ToArray();
+                };
+
+                string[] nameWords = separate(request.Name);
+
                 string singular = pluralizer.Singularize(request.Name);
+                string[] singularWords = separate(singular);
+
                 string plural = pluralizer.Pluralize(request.Name);
+                string[] pluralWords = separate(plural);
 
                 return new Response()
                 {
                     UpperFirst = request.Name.UpperFirst(),
                     LowerFirst = request.Name.LowerFirst(),
-                    LowerDash = "",
-                    LowerUnderLine = "",
+                    LowerDash = string.Join("-", nameWords.Select(x => x.ToLower())),
+                    LowerUnderLine = string.Join("_", nameWords.Select(x => x.ToLower())),
                     SingularUpperFirst = singular.UpperFirst(),
                     SingularLowerFirst = singular.LowerFirst(),
-                    SingularLowerDash = "",
-                    SingularLowerUnderLine = "",
+                    SingularLowerDash = string.Join("-", singularWords.Select(x => x.ToLower())),
+                    SingularLowerUnderLine = string.Join("_", singularWords.Select(x => x.ToLower())),
                     PluralUpperFirst = plural.UpperFirst(),
                     PluralLowerFirst = plural.LowerFirst(),
-                    PluralLowerDash = "",
-                    PluralLowerUnderLine = "",
+                    PluralLowerDash = string.Join("-", pluralWords.Select(x => x.ToLower())),
+                    PluralLowerUnderLine = string.Join("_", pluralWords.Select(x => x.ToLower())),
                 };
             }
         }
