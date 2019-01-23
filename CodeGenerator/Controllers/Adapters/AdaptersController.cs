@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using CodeGenerator.Controllers.Adapters.Actions;
+using CodeGenerator.Controllers.Adapters.Handlers.Database;
 using HelpersForCore;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pluralize.NET.Core;
 
@@ -27,33 +23,14 @@ namespace CodeGenerator.Controllers.Adapters
             this.pluralizer = pluralizer;
         }
 
-        [HttpPost("[action]")]
-        public async Task<ActionResult> DbTableNames([FromBody] DbTableNames.Request request)
+        [HttpPost("db/table")]
+        public async Task<ActionResult> DatabaseGetTable([FromBody] GetTable.Request request)
         {
             return new OkObjectResult(await mediator.Send(request));
         }
 
-        [HttpPost("[action]")]
-        public async Task<ActionResult> DbTableInfo([FromBody] DbTableInfo.Request request)
-        {
-            return new OkObjectResult(await mediator.Send(request));
-        }
-
-        // api/Adapters/DbTableFieldNames
-        [HttpPost("[action]")]
-        public async Task<ActionResult> DbTableFieldNames([FromBody] DbTableFieldNames.Request request)
-        {
-            return new OkObjectResult(await mediator.Send(request));
-        }
-
-        [HttpPost("[action]")]
-        public async Task<ActionResult> DbTableFieldInfo([FromBody] DbTableFieldInfo.Request request)
-        {
-            return new OkObjectResult(await mediator.Send(request));
-        }
-
-        [HttpPost("[action]")]
-        public async Task<ActionResult> DbTableFields([FromBody] DbTableFields.Request request)
+        [HttpPost("db/table/fields")]
+        public async Task<ActionResult> DatabaseGetTableFields([FromBody] GetTableFields.Request request)
         {
             return new OkObjectResult(await mediator.Send(request));
         }
@@ -77,35 +54,11 @@ namespace CodeGenerator.Controllers.Adapters
                             From = RequestFrom.Template,
                             TemplateUrl = "https://codegeneratoradapters.azurewebsites.net/api/GetTemplate?code=jzG4qdc0Lo3Hp5TiPkFiaRoMlDXGHQNWCmNrr59KZFTabesbOAgJUg==&name=DeclareProperty",
                             AdapterNodes = new Dictionary<string, RequestAdapterNode>
-                            {/*
+                            {
                                 {
-                                    "Adapter1", new RequestAdapterNode()
+                                    "AdapterFields", new RequestAdapterNode()
                                     {
-                                        Url = "http://localhost:4967/api/Adapters/DbTableFieldNames",
-                                        RequestNodes = new Dictionary<string, RequestNode>
-                                        {
-                                            { "connectionString", new RequestNode("connectionString") },
-                                            { "tableName", new RequestNode("tableName") },
-                                        },
-                                        Type = RequestAdapterType.Separation
-                                    }
-                                },
-                                {
-                                    "Adapter2", new RequestAdapterNode()
-                                    {
-                                        Url = "http://localhost:4967/api/Adapters/DbTableFieldInfo",
-                                        RequestNodes = new Dictionary<string, RequestNode>
-                                        {
-                                            { "connectionString", new RequestNode("connectionString") },
-                                            { "tableName", new RequestNode("tableName") },
-                                            { "fieldName", new RequestNode("Adapter1", "FieldNames") },
-                                        }
-                                    }
-                                }*/
-                                {
-                                    "Adapter2", new RequestAdapterNode()
-                                    {
-                                        Url = "http://localhost:4967/api/Adapters/DbTableFields",
+                                        Url = "http://localhost:4967/api/adapters/db/table/fields",
                                         RequestNodes = new Dictionary<string, RequestNode>
                                         {
                                             { "connectionString", new RequestNode("connectionString") },
@@ -124,20 +77,26 @@ namespace CodeGenerator.Controllers.Adapters
                                         TemplateUrl = "https://codegeneratoradapters.azurewebsites.net/api/GetTemplate?code=jzG4qdc0Lo3Hp5TiPkFiaRoMlDXGHQNWCmNrr59KZFTabesbOAgJUg==&name=Summary",
                                         TemplateRequestNodes = new Dictionary<string, RequestNode>
                                         {
-                                            { "Text", new RequestNode("Adapter2", "Fields.Description") }
+                                            { "Text", new RequestNode("AdapterFields", "Description") }
                                         }
                                     }
                                 },
-                                { "Attributes", new RequestNode("Adapter2", "Fields.ForCs.EFAttributes") },
-                                { "TypeName", new RequestNode("Adapter2", "Fields.TypeName") },
-                                { "PropertyName", new RequestNode("Adapter2", "Fields.Name") }
+                                { "Attributes", new RequestNode("AdapterFields", "ForCs.EFAttributes") },
+                                { "TypeName", new RequestNode("AdapterFields", "TypeName") },
+                                { "PropertyName", new RequestNode("AdapterFields", "Name") }
                             }
                         }
                     }
                 }
             };
-            node.HttpRequest = rr;
 
+            await mediator.Send(new RequestNodes.Handlers.CreateRequestNode.Request()
+            {
+                Node = node
+            });
+
+
+            node.HttpRequest = rr;
             node.Deep();
             RequestNode[] nodes = (await node.BuildComplex()).ToArray();
             List<GenerateNode> generateNodes = new List<GenerateNode>();

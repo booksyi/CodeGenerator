@@ -9,18 +9,13 @@ namespace CodeGenerator.Controllers.Generators
 {
     public class GeneratorsResource
     {
-        public string SavePath { get; set; }
-        public JToken Tree { get; private set; }
+        public string Path { get; set; }
+        public string Text { get; set; }
 
-        public GeneratorsResource(string savePath)
+        public GeneratorsResource(string path, string text)
         {
-            SavePath = savePath;
-        }
-
-        public async Task<GeneratorsResource> BuildTree(GenerateNode node)
-        {
-            Tree = await node.ToJTokenAsync();
-            return this;
+            Path = path;
+            Text = text;
         }
     }
 }

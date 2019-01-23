@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CodeGenerator.Controllers.Generators.Handlers;
+using CodeGenerator.Controllers.RequestNodes.Handlers;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Pluralize.NET.Core;
 
 namespace CodeGenerator.Controllers.Generators
@@ -23,19 +25,53 @@ namespace CodeGenerator.Controllers.Generators
             this.pluralizer = pluralizer;
         }
 
-        // /api/Generators/GenerateByNode
-        [HttpPost("[action]")]
+        // /api/Generators/Generate
+        [HttpPost("generate")]
         public async Task<ActionResult> GenerateByNode([FromBody] GenerateNode node)
         {
             return new OkObjectResult(await node.GenerateAsync());
         }
 
-        // /api/Generators/GenerateNodeTree
-        [HttpPost("[action]")]
-        public async Task<ActionResult> GenerateNodeTree([FromBody] GenerateNode node)
+        // /api/Generators/{int}/Generate
+        [HttpPost("{id:int}/generate")]
+        public async Task<ActionResult> GenerateByRequestId([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
+        {
+            Generate.Request request = new Generate.Request()
+            {
+                Id = id,
+                Body = body
+            };
+            var resources = await mediator.Send(request);
+            return new OkObjectResult(resources);
+        }
+
+        // /api/Generators/{int}/Tree
+        [HttpPost("tree")]
+        public async Task<ActionResult> GetTreeByNode([FromBody] GenerateNode node)
         {
             return new OkObjectResult(await node.ToJTokenAsync());
         }
+
+        // /api/Generators/{int}/Tree
+        [HttpPost("{id:int}/tree")]
+        public async Task<ActionResult> GetTreeByRequestId([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
+        {
+            ToGenerateNodes.Request request = new ToGenerateNodes.Request()
+            {
+                Id = id,
+                Body = body
+            };
+            var nodes = await mediator.Send(request);
+            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenAsync()));
+            return new OkObjectResult(result);
+        }
+
+
+
+
+
+
+
 
 
 
