@@ -7,11 +7,17 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GenerateCsApiComponent } from './code-generator/generate-cs-api/generate-cs-api.component';
+import { TemplatesListComponent } from './code-generator/templates/list/list.component';
+import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
+import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GenerateCsApiComponent
+    GenerateCsApiComponent,
+    TemplatesListComponent,
+    TemplatesCreateComponent,
+    TemplatesEditComponent
   ],
   imports: [
     BrowserModule,

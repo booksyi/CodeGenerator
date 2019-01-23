@@ -53,6 +53,17 @@ namespace CodeGenerator.Controllers.Templates
             return new OkObjectResult(template);
         }
 
+        [HttpGet("{id:int}/context")]
+        public async Task<ActionResult> GetContextById([FromRoute] int id)
+        {
+            GetTemplateById.Request request = new GetTemplateById.Request()
+            {
+                Id = id
+            };
+            var template = await mediator.Send(request);
+            return new OkObjectResult(template.Context);
+        }
+
         [HttpGet("")]
         public async Task<ActionResult> Get()
         {
