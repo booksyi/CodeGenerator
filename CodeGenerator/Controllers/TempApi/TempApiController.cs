@@ -23,9 +23,13 @@ namespace CodeGenerator.Controllers.TempApi
         [HttpPost("")]
         public async Task<ActionResult> CreateTempApi([FromBody] CreateTempApi.Request request)
         {
+            if (request == null)
+            {
+                request = new CreateTempApi.Request();
+            }
             if (request.Result == null)
             {
-                request.Result = await Request.Body.ToModelAsync<string>();
+                request.Result = await Request.Body.ToStringAsync();
             }
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
@@ -37,7 +41,7 @@ namespace CodeGenerator.Controllers.TempApi
             request.Id = id;
             if (request.Result == null)
             {
-                request.Result = await Request.Body.ToModelAsync<string>();
+                request.Result = await Request.Body.ToStringAsync();
             }
             await mediator.Send(request);
             return new OkResult();

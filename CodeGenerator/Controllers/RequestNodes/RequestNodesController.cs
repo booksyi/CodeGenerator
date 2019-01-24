@@ -51,7 +51,7 @@ namespace CodeGenerator.Controllers.RequestNodes
         {
             if (request.Node == null)
             {
-                request.Node = await Request.Body.ToModelAsync<RequestNode>();
+                request.Node = await Request.Body.ToClassAsync<RequestNode>();
             }
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
@@ -63,7 +63,7 @@ namespace CodeGenerator.Controllers.RequestNodes
             request.Id = id;
             if (request.Node == null)
             {
-                request.Node = await Request.Body.ToModelAsync<RequestNode>();
+                request.Node = await Request.Body.ToClassAsync<RequestNode>();
             }
             await mediator.Send(request);
             return new OkResult();
