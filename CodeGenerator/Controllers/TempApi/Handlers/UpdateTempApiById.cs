@@ -8,13 +8,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.TempPostApi.Handlers
+namespace CodeGenerator.Controllers.TempApi.Handlers
 {
-    public class UpdateTempPostApiById
+    public class UpdateTempApiById
     {
         public class Request : IRequest<uint>
         {
-            public DbTempPostApi TempPostApi { get; set; }
+            internal int Id { get; set; }
+            public string Result { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, uint>
@@ -28,11 +29,11 @@ namespace CodeGenerator.Controllers.TempPostApi.Handlers
             public async Task<uint> Handle(Request request, CancellationToken token)
             {
                 await sqlHelper.ExecuteNonQueryAsync(@"
-                    UPDATE CodeGeneratorTemplate 
+                    UPDATE CodeGeneratorTempApi 
                     SET    [Name] = @Result 
                     WHERE  Id = @Id ",
-                    new SqlParameter("@Id", request.TempPostApi.Id),
-                    new SqlParameter("@Result", request.TempPostApi.Result));
+                    new SqlParameter("@Id", request.Id),
+                    new SqlParameter("@Result", request.Result));
                 return 0;
             }
         }

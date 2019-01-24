@@ -31,7 +31,13 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                     INSERT INTO CodeGeneratorRequestNode 
                     output      inserted.Id 
                     VALUES      (@Node) ",
-                    new SqlParameter("@Node", JsonConvert.SerializeObject(request.Node))));
+                    new SqlParameter("@Node", JsonConvert.SerializeObject(
+                        request.Node,
+                        Formatting.None,
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        }))));
                 return id;
             }
         }

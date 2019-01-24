@@ -8,16 +8,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.Templates.Handlers
+namespace CodeGenerator.Controllers.TempApi.Handlers
 {
-    public class GetTemplateById
+    public class GetTempApiById
     {
-        public class Request : IRequest<DbTemplate>
+        public class Request : IRequest<DbTempApi>
         {
             internal int Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, DbTemplate>
+        public class Handler : IRequestHandler<Request, DbTempApi>
         {
             private readonly SqlHelper sqlHelper;
             public Handler(SqlHelper sqlHelper)
@@ -25,14 +25,14 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                 this.sqlHelper = sqlHelper;
             }
 
-            public async Task<DbTemplate> Handle(Request request, CancellationToken token)
+            public async Task<DbTempApi> Handle(Request request, CancellationToken token)
             {
-                DbTemplate template = (await sqlHelper.ExecuteFirstRowAsync(@"
+                DbTempApi tempApi = (await sqlHelper.ExecuteFirstRowAsync(@"
                     SELECT * 
-                    FROM   CodeGeneratorTemplate 
+                    FROM   CodeGeneratorTempApi 
                     WHERE  Id = @Id ",
-                    new SqlParameter("@Id", request.Id))).ToModel<DbTemplate>();
-                return template;
+                    new SqlParameter("@Id", request.Id))).ToModel<DbTempApi>();
+                return tempApi;
             }
         }
     }

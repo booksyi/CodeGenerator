@@ -20,65 +20,47 @@ namespace CodeGenerator.Controllers.Templates
         }
 
         [HttpPost("")]
-        public async Task<ActionResult> Create([FromBody] DbTemplate template)
+        public async Task<ActionResult> CreateTemplate([FromBody] CreateTemplate.Request request)
         {
-            CreateTemplate.Request request = new CreateTemplate.Request()
-            {
-                Template = template
-            };
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateById([FromRoute] int id, [FromBody] DbTemplate template)
+        public async Task<ActionResult> UpdateTemplateById([FromRoute] int id, [FromBody] UpdateTemplateById.Request request)
         {
-            template.Id = id;
-            UpdateTemplateById.Request request = new UpdateTemplateById.Request()
-            {
-                Template = template
-            };
+            request.Id = id;
             await mediator.Send(request);
             return new OkResult();
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult> GetById([FromRoute] int id)
+        public async Task<ActionResult> GetTemplateById([FromRoute] int id, [FromQuery] GetTemplateById.Request request)
         {
-            GetTemplateById.Request request = new GetTemplateById.Request()
-            {
-                Id = id
-            };
+            request.Id = id;
             var template = await mediator.Send(request);
             return new OkObjectResult(template);
         }
 
         [HttpGet("{id:int}/context")]
-        public async Task<ActionResult> GetContextById([FromRoute] int id)
+        public async Task<ActionResult> GetTemplateContextById([FromRoute] int id, [FromQuery] GetTemplateById.Request request)
         {
-            GetTemplateById.Request request = new GetTemplateById.Request()
-            {
-                Id = id
-            };
+            request.Id = id;
             var template = await mediator.Send(request);
             return new OkObjectResult(template.Context);
         }
 
         [HttpGet("")]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> GetTemplates([FromQuery] GetTemplates.Request request)
         {
-            GetTemplates.Request request = new GetTemplates.Request();
             var templates = await mediator.Send(request);
             return new OkObjectResult(templates);
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteById([FromRoute] int id)
+        public async Task<ActionResult> DeleteTemplateById([FromRoute] int id, [FromQuery] DeleteTemplateById.Request request)
         {
-            DeleteTemplateById.Request request = new DeleteTemplateById.Request()
-            {
-                Id = id
-            };
+            request.Id = id;
             await mediator.Send(request);
             return new OkResult();
         }

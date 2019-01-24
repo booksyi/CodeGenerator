@@ -14,7 +14,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
     {
         public class Request : IRequest<RequestNode>
         {
-            public int Id { get; set; }
+            internal int Id { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, RequestNode>

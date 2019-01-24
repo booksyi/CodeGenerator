@@ -40,7 +40,6 @@ export class TemplatesEditComponent implements OnInit {
 
   templatesEdit() {
     this.templatesEditApi(this.request);
-    this.back();
   }
 
   templatesEditApi(query: TemplatesEditRequest) {
@@ -48,6 +47,7 @@ export class TemplatesEditComponent implements OnInit {
       '/api/templates/' + this.id, query
     ).subscribe(res => {
       this.resources = res;
+      this.back();
     });
   }
 

@@ -13,7 +13,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
     {
         public class Request : IRequest<uint>
         {
-            public int Id { get; set; }
+            internal int Id { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, uint>

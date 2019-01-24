@@ -22,7 +22,40 @@ namespace CodeGenerator.Controllers.Generators
             this.mediator = mediator;
         }
 
-        [HttpPost("download")]
+        // /api/Generators/Generate
+        [HttpPost("generate")]
+        public async Task<ActionResult> GenerateByNode([FromBody] GenerateNode node)
+        {
+            return new OkObjectResult(await node.GenerateAsync());
+        }
+
+        // /api/Generators/{int}/Generate
+        [HttpGet("{id:int}/generate")]
+        public async Task<ActionResult> GenerateByRequestId([FromRoute] int id)
+        {
+            Generate.Request request = new Generate.Request()
+            {
+                Id = id,
+                Body = Request.Query.ToJObject()
+            };
+            var resources = await mediator.Send(request);
+            return new OkObjectResult(resources);
+        }
+
+        // /api/Generators/{int}/Generate
+        [HttpPost("{id:int}/generate")]
+        public async Task<ActionResult> GenerateByRequestId([FromRoute] int id, [FromBody] Generate.Request request)
+        {
+            request.Id = id;
+            if (request.Body == null)
+            {
+                request.Body = await Request.Body.ToJObjectAsync();
+            }
+            var resources = await mediator.Send(request);
+            return new OkObjectResult(resources);
+        }
+
+        [HttpPost("generate/download")]
         public async Task<ActionResult> DownloadByNode([FromBody] GenerateNode node)
         {
             string text = await node.GenerateAsync();
@@ -34,13 +67,13 @@ namespace CodeGenerator.Controllers.Generators
             };
         }
 
-        [HttpPost("{id:int}/download")]
-        public async Task<ActionResult> DownloadByRequestId([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
+        [HttpGet("{id:int}/generate/download")]
+        public async Task<ActionResult> DownloadByRequestId([FromRoute] int id)
         {
             Generate.Request request = new Generate.Request()
             {
                 Id = id,
-                Body = body
+                Body = Request.Query.ToJObject()
             };
             var resources = await mediator.Send(request);
             string text = resources.FirstOrDefault().Text;
@@ -52,27 +85,25 @@ namespace CodeGenerator.Controllers.Generators
             };
         }
 
-        // /api/Generators/Generate
-        [HttpPost("generate")]
-        public async Task<ActionResult> GenerateByNode([FromBody] GenerateNode node)
+        [HttpPost("{id:int}/generate/download")]
+        public async Task<ActionResult> DownloadByRequestId([FromRoute] int id, [FromBody] Generate.Request request)
         {
-            return new OkObjectResult(await node.GenerateAsync());
-        }
-
-        // /api/Generators/{int}/Generate
-        [HttpPost("{id:int}/generate")]
-        public async Task<ActionResult> GenerateByRequestId([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
-        {
-            Generate.Request request = new Generate.Request()
+            request.Id = id;
+            if (request.Body == null)
             {
-                Id = id,
-                Body = body
-            };
+                request.Body = await Request.Body.ToJObjectAsync();
+            }
             var resources = await mediator.Send(request);
-            return new OkObjectResult(resources);
+            string text = resources.FirstOrDefault().Text;
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+            return new FileStreamResult(stream, "text/plain")
+            {
+                FileDownloadName = $"{Guid.NewGuid().ToString("N")}.txt"
+            };
         }
 
-        // /api/Generators/{int}/Tree
+        // /api/Generators/Tree
         [HttpPost("tree")]
         public async Task<ActionResult> GetTreeByNode([FromBody] GenerateNode node)
         {
@@ -80,14 +111,28 @@ namespace CodeGenerator.Controllers.Generators
         }
 
         // /api/Generators/{int}/Tree
-        [HttpPost("{id:int}/tree")]
-        public async Task<ActionResult> GetTreeByRequestId([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
+        [HttpGet("{id:int}/tree")]
+        public async Task<ActionResult> GetTreeByRequestId([FromRoute] int id)
         {
             ToGenerateNodes.Request request = new ToGenerateNodes.Request()
             {
                 Id = id,
-                Body = body
+                Body = Request.Query.ToJObject()
             };
+            var nodes = await mediator.Send(request);
+            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenAsync()));
+            return new OkObjectResult(result);
+        }
+
+        // /api/Generators/{int}/Tree
+        [HttpPost("{id:int}/tree")]
+        public async Task<ActionResult> GetTreeByRequestId([FromRoute] int id, [FromBody] ToGenerateNodes.Request request)
+        {
+            request.Id = id;
+            if (request.Body == null)
+            {
+                request.Body = await Request.Body.ToJObjectAsync();
+            }
             var nodes = await mediator.Send(request);
             var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenAsync()));
             return new OkObjectResult(result);

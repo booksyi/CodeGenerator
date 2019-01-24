@@ -21,48 +21,58 @@ namespace CodeGenerator.Controllers.RequestNodes
         }
 
         // /api/RequestNodes/{int}/ToGenerateNodes
-        [HttpPost("{id:int}/[action]")]
-        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id, [FromBody] Dictionary<string, JToken> body)
+        [HttpGet("{id:int}/toGenerateNodes")]
+        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id)
         {
             ToGenerateNodes.Request request = new ToGenerateNodes.Request()
             {
                 Id = id,
-                Body = body
+                Body = Request.Query.ToJObject()
             };
             var nodes = await mediator.Send(request);
             return new OkObjectResult(nodes);
         }
 
-        [HttpPost("")]
-        public async Task<ActionResult> Create([FromBody] RequestNode node)
+        // /api/RequestNodes/{int}/ToGenerateNodes
+        [HttpPost("{id:int}/toGenerateNodes")]
+        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id, [FromBody] ToGenerateNodes.Request request)
         {
-            CreateRequestNode.Request request = new CreateRequestNode.Request()
+            request.Id = id;
+            if (request.Body == null)
             {
-                Node = node
-            };
+                request.Body = await Request.Body.ToJObjectAsync();
+            }
+            var nodes = await mediator.Send(request);
+            return new OkObjectResult(nodes);
+        }
+
+        [HttpPost("")]
+        public async Task<ActionResult> CreateRequestNode([FromBody] CreateRequestNode.Request request)
+        {
+            if (request.Node == null)
+            {
+                request.Node = await Request.Body.ToModelAsync<RequestNode>();
+            }
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateById([FromRoute] int id, [FromBody] RequestNode node)
+        public async Task<ActionResult> UpdateRequestNodeById([FromRoute] int id, [FromBody] UpdateRequestNodeById.Request request)
         {
-            UpdateRequestNodeById.Request request = new UpdateRequestNodeById.Request()
+            request.Id = id;
+            if (request.Node == null)
             {
-                Id = id,
-                Node = node
-            };
+                request.Node = await Request.Body.ToModelAsync<RequestNode>();
+            }
             await mediator.Send(request);
             return new OkResult();
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult> GetById([FromRoute] int id)
+        public async Task<ActionResult> GetRequestNodeById([FromRoute] int id, [FromQuery] GetRequestNodeById.Request request)
         {
-            GetRequestNodeById.Request request = new GetRequestNodeById.Request()
-            {
-                Id = id
-            };
+            request.Id = id;
             var node = await mediator.Send(request);
             return new OkObjectResult(node);
         }

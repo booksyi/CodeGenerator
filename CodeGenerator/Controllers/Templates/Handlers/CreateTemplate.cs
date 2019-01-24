@@ -14,7 +14,9 @@ namespace CodeGenerator.Controllers.Templates.Handlers
     {
         public class Request : IRequest<int>
         {
-            public DbTemplate Template { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Context { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, int>
@@ -40,11 +42,11 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                                  @Context, 
                                  @Author, 
                                  @Owner) ",
-                    new SqlParameter("@Name", request.Template.Name),
-                    new SqlParameter("@Description", request.Template.Description),
-                    new SqlParameter("@Context", request.Template.Context.Replace("\r\n", "\n").Replace("\n", "\r\n")),
-                    new SqlParameter("@Author", request.Template.Author),
-                    new SqlParameter("@Owner", request.Template.Owner)));
+                    new SqlParameter("@Name", request.Name),
+                    new SqlParameter("@Description", request.Description),
+                    new SqlParameter("@Context", request.Context.Replace("\r\n", "\n").Replace("\n", "\r\n")),
+                    new SqlParameter("@Author", 0 as object),
+                    new SqlParameter("@Owner", 0 as object)));
                 return id;
             }
         }

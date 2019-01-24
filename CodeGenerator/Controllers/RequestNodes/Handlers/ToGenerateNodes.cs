@@ -15,8 +15,8 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
     {
         public class Request : IRequest<IEnumerable<GenerateNode>>
         {
-            public int Id { get; set; }
-            public Dictionary<string, JToken> Body { get; set; }
+            internal int Id { get; set; }
+            public JObject Body { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, IEnumerable<GenerateNode>>
@@ -33,10 +33,9 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                 {
                     Id = request.Id
                 });
-                node.HttpRequest = request.Body;
-                node.Deep();
-                RequestNode[] nodes = (await node.BuildComplex()).ToArray();
-                return (await Task.WhenAll(nodes.Select(async x => await x.ToGenerateNode()))).SelectMany(x => x);
+                //RequestNode[] nodes = (await node.BuildComplex()).ToArray();
+                return await node.ToGenerateNode(request.Body);
+                //return (await Task.WhenAll(nodes.Select(async x => await x.ToGenerateNode(request.Body)))).SelectMany(x => x);
             }
         }
     }

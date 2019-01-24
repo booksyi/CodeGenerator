@@ -1,5 +1,4 @@
-﻿using CodeGenerator.Data.Models;
-using HelpersForCore;
+﻿using HelpersForCore;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,9 +7,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.TempPostApi.Handlers
+namespace CodeGenerator.Controllers.TempApi.Handlers
 {
-    public class CreateTempPostApi
+    public class CreateTempApi
     {
         public class Request : IRequest<int>
         {
@@ -28,7 +27,7 @@ namespace CodeGenerator.Controllers.TempPostApi.Handlers
             public async Task<int> Handle(Request request, CancellationToken token)
             {
                 int id = Convert.ToInt32(await sqlHelper.ExecuteScalarAsync(@"
-                    INSERT INTO CodeGeneratorTempPostApi 
+                    INSERT INTO CodeGeneratorTempApi 
                                 ([Result]) 
                     output      inserted.Id 
                     VALUES      (@Result) ",

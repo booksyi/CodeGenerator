@@ -25,7 +25,6 @@ export class TemplatesCreateComponent implements OnInit {
 
   templatesCreate() {
     this.templatesCreateApi(this.request);
-    this.back();
   }
 
   templatesCreateApi(query: TemplatesCreateRequest) {
@@ -33,6 +32,7 @@ export class TemplatesCreateComponent implements OnInit {
       '/api/templates', query
     ).subscribe(res => {
       this.resources = res;
+      this.back();
     });
   }
 

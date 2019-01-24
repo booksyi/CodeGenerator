@@ -14,8 +14,8 @@ namespace CodeGenerator.Controllers.Generators.Handlers
     {
         public class Request : IRequest<IEnumerable<GeneratorsResource>>
         {
-            public int Id { get; set; }
-            public Dictionary<string, JToken> Body { get; set; }
+            internal int Id { get; set; }
+            public JObject Body { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, IEnumerable<GeneratorsResource>>

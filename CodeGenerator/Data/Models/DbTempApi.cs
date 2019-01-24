@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.Data.Models
 {
-    public class DbTempPostApi
+    public class DbTempApi
     {
         public int Id { get; set; }
         public string Result { get; set; }
