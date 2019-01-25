@@ -25,6 +25,7 @@ namespace CodeGenerator
             services.AddScoped<Pluralize.NET.Core.Pluralizer>();
             services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("DatabaseContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddHttpContextAccessor();
             services.AddMediatR();
             services.AddSwaggerDocument(configure =>
             {
