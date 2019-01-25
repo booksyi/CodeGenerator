@@ -31,7 +31,7 @@ namespace CodeGenerator.Controllers.TempApi.Handlers
                     SELECT * 
                     FROM   CodeGeneratorTempApi 
                     WHERE  Id = @Id ",
-                    new SqlParameter("@Id", request.Id))).ToModel<DbTempApi>();
+                    new SqlParameter("@Id", request.Id))).ToObject<DbTempApi>();
                 return tempApi;
             }
         }

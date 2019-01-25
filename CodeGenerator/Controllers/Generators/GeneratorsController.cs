@@ -107,7 +107,7 @@ namespace CodeGenerator.Controllers.Generators
         [HttpPost("tree")]
         public async Task<ActionResult> GetTreeByNode([FromBody] GenerateNode node)
         {
-            return new OkObjectResult(await node.ToJTokenAsync());
+            return new OkObjectResult(await node.ToJTokenForReadAsync());
         }
 
         // /api/Generators/{int}/Tree
@@ -120,7 +120,7 @@ namespace CodeGenerator.Controllers.Generators
                 Body = Request.Query.ToJObject()
             };
             var nodes = await mediator.Send(request);
-            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenAsync()));
+            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenForReadAsync()));
             return new OkObjectResult(result);
         }
 
@@ -134,7 +134,7 @@ namespace CodeGenerator.Controllers.Generators
                 request.Body = await Request.Body.ToJObjectAsync();
             }
             var nodes = await mediator.Send(request);
-            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenAsync()));
+            var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenForReadAsync()));
             return new OkObjectResult(result);
         }
     }

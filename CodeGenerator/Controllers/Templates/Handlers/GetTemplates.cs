@@ -28,7 +28,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
             {
                 var templates = (await sqlHelper.ExecuteDataTableAsync(@"
                     SELECT * 
-                    FROM   CodeGeneratorTemplate ")).Rows.ToModels<DbTemplate>();
+                    FROM   CodeGeneratorTemplate ")).Rows.ToObjects<DbTemplate>();
                 return templates;
             }
         }

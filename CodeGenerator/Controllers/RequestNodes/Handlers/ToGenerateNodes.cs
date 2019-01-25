@@ -33,9 +33,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                 {
                     Id = request.Id
                 });
-                //RequestNode[] nodes = (await node.BuildComplex()).ToArray();
-                return await node.ToGenerateNode(request.Body);
-                //return (await Task.WhenAll(nodes.Select(async x => await x.ToGenerateNode(request.Body)))).SelectMany(x => x);
+                return await node.ToGenerateNodeAsync(request.Body);
             }
         }
     }

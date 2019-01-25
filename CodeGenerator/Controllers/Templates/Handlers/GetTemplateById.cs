@@ -31,7 +31,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                     SELECT * 
                     FROM   CodeGeneratorTemplate 
                     WHERE  Id = @Id ",
-                    new SqlParameter("@Id", request.Id))).ToModel<DbTemplate>();
+                    new SqlParameter("@Id", request.Id))).ToObject<DbTemplate>();
                 return template;
             }
         }
