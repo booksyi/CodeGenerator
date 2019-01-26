@@ -21,12 +21,15 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
         public class Templates
         {
-            public const string Template1 = @"{{# Names, + }}";
+            public static string Template1(JObject request)
+            {
+                return @"{{# Names, + }}";
+            }
         }
 
         public class Adapters
         {
-            public static JToken Adapter1(JObject query, JObject body)
+            public static JToken Adapter1(JObject request)
             {
                 return JToken.FromObject(new string[] { "AA", "BB", "CC" });
             }
@@ -50,7 +53,10 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 RequestNode node = new RequestNode()
                 {
                     From = RequestFrom.Template,
-                    TemplateUrl = $"{host}/api/testers/templates/Test1/Template1",
+                    TemplateNode = new ApiNode()
+                    {
+                        Url = $"{host}/api/testers/templates/Test1/Template1"
+                    },
                     AdapterNodes = new Dictionary<string, AdapterNode>()
                     {
                         {
@@ -74,7 +80,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 };
 
                 List<string> result = new List<string>();
-                var generateNodes = await node.ToGenerateNodeAsync(httpRequest);
+                var generateNodes = await node.ToGenerateNodesAsync(httpRequest);
                 foreach (var generateNode in generateNodes)
                 {
                     result.Add(await generateNode.GenerateAsync());

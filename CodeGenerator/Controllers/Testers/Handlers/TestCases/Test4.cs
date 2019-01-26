@@ -4,17 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試從 HttpRequest 取值及串流 Adapter
-    /// </summary>
-    public class Test2
+    public class Test4
     {
         public class Request : IRequest<Test.TestCase>
         {
@@ -25,7 +21,17 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
         {
             public static string Template1(JObject request)
             {
-                return @"{{# Result }}";
+                return @"{{# Fields, @@Space }}";
+            }
+
+            public static string Template2(JObject request)
+            {
+                string description = Convert.ToString(request["Description"]);
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    return @"public {{# Name }} { get; set; }";
+                }
+                return @"public {{# Name }} { get; set; } /* {{# Description }} */";
             }
         }
 
@@ -34,15 +40,15 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
         {
             public static JToken Adapter1(JObject request)
             {
-                return JToken.FromObject(new { Name1 = $"{request["Name"]}1" });
-            }
-            public static JToken Adapter2(JObject request)
-            {
-                return JToken.FromObject(new { Name2 = $"{request["Name"]}2" });
-            }
-            public static JToken Adapter3(JObject request)
-            {
-                return JToken.FromObject(new { Name3 = $"{request["Name"]}3" });
+                return JToken.FromObject(new
+                {
+                    Fields = new object[]
+                    {
+                        new { Name = "AA", Description = "標題" },
+                        new { Name = "BB", Description = "內文" },
+                        new { Name = "CC", Description = "" },
+                    }
+                });
             }
         }
 
@@ -59,7 +65,6 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
                 JObject httpRequest = new JObject()
                 {
-                    { "Name", "ABC" }
                 };
 
                 RequestNode node = new RequestNode()
@@ -67,72 +72,59 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     From = RequestFrom.Template,
                     TemplateNode = new ApiNode()
                     {
-                        Url = $"{host}/api/testers/templates/Test2/Template1"
-                    },
-                    AdapterNodes = new Dictionary<string, AdapterNode>()
-                    {
-                        {
-                            "Adapter1", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Get,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter1",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
-                                {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.HttpRequest,
-                                            HttpRequestKey = "Name"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "Adapter2", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Get,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter2",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
-                                {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.Adapter,
-                                            AdapterName = "Adapter1",
-                                            AdapterPropertyName = "Name1"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "Adapter3", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Post,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter3",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
-                                {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.Adapter,
-                                            AdapterName = "Adapter2",
-                                            AdapterPropertyName = "Name2"
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        Url = $"{host}/api/testers/templates/Test4/Template1"
                     },
                     SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
                     {
                         {
-                            "Result", new RequestNode()
+                            "Fields", new RequestNode()
                             {
-                                From = RequestFrom.Adapter,
-                                AdapterName = "Adapter3",
-                                AdapterPropertyName = "Name3"
+                                From = RequestFrom.Template,
+                                AdapterNodes = new Dictionary<string, AdapterNode>()
+                                {
+                                    {
+                                        "Adapter1", new AdapterNode()
+                                        {
+                                            HttpMethod = AdapterHttpMethod.Get,
+                                            Url = $"{host}/api/testers/adapters/Test4/Adapter1",
+                                            Type = AdapterType.Separation
+                                        }
+                                    }
+                                },
+                                TemplateNode = new ApiNode()
+                                {
+                                    Url = $"{host}/api/testers/templates/Test4/Template2",
+                                    RequestNodes = new Dictionary<string, RequestSimpleNode>()
+                                    {
+                                        {
+                                            "Description", new RequestSimpleNode()
+                                            {
+                                                From = RequestSimpleFrom.Adapter,
+                                                AdapterName = "Adapter1",
+                                                AdapterPropertyName = "Fields.Description"
+                                            }
+                                        }
+                                    }
+                                },
+                                SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
+                                {
+                                    {
+                                        "Name", new RequestNode()
+                                        {
+                                            From = RequestFrom.Adapter,
+                                            AdapterName = "Adapter1",
+                                            AdapterPropertyName = "Fields.Name"
+                                        }
+                                    },
+                                    {
+                                        "Description", new RequestNode()
+                                        {
+                                            From = RequestFrom.Adapter,
+                                            AdapterName = "Adapter1",
+                                            AdapterPropertyName = "Fields.Description"
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -144,8 +136,8 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 {
                     result.Add(await generateNode.GenerateAsync());
                 }
-                
-                return result[0] == "ABC123";
+
+                return result[0] == "public AA { get; set; } /* 標題 */ public BB { get; set; } /* 內文 */ public CC { get; set; }";
             }
 
             public async Task<Test.TestCase> Handle(Request request, CancellationToken token)

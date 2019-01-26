@@ -33,7 +33,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                 {
                     Id = request.Id
                 });
-                return await node.ToGenerateNodeAsync(request.Body);
+                return await node.ToGenerateNodesAsync(request.Body);
             }
         }
     }

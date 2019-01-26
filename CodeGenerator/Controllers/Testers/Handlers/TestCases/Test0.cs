@@ -19,13 +19,16 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
         // $"{host}/api/testers/templates/{Tester}/{Template}"
         public class Templates
         {
-            public const string Template1 = @"";
+            public static string Template1(JObject request)
+            {
+                return @"";
+            }
         }
 
         // $"{host}/api/testers/adapters/{Tester}/{Adapter}
         public class Adapters
         {
-            public static JToken Adapter1(JObject query, JObject body)
+            public static JToken Adapter1(JObject request)
             {
                 return JToken.FromObject(new string[] { "AA", "BB", "CC" });
             }

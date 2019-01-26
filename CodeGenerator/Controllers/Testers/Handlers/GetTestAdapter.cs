@@ -16,7 +16,6 @@ namespace CodeGenerator.Controllers.Testers.Handlers
             internal string Tester { get; set; }
             internal string Adapter { get; set; }
             internal JObject Query { get; set; }
-            internal JObject Body { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, JToken>
@@ -31,8 +30,8 @@ namespace CodeGenerator.Controllers.Testers.Handlers
                 Type type = assembly.GetType(
                     $"CodeGenerator.Controllers.Testers.Handlers.TestCases.{request.Tester}+Adapters");
                 var method = type.GetMethod(request.Adapter);
-                var adapterValue = method.Invoke(null, new object[] { request.Query, request.Body });
-                return JToken.FromObject(adapterValue);
+                var value = method.Invoke(null, new object[] { request.Query });
+                return JToken.FromObject(value);
             }
         }
     }

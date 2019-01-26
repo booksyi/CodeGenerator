@@ -30,11 +30,13 @@ namespace CodeGenerator.Controllers.Testers
         [HttpGet("templates/{tester}/{template}")]
         public async Task<ActionResult> GetTestTemplate([FromRoute] string tester, [FromRoute] string template)
         {
-            string txt = await mediator.Send(new GetTestTemplate.Request()
+            GetTestTemplate.Request request = new GetTestTemplate.Request()
             {
                 Tester = tester,
-                Template = template
-            });
+                Template = template,
+                Query = Request.Query.ToJObject()
+            };
+            string txt = await mediator.Send(request);
             return Content(txt);
         }
 
@@ -53,7 +55,7 @@ namespace CodeGenerator.Controllers.Testers
             }
             else if (Request.Method.In("POST", "PUT"))
             {
-                request.Body = await Request.Body.ToJObjectAsync();
+                request.Query = await Request.Body.ToJObjectAsync();
             }
             JToken result = await mediator.Send(request);
             return new OkObjectResult(result);

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers
         {
             internal string Tester { get; set; }
             internal string Template { get; set; }
+            internal JObject Query { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, string>
@@ -27,8 +29,9 @@ namespace CodeGenerator.Controllers.Testers.Handlers
                 Assembly assembly = Assembly.GetEntryAssembly();
                 Type type = assembly.GetType(
                     $"CodeGenerator.Controllers.Testers.Handlers.TestCases.{request.Tester}+Templates");
-                FieldInfo field = type.GetField(request.Template);
-                return field.GetRawConstantValue() as string;
+                var method = type.GetMethod(request.Template);
+                var value = method.Invoke(null, new object[] { request.Query });
+                return value as string;
             }
         }
     }
