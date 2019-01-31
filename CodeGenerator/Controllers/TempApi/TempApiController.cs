@@ -55,6 +55,13 @@ namespace CodeGenerator.Controllers.TempApi
             return new OkObjectResult(tempApi);
         }
 
+        [HttpGet("")]
+        public async Task<ActionResult> GetTempApis([FromQuery] GetTempApis.Request request)
+        {
+            var templates = await mediator.Send(request);
+            return new OkObjectResult(templates);
+        }
+
         [HttpPost("{id:int}/post")]
         public async Task<ActionResult> PostResult([FromRoute] int id, [FromBody] GetTempApiById.Request request)
         {

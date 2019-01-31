@@ -42,17 +42,17 @@ CREATE TABLE [dbo].[CodeGeneratorRequestNode](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-/****** Object:  Table [dbo].[CodeGeneratorTempPostApi]    Script Date: 2019/1/22 下午 06:12:50 ******/
+/****** Object:  Table [dbo].[CodeGeneratorTempApi]    Script Date: 2019/1/22 下午 06:12:50 ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[CodeGeneratorTempPostApi](
+CREATE TABLE [dbo].[CodeGeneratorTempApi](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Result] [nvarchar](max) NOT NULL,
- CONSTRAINT [PK_CodeGeneratorTempPostApi] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_CodeGeneratorTempApi] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

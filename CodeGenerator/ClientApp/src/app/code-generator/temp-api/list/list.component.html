@@ -1,0 +1,16 @@
+<input type="button" class="btn btn-success" value="新增" (click)="create()" />
+
+<table class="table">
+  <tr>
+    <th>Id</th>
+    <th>URL</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let resource of resources">
+    <td>{{resource.id}}</td>
+    <td><a href="/api/temp/{{resource.id}}/get" target="_blank">/api/temp/{{resource.id}}/get</a></td>
+    <td>
+      <input type="button" class="btn btn-link" value="編輯" (click)="edit(resource.id)" />
+    </td>
+  </tr>
+</table>

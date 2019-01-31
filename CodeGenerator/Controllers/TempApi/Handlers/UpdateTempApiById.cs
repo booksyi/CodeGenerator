@@ -30,7 +30,7 @@ namespace CodeGenerator.Controllers.TempApi.Handlers
             {
                 await sqlHelper.ExecuteNonQueryAsync(@"
                     UPDATE CodeGeneratorTempApi 
-                    SET    [Name] = @Result 
+                    SET    Result = @Result 
                     WHERE  Id = @Id ",
                     new SqlParameter("@Id", request.Id),
                     new SqlParameter("@Result", request.Result));

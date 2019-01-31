@@ -6,7 +6,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { GenerateCsApiComponent } from './code-generator/generate-cs-api/generate-cs-api.component';
+import { TempApiListComponent } from './code-generator/temp-api/list/list.component';
+import { TempApiCreateComponent } from './code-generator/temp-api/create/create.component';
+import { TempApiEditComponent } from './code-generator/temp-api/edit/edit.component';
 import { TemplatesListComponent } from './code-generator/templates/list/list.component';
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
@@ -14,7 +16,9 @@ import { TemplatesEditComponent } from './code-generator/templates/edit/edit.com
 @NgModule({
   declarations: [
     AppComponent,
-    GenerateCsApiComponent,
+    TempApiListComponent,
+    TempApiCreateComponent,
+    TempApiEditComponent,
     TemplatesListComponent,
     TemplatesCreateComponent,
     TemplatesEditComponent
