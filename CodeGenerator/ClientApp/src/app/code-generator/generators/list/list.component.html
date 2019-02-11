@@ -1,0 +1,21 @@
+<input type="button" class="btn btn-success" value="新增" (click)="create()" />
+
+<table class="table">
+  <tr>
+    <th>Id</th>
+    <th>樣板</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let resource of resources">
+    <td>{{resource.id}}</td>
+    <td>
+      <div *ngFor="let template of resource.templates">
+        <a href="{{template}}" target="_blank">{{template}}</a>
+      </div>
+    </td>
+    <td>
+      <input type="button" class="btn btn-link" value="編輯" (click)="edit(resource.id)" />
+      <input type="button" class="btn btn-link" value="生成" (click)="generate(resource.id)" />
+    </td>
+  </tr>
+</table>

@@ -76,5 +76,27 @@ namespace CodeGenerator.Controllers.RequestNodes
             var node = await mediator.Send(request);
             return new OkObjectResult(node);
         }
+
+        [HttpGet("")]
+        public async Task<ActionResult> GetRequestNodes([FromQuery] GetRequestNodes.Request request)
+        {
+            var nodes = await mediator.Send(request);
+            return new OkObjectResult(nodes);
+        }
+
+        [HttpGet("{id:int}/inputs")]
+        public async Task<ActionResult> GetRequestNodeInputsById([FromRoute] int id, [FromQuery] GetRequestNodeInputsById.Request request)
+        {
+            request.Id = id;
+            var inputs = await mediator.Send(request);
+            return new OkObjectResult(inputs);
+        }
+
+        [HttpGet("dev")]
+        public async Task<ActionResult> GetRequestNodeJsonFromDeveloper([FromQuery] GetRequestNodeJsonFromDeveloper.Request request)
+        {
+            var json = await mediator.Send(request);
+            return Content(json);
+        }
     }
 }

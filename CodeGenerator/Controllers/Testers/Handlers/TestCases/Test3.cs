@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
+    /// <summary>
+    /// 測試 AdapterNode 的 ResponseConfine 與 Type (AdapterType.Separation)
+    /// </summary>
     public class Test3
     {
         public class Request : IRequest<Test.TestCase>

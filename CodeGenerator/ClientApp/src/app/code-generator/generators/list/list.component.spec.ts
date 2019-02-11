@@ -1,21 +1,21 @@
-/// <reference path="../../../../../../node_modules/@types/jasmine/index.d.ts" />
+﻿/// <reference path="../../../../../../node_modules/@types/jasmine/index.d.ts" />
 import { TestBed, async, ComponentFixture, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { BrowserModule, By } from "@angular/platform-browser";
-import { TempApiEditComponent } from './edit.component';
+import { ListComponent } from './list.component';
 
-let component: TempApiEditComponent;
-let fixture: ComponentFixture<TempApiEditComponent>;
+let component: ListComponent;
+let fixture: ComponentFixture<ListComponent>;
 
-describe('edit component', () => {
+describe('list component', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-          declarations: [ TempApiEditComponent ],
+            declarations: [ ListComponent ],
             imports: [ BrowserModule ],
             providers: [
                 { provide: ComponentFixtureAutoDetect, useValue: true }
             ]
         });
-      fixture = TestBed.createComponent(TempApiEditComponent);
+        fixture = TestBed.createComponent(ListComponent);
         component = fixture.componentInstance;
     }));
 

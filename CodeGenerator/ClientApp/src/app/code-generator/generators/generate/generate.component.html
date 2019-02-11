@@ -1,0 +1,45 @@
+<form>
+  <ng-container *ngIf="resources; then template_codes else template_inputs"></ng-container>
+  <ng-template #template_inputs>
+    <div class="form-group row" *ngFor="let input of inputs">
+      <ng-container *ngIf="input.descriptions.length; then template_descriptions else template_key"></ng-container>
+      <ng-template #template_descriptions>
+        <label class="col-sm-2 col-form-label">{{input.descriptions.join('、')}}</label>
+      </ng-template>
+      <ng-template #template_key>
+        <label class="col-sm-2 col-form-label">{{input.key}}</label>
+      </ng-template>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="input.value" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="offset-sm-2 col-sm-10">
+        <div class="md-form mt-0">
+          <input type="button" class="btn btn-primary" value="生成代碼" (click)="submit()" />
+          <input type="button" class="btn btn-secondary" value="返回列表" (click)="back()" />
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #template_codes>
+    <div class="form-group row" *ngFor="let resource of resources">
+      <label class="col-sm-2 col-form-label">沒有指定名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <textarea class="form-control" rows="7" readonly="readonly">{{resource.text}}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="offset-sm-2 col-sm-10">
+        <div class="md-form mt-0">
+          <input type="button" class="btn btn-primary" value="重新生成" (click)="rollback()" />
+          <input type="button" class="btn btn-secondary" value="返回列表" (click)="back()" />
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</form>

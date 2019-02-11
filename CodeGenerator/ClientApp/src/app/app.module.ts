@@ -12,6 +12,8 @@ import { TempApiEditComponent } from './code-generator/temp-api/edit/edit.compon
 import { TemplatesListComponent } from './code-generator/templates/list/list.component';
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
+import { GeneratorsListComponent } from './code-generator/generators/list/list.component';
+import { GeneratorsGenerateComponent } from './code-generator/generators/generate/generate.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { TemplatesEditComponent } from './code-generator/templates/edit/edit.com
     TempApiEditComponent,
     TemplatesListComponent,
     TemplatesCreateComponent,
-    TemplatesEditComponent
+    TemplatesEditComponent,
+    GeneratorsListComponent,
+    GeneratorsGenerateComponent
   ],
   imports: [
     BrowserModule,

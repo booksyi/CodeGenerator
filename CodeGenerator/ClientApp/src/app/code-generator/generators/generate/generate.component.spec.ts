@@ -1,21 +1,21 @@
 /// <reference path="../../../../../../node_modules/@types/jasmine/index.d.ts" />
 import { TestBed, async, ComponentFixture, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { BrowserModule, By } from "@angular/platform-browser";
-import { TempApiEditComponent } from './edit.component';
+import { GeneratorsGenerateComponent } from './generate.component';
 
-let component: TempApiEditComponent;
-let fixture: ComponentFixture<TempApiEditComponent>;
+let component: GeneratorsGenerateComponent;
+let fixture: ComponentFixture<GeneratorsGenerateComponent>;
 
-describe('edit component', () => {
+describe('generate component', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-          declarations: [ TempApiEditComponent ],
+          declarations: [GeneratorsGenerateComponent ],
             imports: [ BrowserModule ],
             providers: [
                 { provide: ComponentFixtureAutoDetect, useValue: true }
             ]
         });
-      fixture = TestBed.createComponent(TempApiEditComponent);
+      fixture = TestBed.createComponent(GeneratorsGenerateComponent);
         component = fixture.componentInstance;
     }));
 
