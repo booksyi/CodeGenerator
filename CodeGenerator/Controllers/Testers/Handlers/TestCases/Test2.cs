@@ -62,78 +62,39 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     { "Name", "ABC" }
                 };
 
-                RequestNode node = new RequestNode()
+                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
                 {
-                    From = RequestFrom.Template,
-                    TemplateNode = new ApiNode()
+                    From = CodeTemplate.ParameterFrom.Template,
+                    TemplateNode = new CodeTemplate.TemplateNode()
                     {
-                        Url = $"{host}/api/testers/templates/Test2/Template1"
-                    },
-                    AdapterNodes = new Dictionary<string, AdapterNode>()
-                    {
+                        Url = $"{host}/api/testers/templates/Test2/Template1",
+                        AdapterNodes = new CodeTemplate.AdapterNode[]
                         {
-                            "Adapter1", new AdapterNode()
+                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test2/Adapter1")
                             {
-                                HttpMethod = AdapterHttpMethod.Get,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter1",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
+                                RequestNodes = new CodeTemplate.RequestNode[]
                                 {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.HttpRequest,
-                                            HttpRequestKey = "Name"
-                                        }
-                                    }
+                                    new CodeTemplate.RequestNode("Name").FromInput("Name")
+                                }
+                            },
+                            new CodeTemplate.AdapterNode("Adapter2", $"{host}/api/testers/adapters/Test2/Adapter2")
+                            {
+                                RequestNodes = new CodeTemplate.RequestNode[]
+                                {
+                                    new CodeTemplate.RequestNode("Name").FromAdapter("Adapter1", "Name1")
+                                }
+                            },
+                            new CodeTemplate.AdapterNode("Adapter3", $"{host}/api/testers/adapters/Test2/Adapter3")
+                            {
+                                RequestNodes = new CodeTemplate.RequestNode[]
+                                {
+                                    new CodeTemplate.RequestNode("Name").FromAdapter("Adapter2", "Name2")
                                 }
                             }
                         },
+                        ParameterNodes = new CodeTemplate.ParameterNode[]
                         {
-                            "Adapter2", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Get,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter2",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
-                                {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.Adapter,
-                                            AdapterName = "Adapter1",
-                                            AdapterPropertyName = "Name1"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "Adapter3", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Post,
-                                Url = $"{host}/api/testers/adapters/Test2/Adapter3",
-                                RequestNodes = new Dictionary<string, RequestSimpleNode>()
-                                {
-                                    {
-                                        "Name", new RequestSimpleNode()
-                                        {
-                                            From = RequestSimpleFrom.Adapter,
-                                            AdapterName = "Adapter2",
-                                            AdapterPropertyName = "Name2"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
-                    {
-                        {
-                            "Result", new RequestNode()
-                            {
-                                From = RequestFrom.Adapter,
-                                AdapterName = "Adapter3",
-                                AdapterPropertyName = "Name3"
-                            }
+                            new CodeTemplate.ParameterNode("Result").FromAdapter("Adapter3", "Name3")
                         }
                     }
                 };

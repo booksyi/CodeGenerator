@@ -50,31 +50,19 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 {
                 };
 
-                RequestNode node = new RequestNode()
+                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
                 {
-                    From = RequestFrom.Template,
-                    TemplateNode = new ApiNode()
+                    From = CodeTemplate.ParameterFrom.Template,
+                    TemplateNode = new CodeTemplate.TemplateNode()
                     {
-                        Url = $"{host}/api/testers/templates/Test1/Template1"
-                    },
-                    AdapterNodes = new Dictionary<string, AdapterNode>()
-                    {
+                        Url = $"{host}/api/testers/templates/Test1/Template1",
+                        AdapterNodes = new CodeTemplate.AdapterNode[]
                         {
-                            "Adapter1", new AdapterNode()
-                            {
-                                HttpMethod = AdapterHttpMethod.Get,
-                                Url = $"{host}/api/testers/adapters/Test1/Adapter1"
-                            }
-                        }
-                    },
-                    SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
-                    {
+                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test1/Adapter1")
+                        },
+                        ParameterNodes = new CodeTemplate.ParameterNode[]
                         {
-                            "Names", new RequestNode()
-                            {
-                                From = RequestFrom.Adapter,
-                                AdapterName = "Adapter1"
-                            }
+                            new CodeTemplate.ParameterNode("Names").FromAdapter("Adapter1")
                         }
                     }
                 };

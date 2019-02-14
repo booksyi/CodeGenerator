@@ -27,128 +27,57 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
             public async Task<string> Handle(Request request, CancellationToken token)
             {
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
-                RequestNode node = new RequestNode()
+                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
                 {
-                    From = RequestFrom.Template,
-                    TemplateNode = new ApiNode()
+                    From = CodeTemplate.ParameterFrom.Template,
+                    TemplateNode = new CodeTemplate.TemplateNode()
                     {
-                        Url = $"{host}/api/templates/10/context"
-                    },
-                    SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
-                    {
+                        Url = $"{host}/api/templates/10/context",
+                        ParameterNodes = new CodeTemplate.ParameterNode[]
                         {
-                            "ProjectName", new RequestNode()
+                            new CodeTemplate.ParameterNode("ProjectName").FromInput("ProjectName"),
+                            new CodeTemplate.ParameterNode("TableName").FromInput("TableName"),
+                            new CodeTemplate.ParameterNode("ModelName").FromInput("ModelName"),
+                            new CodeTemplate.ParameterNode("Properties")
                             {
-                                From = RequestFrom.HttpRequest,
-                                HttpRequestKey = "ProjectName"
-                            }
-                        },
-                        {
-                            "TableName", new RequestNode()
-                            {
-                                From = RequestFrom.HttpRequest,
-                                HttpRequestKey = "TableName",
-                                HttpRequestDescription = "資料表"
-                            }
-                        },
-                        {
-                            "ModelName", new RequestNode()
-                            {
-                                From = RequestFrom.HttpRequest,
-                                HttpRequestKey = "ModelName"
-                            }
-                        },
-                        {
-                            "Properties", new RequestNode()
-                            {
-                                From = RequestFrom.Template,
-                                TemplateNode = new ApiNode()
+                                From = CodeTemplate.ParameterFrom.Template,
+                                TemplateNode = new CodeTemplate.TemplateNode()
                                 {
-                                    Url = $"{host}/api/templates/9/context"
-                                },
-                                AdapterNodes = new Dictionary<string, AdapterNode>()
-                                {
+                                    Url = $"{host}/api/templates/9/context",
+                                    AdapterNodes = new CodeTemplate.AdapterNode[]
                                     {
-                                        "PropertiesAdapter", new AdapterNode()
+                                        new CodeTemplate.AdapterNode(
+                                            "PropertiesAdapter",
+                                            $"{host}/api/adapters/db/table/fields",
+                                            CodeTemplate.HttpMethod.Get)
                                         {
-                                            HttpMethod = AdapterHttpMethod.Get,
-                                            Url = $"{host}/api/adapters/db/table/fields",
-                                            RequestNodes = new Dictionary<string, RequestSimpleNode>()
+                                            RequestNodes = new CodeTemplate.RequestNode[]
                                             {
-                                                {
-                                                    "ConnectionString", new RequestSimpleNode()
-                                                    {
-                                                        From = RequestSimpleFrom.HttpRequest,
-                                                        HttpRequestKey = "ConnectionString"
-                                                    }
-                                                },
-                                                {
-                                                    "TableName", new RequestSimpleNode()
-                                                    {
-                                                        From = RequestSimpleFrom.HttpRequest,
-                                                        HttpRequestKey = "TableName",
-                                                        HttpRequestDescription = "資料表名稱"
-                                                    }
-                                                }
+                                                new CodeTemplate.RequestNode("ConnectionString").FromInput("ConnectionString"),
+                                                new CodeTemplate.RequestNode("TableName").FromInput("TableName")
                                             },
-                                            Type = AdapterType.Separation
+                                            ResponseSplit = true
                                         }
                                     },
-                                },
-                                SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
-                                {
+                                    ParameterNodes = new CodeTemplate.ParameterNode[]
                                     {
-                                        "Summary", new RequestNode()
+                                        new CodeTemplate.ParameterNode("Summary")
                                         {
-                                            From = RequestFrom.Template,
-                                            TemplateNode = new ApiNode()
+                                            From = CodeTemplate.ParameterFrom.Template,
+                                            TemplateNode = new CodeTemplate.TemplateNode()
                                             {
-                                                Url = $"{host}/api/templates/8/context"
-                                            },
-                                            SimpleTemplateRequestNodes = new Dictionary<string, RequestNode>()
-                                            {
+                                                Url = $"{host}/api/templates/8/context",
+                                                ParameterNodes = new CodeTemplate.ParameterNode[]
                                                 {
-                                                    "Text", new RequestNode()
-                                                    {
-                                                        From = RequestFrom.Adapter,
-                                                        AdapterName = "PropertiesAdapter",
-                                                        AdapterPropertyName = "Description"
-                                                    }
+                                                    new CodeTemplate.ParameterNode("Text").FromAdapter("PropertiesAdapter", "Description")
                                                 }
                                             }
-                                        }
-                                    },
-                                    {
-                                        "Attributes", new RequestNode()
-                                        {
-                                            From = RequestFrom.Adapter,
-                                            AdapterName = "PropertiesAdapter",
-                                            AdapterPropertyName = "ForCs.EFAttributes"
-                                        }
-                                    },
-                                    {
-                                        "Prefix", new RequestNode()
-                                        {
-                                            From = RequestFrom.Value,
-                                            Value = "public"
-                                        }
-                                    },
-                                    {
-                                        "TypeName", new RequestNode()
-                                        {
-                                            From = RequestFrom.Adapter,
-                                            AdapterName = "PropertiesAdapter",
-                                            AdapterPropertyName = "ForCs.TypeName"
-                                        }
-                                    },
-                                    {
-                                        "PropertyName", new RequestNode()
-                                        {
-                                            From = RequestFrom.Adapter,
-                                            AdapterName = "PropertiesAdapter",
-                                            AdapterPropertyName = "Name"
-                                        }
-                                    },
+                                        },
+                                        new CodeTemplate.ParameterNode("Attributes").FromAdapter("PropertiesAdapter", "ForCs.EFAttributes"),
+                                        new CodeTemplate.ParameterNode("Prefix").FromValue("public"),
+                                        new CodeTemplate.ParameterNode("TypeName").FromAdapter("PropertiesAdapter", "ForCs.TypeName"),
+                                        new CodeTemplate.ParameterNode("PropertyName").FromAdapter("PropertiesAdapter", "Name"),
+                                    }
                                 }
                             }
                         }

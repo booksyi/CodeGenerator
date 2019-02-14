@@ -51,7 +51,7 @@ namespace CodeGenerator.Controllers.RequestNodes
         {
             if (request.Node == null)
             {
-                request.Node = await Request.Body.ToObjectAsync<RequestNode>();
+                request.Node = await Request.Body.ToObjectAsync<CodeTemplate.TransactionParameterNode>();
             }
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
@@ -63,7 +63,7 @@ namespace CodeGenerator.Controllers.RequestNodes
             request.Id = id;
             if (request.Node == null)
             {
-                request.Node = await Request.Body.ToObjectAsync<RequestNode>();
+                request.Node = await Request.Body.ToObjectAsync<CodeTemplate.TransactionParameterNode>();
             }
             await mediator.Send(request);
             return new OkResult();

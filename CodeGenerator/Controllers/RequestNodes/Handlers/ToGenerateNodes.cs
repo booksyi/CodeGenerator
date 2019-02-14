@@ -29,7 +29,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
 
             public async Task<IEnumerable<GenerateNode>> Handle(Request request, CancellationToken token)
             {
-                RequestNode node = await mediator.Send(new GetRequestNodeById.Request()
+                CodeTemplate.TransactionParameterNode node = await mediator.Send(new GetRequestNodeById.Request()
                 {
                     Id = request.Id
                 });
