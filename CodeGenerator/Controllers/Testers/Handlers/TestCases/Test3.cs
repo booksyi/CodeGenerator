@@ -83,35 +83,37 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     { "Table", "TableA" }
                 };
 
-                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
+                CodeTemplate template = new CodeTemplate()
                 {
-                    From = CodeTemplate.ParameterFrom.Template,
-                    TemplateNode = new CodeTemplate.TemplateNode()
+                    TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
-                        Url = $"{host}/api/testers/templates/Test3/Template1",
-                        ParameterNodes = new CodeTemplate.ParameterNode[]
+                        new CodeTemplate.TemplateNode()
                         {
-                            new CodeTemplate.ParameterNode("Fields")
+                            Url = $"{host}/api/testers/templates/Test3/Template1",
+                            ParameterNodes = new CodeTemplate.ParameterNode[]
                             {
-                                From = CodeTemplate.ParameterFrom.Template,
-                                TemplateNode = new CodeTemplate.TemplateNode()
+                                new CodeTemplate.ParameterNode("Fields")
                                 {
-                                    Url = $"{host}/api/testers/templates/Test3/Template2",
-                                    AdapterNodes = new CodeTemplate.AdapterNode[]
+                                    From = CodeTemplate.ParameterFrom.Template,
+                                    TemplateNode = new CodeTemplate.TemplateNode()
                                     {
-                                        new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test3/Adapter1")
+                                        Url = $"{host}/api/testers/templates/Test3/Template2",
+                                        AdapterNodes = new CodeTemplate.AdapterNode[]
                                         {
-                                            RequestNodes = new CodeTemplate.RequestNode[]
+                                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test3/Adapter1")
                                             {
-                                                new CodeTemplate.RequestNode("TableName").FromInput("Table")
-                                            },
-                                            ResponseConfine = "Fields",
-                                            ResponseSplit = true
+                                                RequestNodes = new CodeTemplate.RequestNode[]
+                                                {
+                                                    new CodeTemplate.RequestNode("TableName").FromInput("Table")
+                                                },
+                                                ResponseConfine = "Fields",
+                                                ResponseSplit = true
+                                            }
+                                        },
+                                        ParameterNodes = new CodeTemplate.ParameterNode[]
+                                        {
+                                            new CodeTemplate.ParameterNode("FieldName").FromAdapter("Adapter1", "Fields.Name")
                                         }
-                                    },
-                                    ParameterNodes = new CodeTemplate.ParameterNode[]
-                                    {
-                                        new CodeTemplate.ParameterNode("FieldName").FromAdapter("Adapter1", "Fields.Name")
                                     }
                                 }
                             }
@@ -120,7 +122,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 };
 
                 List<string> result = new List<string>();
-                var generateNodes = await node.ToGenerateNodesAsync(httpRequest);
+                var generateNodes = await template.ToGenerateNodesAsync(httpRequest);
                 foreach (var generateNode in generateNodes)
                 {
                     result.Add(await generateNode.GenerateAsync());

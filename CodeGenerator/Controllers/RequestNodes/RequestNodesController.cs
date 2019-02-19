@@ -49,9 +49,9 @@ namespace CodeGenerator.Controllers.RequestNodes
         [HttpPost("")]
         public async Task<ActionResult> CreateRequestNode([FromBody] CreateRequestNode.Request request)
         {
-            if (request.Node == null)
+            if (request.Template == null)
             {
-                request.Node = await Request.Body.ToObjectAsync<CodeTemplate.TransactionParameterNode>();
+                request.Template = await Request.Body.ToObjectAsync<CodeTemplate>();
             }
             int id = await mediator.Send(request);
             return new OkObjectResult(id);
@@ -61,9 +61,9 @@ namespace CodeGenerator.Controllers.RequestNodes
         public async Task<ActionResult> UpdateRequestNodeById([FromRoute] int id, [FromBody] UpdateRequestNodeById.Request request)
         {
             request.Id = id;
-            if (request.Node == null)
+            if (request.Template == null)
             {
-                request.Node = await Request.Body.ToObjectAsync<CodeTemplate.TransactionParameterNode>();
+                request.Template = await Request.Body.ToObjectAsync<CodeTemplate>();
             }
             await mediator.Send(request);
             return new OkResult();

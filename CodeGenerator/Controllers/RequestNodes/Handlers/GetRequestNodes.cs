@@ -36,8 +36,8 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                     FROM   CodeGeneratorRequestNode ")).Rows.ToObjects<Response>();
                 foreach (var node in nodes)
                 {
-                    CodeTemplate.TransactionParameterNode requestNode = JsonConvert.DeserializeObject<CodeTemplate.TransactionParameterNode>(node.Node);
-                    node.Templates = requestNode.GetAllTemplates();
+                    CodeTemplate template = JsonConvert.DeserializeObject<CodeTemplate>(node.Node);
+                    node.Templates = new string[0];
                 }
                 return nodes;
             }

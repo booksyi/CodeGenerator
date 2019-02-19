@@ -15,7 +15,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
         public class Request : IRequest<uint>
         {
             internal int Id { get; set; }
-            public CodeTemplate.TransactionParameterNode Node { get; set; }
+            public CodeTemplate Template { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, uint>
@@ -33,13 +33,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                     SET    [Node] = @Node 
                     WHERE  Id = @Id ",
                     new SqlParameter("@Id", request.Id),
-                    new SqlParameter("@Node", JsonConvert.SerializeObject(
-                        request.Node,
-                        Formatting.None,
-                        new JsonSerializerSettings
-                        {
-                            NullValueHandling = NullValueHandling.Ignore
-                        })));
+                    new SqlParameter("@Node", JsonConvert.SerializeObject(request.Template)));
                 return 0;
             }
         }

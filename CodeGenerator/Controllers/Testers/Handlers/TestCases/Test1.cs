@@ -50,25 +50,27 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 {
                 };
 
-                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
+                CodeTemplate template = new CodeTemplate()
                 {
-                    From = CodeTemplate.ParameterFrom.Template,
-                    TemplateNode = new CodeTemplate.TemplateNode()
+                    TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
-                        Url = $"{host}/api/testers/templates/Test1/Template1",
-                        AdapterNodes = new CodeTemplate.AdapterNode[]
+                        new CodeTemplate.TemplateNode()
                         {
-                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test1/Adapter1")
-                        },
-                        ParameterNodes = new CodeTemplate.ParameterNode[]
-                        {
-                            new CodeTemplate.ParameterNode("Names").FromAdapter("Adapter1")
+                            Url = $"{host}/api/testers/templates/Test1/Template1",
+                            AdapterNodes = new CodeTemplate.AdapterNode[]
+                            {
+                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test1/Adapter1")
+                            },
+                            ParameterNodes = new CodeTemplate.ParameterNode[]
+                            {
+                                new CodeTemplate.ParameterNode("Names").FromAdapter("Adapter1")
+                            }
                         }
                     }
                 };
 
                 List<string> result = new List<string>();
-                var generateNodes = await node.ToGenerateNodesAsync(httpRequest);
+                var generateNodes = await template.ToGenerateNodesAsync(httpRequest);
                 foreach (var generateNode in generateNodes)
                 {
                     result.Add(await generateNode.GenerateAsync());

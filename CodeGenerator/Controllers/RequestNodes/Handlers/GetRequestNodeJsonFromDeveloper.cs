@@ -27,63 +27,67 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
             public async Task<string> Handle(Request request, CancellationToken token)
             {
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
-                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
+
+                CodeTemplate template = new CodeTemplate()
                 {
-                    From = CodeTemplate.ParameterFrom.Template,
-                    TemplateNode = new CodeTemplate.TemplateNode()
+                    TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
-                        Url = $"{host}/api/templates/10/context",
-                        ParameterNodes = new CodeTemplate.ParameterNode[]
+                        new CodeTemplate.TemplateNode()
                         {
-                            new CodeTemplate.ParameterNode("ProjectName").FromInput("ProjectName"),
-                            new CodeTemplate.ParameterNode("TableName").FromInput("TableName"),
-                            new CodeTemplate.ParameterNode("ModelName").FromInput("ModelName"),
-                            new CodeTemplate.ParameterNode("Properties")
+                            Url = $"{host}/api/templates/10/context",
+                            ParameterNodes = new CodeTemplate.ParameterNode[]
                             {
-                                From = CodeTemplate.ParameterFrom.Template,
-                                TemplateNode = new CodeTemplate.TemplateNode()
+                                new CodeTemplate.ParameterNode("ProjectName").FromInput("ProjectName"),
+                                new CodeTemplate.ParameterNode("TableName").FromInput("TableName"),
+                                new CodeTemplate.ParameterNode("ModelName").FromInput("ModelName"),
+                                new CodeTemplate.ParameterNode("Properties")
                                 {
-                                    Url = $"{host}/api/templates/9/context",
-                                    AdapterNodes = new CodeTemplate.AdapterNode[]
+                                    From = CodeTemplate.ParameterFrom.Template,
+                                    TemplateNode = new CodeTemplate.TemplateNode()
                                     {
-                                        new CodeTemplate.AdapterNode(
-                                            "PropertiesAdapter",
-                                            $"{host}/api/adapters/db/table/fields",
-                                            CodeTemplate.HttpMethod.Get)
+                                        Url = $"{host}/api/templates/9/context",
+                                        AdapterNodes = new CodeTemplate.AdapterNode[]
                                         {
-                                            RequestNodes = new CodeTemplate.RequestNode[]
+                                            new CodeTemplate.AdapterNode(
+                                                "PropertiesAdapter",
+                                                $"{host}/api/adapters/db/table/fields",
+                                                CodeTemplate.HttpMethod.Get)
                                             {
-                                                new CodeTemplate.RequestNode("ConnectionString").FromInput("ConnectionString"),
-                                                new CodeTemplate.RequestNode("TableName").FromInput("TableName")
-                                            },
-                                            ResponseSplit = true
-                                        }
-                                    },
-                                    ParameterNodes = new CodeTemplate.ParameterNode[]
-                                    {
-                                        new CodeTemplate.ParameterNode("Summary")
-                                        {
-                                            From = CodeTemplate.ParameterFrom.Template,
-                                            TemplateNode = new CodeTemplate.TemplateNode()
-                                            {
-                                                Url = $"{host}/api/templates/8/context",
-                                                ParameterNodes = new CodeTemplate.ParameterNode[]
+                                                RequestNodes = new CodeTemplate.RequestNode[]
                                                 {
-                                                    new CodeTemplate.ParameterNode("Text").FromAdapter("PropertiesAdapter", "Description")
-                                                }
+                                                    new CodeTemplate.RequestNode("ConnectionString").FromInput("ConnectionString"),
+                                                    new CodeTemplate.RequestNode("TableName").FromInput("TableName")
+                                                },
+                                                ResponseSplit = true
                                             }
                                         },
-                                        new CodeTemplate.ParameterNode("Attributes").FromAdapter("PropertiesAdapter", "ForCs.EFAttributes"),
-                                        new CodeTemplate.ParameterNode("Prefix").FromValue("public"),
-                                        new CodeTemplate.ParameterNode("TypeName").FromAdapter("PropertiesAdapter", "ForCs.TypeName"),
-                                        new CodeTemplate.ParameterNode("PropertyName").FromAdapter("PropertiesAdapter", "Name"),
+                                        ParameterNodes = new CodeTemplate.ParameterNode[]
+                                        {
+                                            new CodeTemplate.ParameterNode("Summary")
+                                            {
+                                                From = CodeTemplate.ParameterFrom.Template,
+                                                TemplateNode = new CodeTemplate.TemplateNode()
+                                                {
+                                                    Url = $"{host}/api/templates/8/context",
+                                                    ParameterNodes = new CodeTemplate.ParameterNode[]
+                                                    {
+                                                        new CodeTemplate.ParameterNode("Text").FromAdapter("PropertiesAdapter", "Description")
+                                                    }
+                                                }
+                                            },
+                                            new CodeTemplate.ParameterNode("Attributes").FromAdapter("PropertiesAdapter", "ForCs.EFAttributes"),
+                                            new CodeTemplate.ParameterNode("Prefix").FromValue("public"),
+                                            new CodeTemplate.ParameterNode("TypeName").FromAdapter("PropertiesAdapter", "ForCs.TypeName"),
+                                            new CodeTemplate.ParameterNode("PropertyName").FromAdapter("PropertiesAdapter", "Name"),
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 };
-                return JsonConvert.SerializeObject(node);
+
+                return JsonConvert.SerializeObject(template);
             }
         }
     }

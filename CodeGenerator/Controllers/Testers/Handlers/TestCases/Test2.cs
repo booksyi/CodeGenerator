@@ -62,45 +62,47 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     { "Name", "ABC" }
                 };
 
-                CodeTemplate.ParameterNode node = new CodeTemplate.ParameterNode()
+                CodeTemplate template = new CodeTemplate()
                 {
-                    From = CodeTemplate.ParameterFrom.Template,
-                    TemplateNode = new CodeTemplate.TemplateNode()
+                    TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
-                        Url = $"{host}/api/testers/templates/Test2/Template1",
-                        AdapterNodes = new CodeTemplate.AdapterNode[]
+                        new CodeTemplate.TemplateNode()
                         {
-                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test2/Adapter1")
+                            Url = $"{host}/api/testers/templates/Test2/Template1",
+                            AdapterNodes = new CodeTemplate.AdapterNode[]
                             {
-                                RequestNodes = new CodeTemplate.RequestNode[]
+                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test2/Adapter1")
                                 {
-                                    new CodeTemplate.RequestNode("Name").FromInput("Name")
+                                    RequestNodes = new CodeTemplate.RequestNode[]
+                                    {
+                                        new CodeTemplate.RequestNode("Name").FromInput("Name")
+                                    }
+                                },
+                                new CodeTemplate.AdapterNode("Adapter2", $"{host}/api/testers/adapters/Test2/Adapter2")
+                                {
+                                    RequestNodes = new CodeTemplate.RequestNode[]
+                                    {
+                                        new CodeTemplate.RequestNode("Name").FromAdapter("Adapter1", "Name1")
+                                    }
+                                },
+                                new CodeTemplate.AdapterNode("Adapter3", $"{host}/api/testers/adapters/Test2/Adapter3")
+                                {
+                                    RequestNodes = new CodeTemplate.RequestNode[]
+                                    {
+                                        new CodeTemplate.RequestNode("Name").FromAdapter("Adapter2", "Name2")
+                                    }
                                 }
                             },
-                            new CodeTemplate.AdapterNode("Adapter2", $"{host}/api/testers/adapters/Test2/Adapter2")
+                            ParameterNodes = new CodeTemplate.ParameterNode[]
                             {
-                                RequestNodes = new CodeTemplate.RequestNode[]
-                                {
-                                    new CodeTemplate.RequestNode("Name").FromAdapter("Adapter1", "Name1")
-                                }
-                            },
-                            new CodeTemplate.AdapterNode("Adapter3", $"{host}/api/testers/adapters/Test2/Adapter3")
-                            {
-                                RequestNodes = new CodeTemplate.RequestNode[]
-                                {
-                                    new CodeTemplate.RequestNode("Name").FromAdapter("Adapter2", "Name2")
-                                }
+                                new CodeTemplate.ParameterNode("Result").FromAdapter("Adapter3", "Name3")
                             }
-                        },
-                        ParameterNodes = new CodeTemplate.ParameterNode[]
-                        {
-                            new CodeTemplate.ParameterNode("Result").FromAdapter("Adapter3", "Name3")
                         }
                     }
                 };
 
                 List<string> result = new List<string>();
-                var generateNodes = await node.ToGenerateNodesAsync(httpRequest);
+                var generateNodes = await template.ToGenerateNodesAsync(httpRequest);
                 foreach (var generateNode in generateNodes)
                 {
                     result.Add(await generateNode.GenerateAsync());
