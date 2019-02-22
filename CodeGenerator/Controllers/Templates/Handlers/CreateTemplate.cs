@@ -12,42 +12,32 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 {
     public class CreateTemplate
     {
-        public class Request : IRequest<int>
+        public class Request : IRequest<DbTemplate>
         {
             public string Name { get; set; }
             public string Description { get; set; }
             public string Context { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, int>
+        public class Handler : IRequestHandler<Request, DbTemplate>
         {
-            private readonly SqlHelper sqlHelper;
-            public Handler(SqlHelper sqlHelper)
+            private readonly CodeGeneratorContext context;
+            public Handler(CodeGeneratorContext context)
             {
-                this.sqlHelper = sqlHelper;
+                this.context = context;
             }
 
-            public async Task<int> Handle(Request request, CancellationToken token)
+            public async Task<DbTemplate> Handle(Request request, CancellationToken token)
             {
-                int id = Convert.ToInt32(await sqlHelper.ExecuteScalarAsync(@"
-                    INSERT INTO CodeGeneratorTemplate 
-                                ([Name], 
-                                 [Description], 
-                                 Context, 
-                                 Author, 
-                                 [Owner]) 
-                    output      inserted.Id 
-                    VALUES      (@Name, 
-                                 @Description, 
-                                 @Context, 
-                                 @Author, 
-                                 @Owner) ",
-                    new SqlParameter("@Name", request.Name),
-                    new SqlParameter("@Description", request.Description),
-                    new SqlParameter("@Context", request.Context.Replace("\r\n", "\n").Replace("\n", "\r\n")),
-                    new SqlParameter("@Author", 0 as object),
-                    new SqlParameter("@Owner", 0 as object)));
-                return id;
+                DbTemplate template = new DbTemplate()
+                {
+                    Name = request.Name,
+                    Description = request.Description,
+                    Context = request.Context
+                };
+                await context.Templates.AddAsync(template);
+                await context.SaveChangesAsync();
+                return template;
             }
         }
     }

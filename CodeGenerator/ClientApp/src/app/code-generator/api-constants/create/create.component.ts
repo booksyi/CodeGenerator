@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-temp-api-create',
+  selector: 'app-api-constants-create',
     templateUrl: './create.component.html',
     styleUrls: ['./create.component.scss']
 })
 /** create component*/
-export class TempApiCreateComponent {
+export class ApiConstantsCreateComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     public router: Router) { }
@@ -16,19 +16,19 @@ export class TempApiCreateComponent {
   ngOnInit() {
   }
 
-  request: TempApiCreateRequest = {
+  request: ApiConstantsCreateRequest = {
     result: null
   };
 
-  resources: TempApiCreateResource;
+  resources: ApiConstantsCreateResource;
 
   create() {
     this.createApi(this.request);
   }
 
-  createApi(query: TempApiCreateRequest) {
-    this.http.post<TempApiCreateResource>(
-      '/api/temp', query
+  createApi(query: ApiConstantsCreateRequest) {
+    this.http.post<ApiConstantsCreateResource>(
+      '/api/apiConstants', query.result
     ).subscribe(res => {
       this.resources = res;
       this.back();
@@ -36,13 +36,13 @@ export class TempApiCreateComponent {
   }
 
   back() {
-    this.router.navigate(['temp-api/list']);
+    this.router.navigate(['api-constants/list']);
   }
 }
 
-export class TempApiCreateRequest {
+export class ApiConstantsCreateRequest {
   result: string;
 }
 
-export class TempApiCreateResource {
+export class ApiConstantsCreateResource {
 }

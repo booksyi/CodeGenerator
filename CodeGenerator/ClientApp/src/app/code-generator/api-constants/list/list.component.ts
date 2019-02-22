@@ -4,50 +4,50 @@ import { Router } from '@angular/router';
 import { buildQueryParams } from '@app/lib';
 
 @Component({
-    selector: 'app-temp-api-list',
+  selector: 'app-api-constants-list',
     templateUrl: './list.component.html',
     styleUrls: ['./list.component.scss']
 })
 /** list component*/
-export class TempApiListComponent {
+export class ApiConstantsListComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     public router: Router) { }
 
   ngOnInit() {
-    this.tempApiList();
+    this.list();
   }
 
-  request: TempApiListRequest = {
+  request: ApiConstantsListRequest = {
   };
 
-  resources: TempApiListResource[];
+  resources: ApiConstantsListResource[];
 
-  tempApiList() {
-    this.tempApiListApi(this.request);
+  list() {
+    this.listApi(this.request);
   }
 
-  tempApiListApi(query: TempApiListRequest) {
-    this.http.get<TempApiListResource[]>(
-      '/api/temp' + buildQueryParams(query)
+  listApi(query: ApiConstantsListRequest) {
+    this.http.get<ApiConstantsListResource[]>(
+      '/api/apiConstants' + buildQueryParams(query)
     ).subscribe(res => {
       this.resources = res;
     });
   }
 
   create() {
-    this.router.navigate(['temp-api/create']);
+    this.router.navigate(['api-constants/create']);
   }
 
   edit(id: number) {
-    this.router.navigate(['temp-api/edit/' + id]);
+    this.router.navigate(['api-constants/edit/' + id]);
   }
 }
 
-export class TempApiListRequest {
+export class ApiConstantsListRequest {
 }
 
-export class TempApiListResource {
+export class ApiConstantsListResource {
   id: number;
   result: string;
 }

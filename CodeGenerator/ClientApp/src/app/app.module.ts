@@ -6,9 +6,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TempApiListComponent } from './code-generator/temp-api/list/list.component';
-import { TempApiCreateComponent } from './code-generator/temp-api/create/create.component';
-import { TempApiEditComponent } from './code-generator/temp-api/edit/edit.component';
+import { ApiConstantsListComponent } from './code-generator/api-constants/list/list.component';
+import { ApiConstantsCreateComponent } from './code-generator/api-constants/create/create.component';
+import { ApiConstantsEditComponent } from './code-generator/api-constants/edit/edit.component';
 import { TemplatesListComponent } from './code-generator/templates/list/list.component';
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
@@ -18,9 +18,9 @@ import { GeneratorsGenerateComponent } from './code-generator/generators/generat
 @NgModule({
   declarations: [
     AppComponent,
-    TempApiListComponent,
-    TempApiCreateComponent,
-    TempApiEditComponent,
+    ApiConstantsListComponent,
+    ApiConstantsCreateComponent,
+    ApiConstantsEditComponent,
     TemplatesListComponent,
     TemplatesCreateComponent,
     TemplatesEditComponent,

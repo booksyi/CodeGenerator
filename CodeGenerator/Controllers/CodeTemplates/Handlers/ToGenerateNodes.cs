@@ -1,15 +1,15 @@
-﻿using HelpersForCore;
+﻿using CodeGenerator.Data.Models;
+using HelpersForCore;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.RequestNodes.Handlers
+namespace CodeGenerator.Controllers.CodeTemplates.Handlers
 {
     public class ToGenerateNodes
     {
@@ -29,10 +29,11 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
 
             public async Task<IEnumerable<GenerateNode>> Handle(Request request, CancellationToken token)
             {
-                CodeTemplate template = await mediator.Send(new GetRequestNodeById.Request()
+                DbCodeTemplate codeTemplate = await mediator.Send(new GetCodeTemplateById.Request()
                 {
                     Id = request.Id
                 });
+                CodeTemplate template = JsonConvert.DeserializeObject<CodeTemplate>(codeTemplate.Node);
                 return await template.ToGenerateNodesAsync(request.Body);
             }
         }

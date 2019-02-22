@@ -25,7 +25,7 @@ export class GeneratorsGenerateComponent {
 
   getApi(id: number) {
     this.http.get<Input[]>(
-      '/api/requestNodes/' + id + '/inputs'
+      '/api/codeTemplates/' + id + '/template/inputs'
     ).subscribe(res => {
       this.inputs = res;
     });
@@ -38,7 +38,7 @@ export class GeneratorsGenerateComponent {
   submitApi() {
     let query = new Dictionary();
     for (var input of this.inputs) {
-      query[input.key] = input.value;
+      query[input.name] = input.value;
     }
     this.http.post<GenerateResource[]>(
       '/api/generators/' + this.id + '/generate', query
@@ -61,8 +61,8 @@ class Dictionary {
 }
 
 class Input {
-  public key: string;
-  public descriptions: string[];
+  public name: string;
+  public description: string;
   public value: string;
   public type: string;
   public regex: string;

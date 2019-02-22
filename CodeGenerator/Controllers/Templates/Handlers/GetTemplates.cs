@@ -12,23 +12,21 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 {
     public class GetTemplates
     {
-        public class Request : IRequest<IEnumerable<DbTemplate>>
+        public class Request : IRequest<DbTemplate[]>
         {
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<DbTemplate>>
+        public class Handler : IRequestHandler<Request, DbTemplate[]>
         {
-            private readonly SqlHelper sqlHelper;
-            public Handler(SqlHelper sqlHelper)
+            private readonly CodeGeneratorContext context;
+            public Handler(CodeGeneratorContext context)
             {
-                this.sqlHelper = sqlHelper;
+                this.context = context;
             }
 
-            public async Task<IEnumerable<DbTemplate>> Handle(Request request, CancellationToken token)
+            public async Task<DbTemplate[]> Handle(Request request, CancellationToken token)
             {
-                var templates = (await sqlHelper.ExecuteDataTableAsync(@"
-                    SELECT * 
-                    FROM   CodeGeneratorTemplate ")).Rows.ToObjects<DbTemplate>();
+                DbTemplate[] templates = context.Templates.ToArray();
                 return templates;
             }
         }

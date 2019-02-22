@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    selector: 'app-temp-api-edit',
+  selector: 'app-api-constants-edit',
     templateUrl: './edit.component.html',
     styleUrls: ['./edit.component.scss']
 })
 /** edit component*/
-export class TempApiEditComponent {
+export class ApiConstantsEditComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     public route: ActivatedRoute,
@@ -20,15 +20,15 @@ export class TempApiEditComponent {
     this.getApi(this.id);
   }
 
-  request: TempApiEditRequest = {
+  request: ApiConstantsEditRequest = {
     result: null
   };
 
-  resources: TempApiEditResource;
+  resources: ApiConstantsEditResource;
 
   getApi(id: number) {
-    this.http.get<TempApiGetResource>(
-      '/api/temp/' + id
+    this.http.get<ApiConstantsGetResource>(
+      '/api/apiConstants/' + id
     ).subscribe(res => {
       this.request.result = res.result;
     });
@@ -38,9 +38,9 @@ export class TempApiEditComponent {
     this.editApi(this.request);
   }
 
-  editApi(query: TempApiEditRequest) {
-    this.http.put<TempApiEditResource>(
-      '/api/temp/' + this.id, query
+  editApi(query: ApiConstantsEditRequest) {
+    this.http.put<ApiConstantsEditResource>(
+      '/api/apiConstants/' + this.id, query
     ).subscribe(res => {
       this.resources = res;
       this.back();
@@ -48,17 +48,17 @@ export class TempApiEditComponent {
   }
 
   back() {
-    this.router.navigate(['temp-api/list']);
+    this.router.navigate(['api-constants/list']);
   }
 }
 
-export class TempApiGetResource {
+export class ApiConstantsGetResource {
   result: string;
 }
 
-export class TempApiEditRequest {
+export class ApiConstantsEditRequest {
   result: string;
 }
 
-export class TempApiEditResource {
+export class ApiConstantsEditResource {
 }

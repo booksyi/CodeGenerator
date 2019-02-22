@@ -1,9 +1,11 @@
+using CodeGenerator.Data.Models;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSwag.AspNetCore;
@@ -23,7 +25,12 @@ namespace CodeGenerator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<Pluralize.NET.Core.Pluralizer>();
-            services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("DatabaseContext")));
+            services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("CodeGeneratorContext")));
+            services.AddEntityFrameworkSqlServer().AddDbContext<CodeGeneratorContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("CodeGeneratorContext"));
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddHttpContextAccessor();
             services.AddMediatR();

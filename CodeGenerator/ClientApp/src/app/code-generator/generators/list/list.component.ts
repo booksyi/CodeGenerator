@@ -29,7 +29,7 @@ export class GeneratorsListComponent {
 
   getListApi(query: GetListRequest) {
     this.http.get<GetListResource[]>(
-      '/api/requestNodes' + buildQueryParams(query)
+      '/api/codeTemplates' + buildQueryParams(query)
     ).subscribe(res => {
       this.resources = res;
     });

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { TempApiListComponent } from './code-generator/temp-api/list/list.component';
-import { TempApiCreateComponent } from './code-generator/temp-api/create/create.component';
-import { TempApiEditComponent } from './code-generator/temp-api/edit/edit.component';
+import { ApiConstantsListComponent } from './code-generator/api-constants/list/list.component';
+import { ApiConstantsCreateComponent } from './code-generator/api-constants/create/create.component';
+import { ApiConstantsEditComponent } from './code-generator/api-constants/edit/edit.component';
 import { TemplatesListComponent } from './code-generator/templates/list/list.component';
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
@@ -10,10 +10,10 @@ import { GeneratorsListComponent } from './code-generator/generators/list/list.c
 import { GeneratorsGenerateComponent } from './code-generator/generators/generate/generate.component';
 
 const routes: Routes = [
-  { path: 'temp-api', redirectTo: '/temp-api/list', pathMatch: 'full' },
-  { path: 'temp-api/list', component: TempApiListComponent },
-  { path: 'temp-api/create', component: TempApiCreateComponent },
-  { path: 'temp-api/edit/:id', component: TempApiEditComponent },
+  { path: 'api-constants', redirectTo: '/api-constants/list', pathMatch: 'full' },
+  { path: 'api-constants/list', component: ApiConstantsListComponent },
+  { path: 'api-constants/create', component: ApiConstantsCreateComponent },
+  { path: 'api-constants/edit/:id', component: ApiConstantsEditComponent },
   { path: 'templates', redirectTo: '/templates/list', pathMatch: 'full' },
   { path: 'templates/list', component: TemplatesListComponent },
   { path: 'templates/create', component: TemplatesCreateComponent },

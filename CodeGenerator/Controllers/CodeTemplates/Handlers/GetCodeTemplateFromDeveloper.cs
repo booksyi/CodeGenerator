@@ -8,9 +8,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.RequestNodes.Handlers
+namespace CodeGenerator.Controllers.CodeTemplates.Handlers
 {
-    public class GetRequestNodeJsonFromDeveloper
+    public class GetCodeTemplateFromDeveloper
     {
         public class Request : IRequest<string>
         {
@@ -47,10 +47,8 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                                 new CodeTemplate.ParameterNode("ProjectName").FromInput("ProjectName"),
                                 new CodeTemplate.ParameterNode("TableName").FromInput("TableName"),
                                 new CodeTemplate.ParameterNode("ModelName").FromInput("ModelName"),
-                                new CodeTemplate.ParameterNode("Properties")
-                                {
-                                    From = CodeTemplate.ParameterFrom.Template,
-                                    TemplateNode = new CodeTemplate.TemplateNode()
+                                new CodeTemplate.ParameterNode("Properties").FromTemplate(
+                                    new CodeTemplate.TemplateNode()
                                     {
                                         Url = $"{host}/api/templates/9/context",
                                         AdapterNodes = new CodeTemplate.AdapterNode[]
@@ -70,25 +68,21 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                                         },
                                         ParameterNodes = new CodeTemplate.ParameterNode[]
                                         {
-                                            new CodeTemplate.ParameterNode("Summary")
-                                            {
-                                                From = CodeTemplate.ParameterFrom.Template,
-                                                TemplateNode = new CodeTemplate.TemplateNode()
+                                            new CodeTemplate.ParameterNode("Summary").FromTemplate(
+                                                new CodeTemplate.TemplateNode()
                                                 {
                                                     Url = $"{host}/api/templates/8/context",
                                                     ParameterNodes = new CodeTemplate.ParameterNode[]
                                                     {
                                                         new CodeTemplate.ParameterNode("Text").FromAdapter("PropertiesAdapter", "Description")
                                                     }
-                                                }
-                                            },
+                                                }),
                                             new CodeTemplate.ParameterNode("Attributes").FromAdapter("PropertiesAdapter", "ForCs.EFAttributes"),
                                             new CodeTemplate.ParameterNode("Prefix").FromValue("public"),
                                             new CodeTemplate.ParameterNode("TypeName").FromAdapter("PropertiesAdapter", "ForCs.TypeName"),
                                             new CodeTemplate.ParameterNode("PropertyName").FromAdapter("PropertiesAdapter", "Name"),
                                         }
-                                    }
-                                }
+                                    })
                             }
                         }
                     }

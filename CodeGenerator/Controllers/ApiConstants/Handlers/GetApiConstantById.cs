@@ -1,24 +1,22 @@
 ﻿using CodeGenerator.Data.Models;
-using HelpersForCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.Templates.Handlers
+namespace CodeGenerator.Controllers.ApiConstants.Handlers
 {
-    public class GetTemplateById
+    public class GetApiConstantById
     {
-        public class Request : IRequest<DbTemplate>
+        public class Request : IRequest<DbApiConstant>
         {
             internal int Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, DbTemplate>
+        public class Handler : IRequestHandler<Request, DbApiConstant>
         {
             private readonly CodeGeneratorContext context;
             public Handler(CodeGeneratorContext context)
@@ -26,10 +24,10 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                 this.context = context;
             }
 
-            public async Task<DbTemplate> Handle(Request request, CancellationToken token)
+            public async Task<DbApiConstant> Handle(Request request, CancellationToken token)
             {
-                DbTemplate template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
-                return template;
+                DbApiConstant apiConstant = await context.ApiConstants.FirstOrDefaultAsync(x => x.Id == request.Id);
+                return apiConstant;
             }
         }
     }

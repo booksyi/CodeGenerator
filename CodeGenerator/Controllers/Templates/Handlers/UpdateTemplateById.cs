@@ -1,6 +1,7 @@
 ﻿using CodeGenerator.Data.Models;
 using HelpersForCore;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -12,7 +13,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 {
     public class UpdateTemplateById
     {
-        public class Request : IRequest<uint>
+        public class Request : IRequest<DbTemplate>
         {
             internal int Id { get; set; }
             public string Name { get; set; }
@@ -20,29 +21,22 @@ namespace CodeGenerator.Controllers.Templates.Handlers
             public string Context { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, uint>
+        public class Handler : IRequestHandler<Request, DbTemplate>
         {
-            private readonly SqlHelper sqlHelper;
-            public Handler(SqlHelper sqlHelper)
+            private readonly CodeGeneratorContext context;
+            public Handler(CodeGeneratorContext context)
             {
-                this.sqlHelper = sqlHelper;
+                this.context = context;
             }
 
-            public async Task<uint> Handle(Request request, CancellationToken token)
+            public async Task<DbTemplate> Handle(Request request, CancellationToken token)
             {
-                await sqlHelper.ExecuteNonQueryAsync(@"
-                    UPDATE CodeGeneratorTemplate 
-                    SET    [Name] = @Name, 
-                           [Description] = @Description, 
-                           Context = @Context, 
-                           UpdateDate = @UpdateDate 
-                    WHERE  Id = @Id ",
-                    new SqlParameter("@Id", request.Id),
-                    new SqlParameter("@Name", request.Name),
-                    new SqlParameter("@Description", request.Description),
-                    new SqlParameter("@Context", request.Context.Replace("\r\n", "\n").Replace("\n", "\r\n")),
-                    new SqlParameter("@UpdateDate", DateTime.Now));
-                return 0;
+                DbTemplate template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
+                template.Name = request.Name;
+                template.Description = request.Description;
+                template.Context = request.Context;
+                await context.SaveChangesAsync();
+                return template;
             }
         }
     }
