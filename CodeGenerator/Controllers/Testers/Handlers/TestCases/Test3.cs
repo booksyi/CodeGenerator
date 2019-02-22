@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
     /// <summary>
-    /// 測試 AdapterNode 的 ResponseConfine 與 Type (AdapterType.Separation)
+    /// 測試 AdapterNode 的 ResponseConfine 與 ResponseSplit
     /// </summary>
     public class Test3
     {
@@ -77,6 +77,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
             public async Task<bool> Test(Request request)
             {
+                string tester = "Test3";
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
                 JObject httpRequest = new JObject()
                 {
@@ -85,11 +86,15 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
                 CodeTemplate template = new CodeTemplate()
                 {
+                    Inputs = new CodeTemplate.Input[]
+                    {
+                        new CodeTemplate.Input("Table")
+                    },
                     TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
                         new CodeTemplate.TemplateNode()
                         {
-                            Url = $"{host}/api/testers/templates/Test3/Template1",
+                            Url = $"{host}/api/testers/templates/{tester}/Template1",
                             ParameterNodes = new CodeTemplate.ParameterNode[]
                             {
                                 new CodeTemplate.ParameterNode("Fields")
@@ -97,17 +102,17 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                                     From = CodeTemplate.ParameterFrom.Template,
                                     TemplateNode = new CodeTemplate.TemplateNode()
                                     {
-                                        Url = $"{host}/api/testers/templates/Test3/Template2",
+                                        Url = $"{host}/api/testers/templates/{tester}/Template2",
                                         AdapterNodes = new CodeTemplate.AdapterNode[]
                                         {
-                                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test3/Adapter1")
+                                            new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/{tester}/Adapter1")
                                             {
                                                 RequestNodes = new CodeTemplate.RequestNode[]
                                                 {
                                                     new CodeTemplate.RequestNode("TableName").FromInput("Table")
                                                 },
                                                 ResponseConfine = "Fields",
-                                                ResponseSplit = true
+                                                IsSplit = true
                                             }
                                         },
                                         ParameterNodes = new CodeTemplate.ParameterNode[]

@@ -65,6 +65,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
             public async Task<bool> Test(Request request)
             {
+                string tester = "Test4";
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
                 JObject httpRequest = new JObject()
                 {
@@ -76,7 +77,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     {
                         new CodeTemplate.TemplateNode()
                         {
-                            Url = $"{host}/api/testers/templates/Test4/Template1",
+                            Url = $"{host}/api/testers/templates/{tester}/Template1",
                             ParameterNodes = new CodeTemplate.ParameterNode[]
                             {
                                 new CodeTemplate.ParameterNode("Fields")
@@ -84,7 +85,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                                     From = CodeTemplate.ParameterFrom.Template,
                                     TemplateNode = new CodeTemplate.TemplateNode()
                                     {
-                                        Url = $"{host}/api/testers/templates/Test4/Template2",
+                                        Url = $"{host}/api/testers/templates/{tester}/Template2",
                                         RequestNodes = new CodeTemplate.RequestNode[]
                                         {
                                             new CodeTemplate.RequestNode("Description").FromAdapter("Adapter1", "Fields.Description")
@@ -93,9 +94,9 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                                         {
                                             new CodeTemplate.AdapterNode(
                                                 "Adapter1",
-                                                $"{host}/api/testers/adapters/Test4/Adapter1")
+                                                $"{host}/api/testers/adapters/{tester}/Adapter1")
                                             {
-                                                ResponseSplit = true
+                                                IsSplit = true
                                             }
                                         },
                                         ParameterNodes = new CodeTemplate.ParameterNode[]

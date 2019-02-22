@@ -56,6 +56,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
             public async Task<bool> Test(Request request)
             {
+                string tester = "Test2";
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
                 JObject httpRequest = new JObject()
                 {
@@ -64,28 +65,32 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
                 CodeTemplate template = new CodeTemplate()
                 {
+                    Inputs = new CodeTemplate.Input[]
+                    {
+                        new CodeTemplate.Input("Name")
+                    },
                     TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
                         new CodeTemplate.TemplateNode()
                         {
-                            Url = $"{host}/api/testers/templates/Test2/Template1",
+                            Url = $"{host}/api/testers/templates/{tester}/Template1",
                             AdapterNodes = new CodeTemplate.AdapterNode[]
                             {
-                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test2/Adapter1")
+                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/{tester}/Adapter1")
                                 {
                                     RequestNodes = new CodeTemplate.RequestNode[]
                                     {
                                         new CodeTemplate.RequestNode("Name").FromInput("Name")
                                     }
                                 },
-                                new CodeTemplate.AdapterNode("Adapter2", $"{host}/api/testers/adapters/Test2/Adapter2")
+                                new CodeTemplate.AdapterNode("Adapter2", $"{host}/api/testers/adapters/{tester}/Adapter2")
                                 {
                                     RequestNodes = new CodeTemplate.RequestNode[]
                                     {
                                         new CodeTemplate.RequestNode("Name").FromAdapter("Adapter1", "Name1")
                                     }
                                 },
-                                new CodeTemplate.AdapterNode("Adapter3", $"{host}/api/testers/adapters/Test2/Adapter3")
+                                new CodeTemplate.AdapterNode("Adapter3", $"{host}/api/testers/adapters/{tester}/Adapter3")
                                 {
                                     RequestNodes = new CodeTemplate.RequestNode[]
                                     {

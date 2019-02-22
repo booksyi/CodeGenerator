@@ -30,6 +30,13 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
 
                 CodeTemplate template = new CodeTemplate()
                 {
+                    Inputs = new CodeTemplate.Input[]
+                    {
+                        new CodeTemplate.Input("ProjectName").HasDescription("專案名稱"),
+                        new CodeTemplate.Input("TableName").HasDescription("資料表名稱"),
+                        new CodeTemplate.Input("ModelName").HasDescription("資料模型名稱"),
+                        new CodeTemplate.Input("ConnectionString").HasDescription("連接字串"),
+                    },
                     TemplateNodes = new CodeTemplate.TemplateNode[]
                     {
                         new CodeTemplate.TemplateNode()
@@ -58,7 +65,7 @@ namespace CodeGenerator.Controllers.RequestNodes.Handlers
                                                     new CodeTemplate.RequestNode("ConnectionString").FromInput("ConnectionString"),
                                                     new CodeTemplate.RequestNode("TableName").FromInput("TableName")
                                                 },
-                                                ResponseSplit = true
+                                                IsSplit = true
                                             }
                                         },
                                         ParameterNodes = new CodeTemplate.ParameterNode[]

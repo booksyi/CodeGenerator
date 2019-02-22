@@ -45,6 +45,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 
             public async Task<bool> Test(Request request)
             {
+                string tester = "Test1";
                 string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}";
                 JObject httpRequest = new JObject()
                 {
@@ -56,10 +57,10 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                     {
                         new CodeTemplate.TemplateNode()
                         {
-                            Url = $"{host}/api/testers/templates/Test1/Template1",
+                            Url = $"{host}/api/testers/templates/{tester}/Template1",
                             AdapterNodes = new CodeTemplate.AdapterNode[]
                             {
-                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/Test1/Adapter1")
+                                new CodeTemplate.AdapterNode("Adapter1", $"{host}/api/testers/adapters/{tester}/Adapter1")
                             },
                             ParameterNodes = new CodeTemplate.ParameterNode[]
                             {

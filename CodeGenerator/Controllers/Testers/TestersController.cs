@@ -27,6 +27,13 @@ namespace CodeGenerator.Controllers.Testers
             return new OkObjectResult(response.Result);
         }
 
+        [HttpGet("{tester}")]
+        public async Task<ActionResult> Test(string tester)
+        {
+            var response = await mediator.Send(new Test.Request() { Tester = tester });
+            return new OkObjectResult(response.Result);
+        }
+
         [HttpGet("templates/{tester}/{template}")]
         public async Task<ActionResult> GetTestTemplate([FromRoute] string tester, [FromRoute] string template)
         {

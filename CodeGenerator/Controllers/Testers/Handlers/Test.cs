@@ -14,6 +14,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers
     {
         public class Request : IRequest<Response>
         {
+            public string Tester { get; set; }
         }
 
         public class TestCase
@@ -53,9 +54,12 @@ namespace CodeGenerator.Controllers.Testers.Handlers
 
                 foreach (Type tester in testers)
                 {
-                    Type testerRequestType = assembly.GetType($"{tester.FullName}+Request");
-                    IRequest<TestCase> testerRequest = Activator.CreateInstance(testerRequestType) as IRequest<TestCase>;
-                    cases.Add(await mediator.Send(testerRequest));
+                    if (string.IsNullOrWhiteSpace(request.Tester) || request.Tester == tester.Name)
+                    {
+                        Type testerRequestType = assembly.GetType($"{tester.FullName}+Request");
+                        IRequest<TestCase> testerRequest = Activator.CreateInstance(testerRequestType) as IRequest<TestCase>;
+                        cases.Add(await mediator.Send(testerRequest));
+                    }
                 }
 
                 return new Response() { Result = cases };
