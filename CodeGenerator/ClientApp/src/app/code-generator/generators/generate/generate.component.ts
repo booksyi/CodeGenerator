@@ -28,7 +28,18 @@ export class GeneratorsGenerateComponent {
       '/api/codeTemplates/' + id + '/template/inputs'
     ).subscribe(res => {
       this.inputs = res;
+      for (let input of this.inputs) {
+        input.values = [''];
+      }
     });
+  }
+
+  add(input: Input) {
+    input.values.push('');
+  }
+
+  remove(input: Input, index: number) {
+    input.values.splice(index, 1);
   }
 
   submit() {
@@ -37,8 +48,8 @@ export class GeneratorsGenerateComponent {
 
   submitApi() {
     let query = new Dictionary();
-    for (var input of this.inputs) {
-      query[input.name] = input.value;
+    for (let input of this.inputs) {
+      query[input.name] = input.values;
     }
     this.http.post<GenerateResource[]>(
       '/api/generators/' + this.id + '/generate', query
@@ -57,13 +68,14 @@ export class GeneratorsGenerateComponent {
 }
 
 class Dictionary {
-  [index: string]: string;
+  [index: string]: string[];
 }
 
 class Input {
   public name: string;
   public description: string;
-  public value: string;
+  public isMultiple: boolean;
+  public values: string[];
   public type: string;
   public regex: string;
 }

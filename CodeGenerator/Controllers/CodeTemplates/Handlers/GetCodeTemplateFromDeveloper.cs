@@ -33,8 +33,7 @@ namespace CodeGenerator.Controllers.CodeTemplates.Handlers
                     Inputs = new CodeTemplate.Input[]
                     {
                         new CodeTemplate.Input("ProjectName").HasDescription("專案名稱"),
-                        new CodeTemplate.Input("TableName").HasDescription("資料表名稱"),
-                        new CodeTemplate.Input("ModelName").HasDescription("資料模型名稱"),
+                        new CodeTemplate.Input("TableName").HasDescription("資料表名稱").Multiple().Split(),
                         new CodeTemplate.Input("ConnectionString").HasDescription("連接字串"),
                     },
                     TemplateNodes = new CodeTemplate.TemplateNode[]
@@ -46,7 +45,7 @@ namespace CodeGenerator.Controllers.CodeTemplates.Handlers
                             {
                                 new CodeTemplate.ParameterNode("ProjectName").FromInput("ProjectName"),
                                 new CodeTemplate.ParameterNode("TableName").FromInput("TableName"),
-                                new CodeTemplate.ParameterNode("ModelName").FromInput("ModelName"),
+                                new CodeTemplate.ParameterNode("ModelName").FromInput("TableName"),
                                 new CodeTemplate.ParameterNode("Properties").FromTemplate(
                                     new CodeTemplate.TemplateNode()
                                     {

@@ -11,7 +11,19 @@
       </ng-template>
       <div class="col-sm-10">
         <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="input.value" [ngModelOptions]="{standalone: true}">
+          <ng-container *ngIf="input.isMultiple; then template_input_values else template_input_value"></ng-container>
+          <ng-template #template_input_values>
+            <div class="input-group mb-3" *ngFor="let value of input.values; let i = index">
+              <div class="input-group-prepend">
+                <button *ngIf="i === 0" class="btn btn-success" type="button" (click)="add(input)">＋</button>
+                <button *ngIf="i !== 0" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
+              </div>
+              <input type="text" class="form-control" [(ngModel)]="input.values[i]" [ngModelOptions]="{standalone: true}">
+            </div>
+          </ng-template>
+          <ng-template #template_input_value>
+            <input type="text" class="form-control" [(ngModel)]="input.values[0]" [ngModelOptions]="{standalone: true}">
+          </ng-template>
         </div>
       </div>
     </div>
@@ -36,8 +48,8 @@
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-10">
         <div class="md-form mt-0">
-          <input type="button" class="btn btn-primary" value="重新生成" (click)="rollback()" />
-          <input type="button" class="btn btn-secondary" value="返回列表" (click)="back()" />
+          <input type="button" class="btn btn-warning" value="重新生成" (click)="rollback()" />
+          <input type="button" class="btn btn-danger" value="離開" (click)="back()" />
         </div>
       </div>
     </div>
