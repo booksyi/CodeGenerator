@@ -13,6 +13,8 @@ import { TemplatesListComponent } from './code-generator/templates/list/list.com
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
 import { GeneratorsListComponent } from './code-generator/generators/list/list.component';
+import { GeneratorsCreateComponent } from './code-generator/generators/create/create.component';
+import { GeneratorsEditComponent } from './code-generator/generators/edit/edit.component';
 import { GeneratorsGenerateComponent } from './code-generator/generators/generate/generate.component';
 
 @NgModule({
@@ -25,6 +27,8 @@ import { GeneratorsGenerateComponent } from './code-generator/generators/generat
     TemplatesCreateComponent,
     TemplatesEditComponent,
     GeneratorsListComponent,
+    GeneratorsCreateComponent,
+    GeneratorsEditComponent,
     GeneratorsGenerateComponent
   ],
   imports: [

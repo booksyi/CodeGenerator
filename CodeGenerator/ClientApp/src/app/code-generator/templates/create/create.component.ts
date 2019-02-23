@@ -33,6 +33,8 @@ export class TemplatesCreateComponent implements OnInit {
     ).subscribe(res => {
       this.resources = res;
       this.back();
+    }, err => {
+      console.log(err)
     });
   }
 

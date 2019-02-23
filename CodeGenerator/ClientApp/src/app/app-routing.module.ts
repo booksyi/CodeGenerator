@@ -7,6 +7,8 @@ import { TemplatesListComponent } from './code-generator/templates/list/list.com
 import { TemplatesCreateComponent } from './code-generator/templates/create/create.component';
 import { TemplatesEditComponent } from './code-generator/templates/edit/edit.component';
 import { GeneratorsListComponent } from './code-generator/generators/list/list.component';
+import { GeneratorsCreateComponent } from './code-generator/generators/create/create.component';
+import { GeneratorsEditComponent } from './code-generator/generators/edit/edit.component';
 import { GeneratorsGenerateComponent } from './code-generator/generators/generate/generate.component';
 
 const routes: Routes = [
@@ -20,6 +22,8 @@ const routes: Routes = [
   { path: 'templates/edit/:id', component: TemplatesEditComponent },
   { path: 'generators', redirectTo: '/generators/list', pathMatch: 'full' },
   { path: 'generators/list', component: GeneratorsListComponent },
+  { path: 'generators/create', component: GeneratorsCreateComponent },
+  { path: 'generators/edit/:id', component: GeneratorsEditComponent },
   { path: 'generators/generate/:id', component: GeneratorsGenerateComponent },
 ];
 

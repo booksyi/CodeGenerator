@@ -25,7 +25,7 @@ export class GeneratorsGenerateComponent {
 
   getApi(id: number) {
     this.http.get<Input[]>(
-      '/api/codeTemplates/' + id + '/template/inputs'
+      '/api/codeTemplates/' + id + '/inputs'
     ).subscribe(res => {
       this.inputs = res;
       for (let input of this.inputs) {

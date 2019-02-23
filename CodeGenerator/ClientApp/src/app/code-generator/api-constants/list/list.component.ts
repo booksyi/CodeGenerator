@@ -1,4 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { buildQueryParams } from '@app/lib';
@@ -12,6 +13,7 @@ import { buildQueryParams } from '@app/lib';
 export class ApiConstantsListComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
+    private modalService: NgbModal,
     public router: Router) { }
 
   ngOnInit() {
@@ -41,6 +43,21 @@ export class ApiConstantsListComponent {
 
   edit(id: number) {
     this.router.navigate(['api-constants/edit/' + id]);
+  }
+
+  confirmItem: ApiConstantsListResource;
+
+  deleteConfirm(id: number, content) {
+    this.confirmItem = this.resources.filter(e => e.id === id)[0];
+    this.modalService.open(content);
+  }
+
+  delete(id: number) {
+    this.http.delete(
+      '/api/apiConstants/' + id
+    ).subscribe(() => {
+      this.list();
+    });
   }
 }
 

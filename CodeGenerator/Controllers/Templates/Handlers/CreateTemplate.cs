@@ -29,15 +29,24 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 
             public async Task<DbTemplate> Handle(Request request, CancellationToken token)
             {
-                DbTemplate template = new DbTemplate()
+                try
                 {
-                    Name = request.Name,
-                    Description = request.Description,
-                    Context = request.Context
-                };
-                await context.Templates.AddAsync(template);
-                await context.SaveChangesAsync();
-                return template;
+                    DbTemplate template = new DbTemplate()
+                    {
+                        Name = request.Name,
+                        Description = request.Description,
+                        Context = request.Context,
+                        CreateDate = DateTime.Now
+                    };
+                    await context.Templates.AddAsync(template);
+                    await context.SaveChangesAsync();
+                    return template;
+                }
+                catch (Exception e)
+                {
+                    string a = e.Message;
+                }
+                return null;
             }
         }
     }

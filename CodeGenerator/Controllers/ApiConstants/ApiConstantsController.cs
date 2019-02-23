@@ -29,13 +29,9 @@ namespace CodeGenerator.Controllers.ApiConstants
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateApiConstantById([FromRoute] int id, [FromBody] string result)
+        public async Task<ActionResult> UpdateApiConstantById([FromRoute] int id, [FromBody] UpdateApiConstantById.Request request)
         {
-            UpdateApiConstantById.Request request = new UpdateApiConstantById.Request()
-            {
-                Id = id,
-                Result = result
-            };
+            request.Id = id;
             DbApiConstant apiConstant = await mediator.Send(request);
             return new OkObjectResult(apiConstant);
         }
@@ -68,6 +64,17 @@ namespace CodeGenerator.Controllers.ApiConstants
             };
             DbApiConstant apiConstant = await mediator.Send(request);
             return Content(apiConstant.Result);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> DeleteApiConstantById([FromRoute] int id)
+        {
+            DeleteApiConstantById.Request request = new DeleteApiConstantById.Request()
+            {
+                Id = id
+            };
+            await mediator.Send(request);
+            return NoContent();
         }
     }
 }

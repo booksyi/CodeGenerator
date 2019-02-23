@@ -35,6 +35,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                 template.Name = request.Name;
                 template.Description = request.Description;
                 template.Context = request.Context;
+                template.UpdateDate = DateTime.Now;
                 await context.SaveChangesAsync();
                 return template;
             }

@@ -101,8 +101,8 @@ namespace CodeGenerator.Controllers.CodeTemplates
             return new OkObjectResult(template);
         }
 
-        [HttpGet("{id:int}/template/inputs")]
-        public async Task<ActionResult> GetCodeTemplateTemplateInputsById([FromRoute] int id)
+        [HttpGet("{id:int}/inputs")]
+        public async Task<ActionResult> GetCodeTemplateInputsById([FromRoute] int id)
         {
             GetCodeTemplateById.Request request = new GetCodeTemplateById.Request()
             {
@@ -111,6 +111,18 @@ namespace CodeGenerator.Controllers.CodeTemplates
             DbCodeTemplate codeTemplate = await mediator.Send(request);
             CodeTemplate template = JsonConvert.DeserializeObject<CodeTemplate>(codeTemplate.Node);
             return new OkObjectResult(template.Inputs);
+        }
+
+        [HttpGet("{id:int}/templates")]
+        public async Task<ActionResult> GetCodeTemplateTemplatesById([FromRoute] int id)
+        {
+            GetCodeTemplateById.Request request = new GetCodeTemplateById.Request()
+            {
+                Id = id
+            };
+            DbCodeTemplate codeTemplate = await mediator.Send(request);
+            CodeTemplate template = JsonConvert.DeserializeObject<CodeTemplate>(codeTemplate.Node);
+            return new OkObjectResult(template.GetTemplateUris());
         }
 
         [HttpGet("dev")]

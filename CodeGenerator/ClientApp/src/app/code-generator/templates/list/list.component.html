@@ -10,8 +10,25 @@
     <td>{{resource.id}}</td>
     <td>{{resource.name}}</td>
     <td>
-      <input type="button" class="btn btn-link" value="編輯" (click)="edit(resource.id)" />
-      <a class="btn btn-link" href="/api/templates/{{resource.id}}/context" target="_blank">API</a>
+      <a class="btn btn-info" href="/api/templates/{{resource.id}}/context" target="_blank">查看</a>
+      <input type="button" class="btn btn-secondary" value="編輯" (click)="edit(resource.id)" />
+      <input type="button" class="btn btn-danger" value="刪除" (click)="deleteConfirm(resource.id, content)" />
     </td>
   </tr>
 </table>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">刪除 Template</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p *ngIf="confirmItem">確定要刪除 {{confirmItem.name}} 嗎？</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Delete'); delete(confirmItem.id);">刪除</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">取消</button>
+  </div>
+</ng-template>

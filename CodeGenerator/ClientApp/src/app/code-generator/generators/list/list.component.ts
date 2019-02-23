@@ -30,8 +30,15 @@ export class GeneratorsListComponent {
   getListApi(query: GetListRequest) {
     this.http.get<GetListResource[]>(
       '/api/codeTemplates' + buildQueryParams(query)
-    ).subscribe(res => {
-      this.resources = res;
+    ).subscribe(result => {
+      this.resources = result;
+      for (let resource of this.resources) {
+        this.http.get<string[]>(
+          '/api/codeTemplates/' + resource.id + '/templates'
+        ).subscribe(templates => {
+          resource.templates = templates;
+        });
+      }
     });
   }
 

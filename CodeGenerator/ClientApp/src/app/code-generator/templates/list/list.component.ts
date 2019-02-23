@@ -1,4 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { buildQueryParams } from '@app/lib';
@@ -11,10 +12,11 @@ import { buildQueryParams } from '@app/lib';
 export class TemplatesListComponent implements OnInit {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
+    private modalService: NgbModal,
     public router: Router) { }
 
   ngOnInit() {
-    this.templatesList();
+    this.list();
   }
 
   request: TemplatesListRequest = {
@@ -22,11 +24,11 @@ export class TemplatesListComponent implements OnInit {
 
   resources: TemplatesListResource[];
 
-  templatesList() {
-    this.templatesListApi(this.request);
+  list() {
+    this.listApi(this.request);
   }
 
-  templatesListApi(query: TemplatesListRequest) {
+  listApi(query: TemplatesListRequest) {
     this.http.get<TemplatesListResource[]>(
       '/api/templates' + buildQueryParams(query)
     ).subscribe(res => {
@@ -40,6 +42,21 @@ export class TemplatesListComponent implements OnInit {
 
   edit(id: number) {
     this.router.navigate(['templates/edit/' + id]);
+  }
+
+  confirmItem: TemplatesListResource;
+
+  deleteConfirm(id: number, content) {
+    this.confirmItem = this.resources.filter(e => e.id === id)[0];
+    this.modalService.open(content);
+  }
+
+  delete(id: number) {
+    this.http.delete(
+      '/api/templates/' + id
+    ).subscribe(() => {
+      this.list();
+    });
   }
 }
 

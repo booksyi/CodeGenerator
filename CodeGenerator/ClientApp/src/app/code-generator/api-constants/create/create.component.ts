@@ -28,7 +28,7 @@ export class ApiConstantsCreateComponent {
 
   createApi(query: ApiConstantsCreateRequest) {
     this.http.post<ApiConstantsCreateResource>(
-      '/api/apiConstants', query.result
+      '/api/apiConstants', query
     ).subscribe(res => {
       this.resources = res;
       this.back();
