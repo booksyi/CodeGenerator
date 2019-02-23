@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { buildQueryParams } from '@app/lib';
   templateUrl: './list.component.html',
   //styleUrls: ['./list.component.scss']
 })
-export class TemplatesListComponent implements OnInit {
+export class TemplatesListComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     private modalService: NgbModal,
@@ -25,12 +25,8 @@ export class TemplatesListComponent implements OnInit {
   resources: TemplatesListResource[];
 
   list() {
-    this.listApi(this.request);
-  }
-
-  listApi(query: TemplatesListRequest) {
     this.http.get<TemplatesListResource[]>(
-      '/api/templates' + buildQueryParams(query)
+      '/api/templates' + buildQueryParams(this.request)
     ).subscribe(res => {
       this.resources = res;
     });
@@ -46,7 +42,7 @@ export class TemplatesListComponent implements OnInit {
 
   confirmItem: TemplatesListResource;
 
-  deleteConfirm(id: number, content) {
+  confirm(id: number, content) {
     this.confirmItem = this.resources.filter(e => e.id === id)[0];
     this.modalService.open(content);
   }
@@ -55,6 +51,7 @@ export class TemplatesListComponent implements OnInit {
     this.http.delete(
       '/api/templates/' + id
     ).subscribe(() => {
+      this.confirmItem = null;
       this.list();
     });
   }

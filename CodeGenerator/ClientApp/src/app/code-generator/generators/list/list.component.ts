@@ -1,7 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { buildQueryParams } from '@app/lib';
+import { async } from '@angular/core/testing';
 
 @Component({
   selector: 'app-generators-list',
@@ -15,7 +16,7 @@ export class GeneratorsListComponent {
     public router: Router) { }
 
   ngOnInit() {
-    this.getList();
+    this.list();
   }
 
   request: GetListRequest = {
@@ -23,13 +24,9 @@ export class GeneratorsListComponent {
 
   resources: GetListResource[];
 
-  getList() {
-    this.getListApi(this.request);
-  }
-
-  getListApi(query: GetListRequest) {
+  list() {
     this.http.get<GetListResource[]>(
-      '/api/codeTemplates' + buildQueryParams(query)
+      '/api/codeTemplates' + buildQueryParams(this.request)
     ).subscribe(result => {
       this.resources = result;
       for (let resource of this.resources) {

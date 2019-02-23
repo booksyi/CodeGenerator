@@ -13,7 +13,7 @@
         <div class="md-form mt-0">
           <ng-container *ngIf="input.isMultiple; then template_input_values else template_input_value"></ng-container>
           <ng-template #template_input_values>
-            <div class="input-group mb-3" *ngFor="let value of input.values; let i = index">
+            <div class="input-group mb-3" *ngFor="let value of input.values; let i = index; trackBy: trackByFn">
               <div class="input-group-prepend">
                 <button *ngIf="i === 0" class="btn btn-success" type="button" (click)="add(input)">＋</button>
                 <button *ngIf="i !== 0" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
@@ -22,7 +22,20 @@
             </div>
           </ng-template>
           <ng-template #template_input_value>
-            <input type="text" class="form-control" [(ngModel)]="input.values[0]" [ngModelOptions]="{standalone: true}">
+            <ng-container *ngIf="input.children; then input_value_object else input_value_string"></ng-container>
+            <ng-template #input_value_object>
+              <div class="form-group row" *ngFor="let child of input.children; let i = index">
+                <label class="col-sm-2 col-form-label">{{child.name}}</label>
+                <div class="col-sm-10">
+                  <div class="md-form mt-0">
+                    <input type="text" class="form-control" [(ngModel)]="input.children[i].values[0]" [ngModelOptions]="{standalone: true}">
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #input_value_string>
+              <input type="text" class="form-control" [(ngModel)]="input.values[0]" [ngModelOptions]="{standalone: true}">
+            </ng-template>
           </ng-template>
         </div>
       </div>

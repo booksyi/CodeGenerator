@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -19,16 +19,11 @@ export class ApiConstantsCreateComponent {
   request: ApiConstantsCreateRequest = {
     result: null
   };
-
   resources: ApiConstantsCreateResource;
 
   create() {
-    this.createApi(this.request);
-  }
-
-  createApi(query: ApiConstantsCreateRequest) {
     this.http.post<ApiConstantsCreateResource>(
-      '/api/apiConstants', query
+      '/api/apiConstants', this.request
     ).subscribe(res => {
       this.resources = res;
       this.back();

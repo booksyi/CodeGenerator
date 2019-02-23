@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -17,16 +17,15 @@ export class ApiConstantsEditComponent {
   public id: number;
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.getApi(this.id);
+    this.get(this.id);
   }
 
   request: ApiConstantsEditRequest = {
     result: null
   };
-
   resources: ApiConstantsEditResource;
 
-  getApi(id: number) {
+  get(id: number) {
     this.http.get<ApiConstantsGetResource>(
       '/api/apiConstants/' + id
     ).subscribe(res => {
@@ -35,12 +34,8 @@ export class ApiConstantsEditComponent {
   }
 
   edit() {
-    this.editApi(this.request);
-  }
-
-  editApi(query: ApiConstantsEditRequest) {
     this.http.put<ApiConstantsEditResource>(
-      '/api/apiConstants/' + this.id, query
+      '/api/apiConstants/' + this.id, this.request
     ).subscribe(res => {
       this.resources = res;
       this.back();

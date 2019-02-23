@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { buildQueryParams } from '@app/lib';
@@ -8,7 +8,7 @@ import { buildQueryParams } from '@app/lib';
   templateUrl: './edit.component.html',
   //styleUrls: ['./edit.component.scss']
 })
-export class TemplatesEditComponent implements OnInit {
+export class TemplatesEditComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     public route: ActivatedRoute,
@@ -17,7 +17,7 @@ export class TemplatesEditComponent implements OnInit {
   public id: number;
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.templatesGetApi(this.id);
+    this.get(this.id);
   }
 
   request: TemplatesEditRequest = {
@@ -25,10 +25,9 @@ export class TemplatesEditComponent implements OnInit {
     description: null,
     context: null
   };
-
   resources: TemplatesEditResource;
 
-  templatesGetApi(id: number) {
+  get(id: number) {
     this.http.get<TemplatesGetResource>(
       '/api/templates/' + id
     ).subscribe(res => {
@@ -38,13 +37,9 @@ export class TemplatesEditComponent implements OnInit {
     });
   }
 
-  templatesEdit() {
-    this.templatesEditApi(this.request);
-  }
-
-  templatesEditApi(query: TemplatesEditRequest) {
+  edit() {
     this.http.put<TemplatesEditResource>(
-      '/api/templates/' + this.id, query
+      '/api/templates/' + this.id, this.request
     ).subscribe(res => {
       this.resources = res;
       this.back();

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -17,21 +17,36 @@ export class GeneratorsGenerateComponent {
   public id: number;
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.getApi(this.id);
+    this.get(this.id);
   }
 
   inputs: Input[];
   resources: GenerateResource[];
 
-  getApi(id: number) {
+  get(id: number) {
     this.http.get<Input[]>(
       '/api/codeTemplates/' + id + '/inputs'
     ).subscribe(res => {
       this.inputs = res;
       for (let input of this.inputs) {
-        input.values = [''];
+        this.setDefaultValues(input);
       }
     });
+  }
+
+  setDefaultValues(input: Input) {
+    if (input.children && input.children.length) {
+      for (let child of input.children) {
+        this.setDefaultValues(child);
+      }
+    }
+    else {
+      input.values = [''];
+    }
+  }
+
+  trackByFn(index: any, item: any) {
+    return index;
   }
 
   add(input: Input) {
@@ -43,10 +58,6 @@ export class GeneratorsGenerateComponent {
   }
 
   submit() {
-    this.submitApi();
-  }
-
-  submitApi() {
     let query = new Dictionary();
     for (let input of this.inputs) {
       query[input.name] = input.values;
@@ -75,9 +86,10 @@ class Input {
   public name: string;
   public description: string;
   public isMultiple: boolean;
+  public children: Input[];
   public values: string[];
-  public type: string;
-  public regex: string;
+  //public type: string;
+  //public regex: string;
 }
 
 class GenerateResource {

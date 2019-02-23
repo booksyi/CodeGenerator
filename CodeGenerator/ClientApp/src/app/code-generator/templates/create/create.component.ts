@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   templateUrl: './create.component.html',
   //styleUrls: ['./create.component.scss']
 })
-export class TemplatesCreateComponent implements OnInit {
+export class TemplatesCreateComponent {
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     public router: Router) { }
@@ -23,13 +23,9 @@ export class TemplatesCreateComponent implements OnInit {
 
   resources: TemplatesCreateResource;
 
-  templatesCreate() {
-    this.templatesCreateApi(this.request);
-  }
-
-  templatesCreateApi(query: TemplatesCreateRequest) {
+  create() {
     this.http.post<TemplatesCreateResource>(
-      '/api/templates', query
+      '/api/templates', this.request
     ).subscribe(res => {
       this.resources = res;
       this.back();
