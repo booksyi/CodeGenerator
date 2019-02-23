@@ -36,14 +36,14 @@ export class GeneratorsGenerateComponent {
 
   defaultValues(input: Input): InputObject[] | string[] {
     if (input.children && input.children.length) {
-      let childInputs: InputObject = [];
+      let valueInputs: InputObject = [];
       for (let child of input.children) {
-        childInputs.push(JSON.parse(JSON.stringify(child)));
-        for (let childInput of childInputs) {
-          childInput.values = this.defaultValues(child);
+        valueInputs.push(JSON.parse(JSON.stringify(child)));
+        for (let valueInput of valueInputs) {
+          valueInput.values = this.defaultValues(valueInput);
         }
       }
-      return [childInputs];
+      return [valueInputs];
     }
     else {
       return [''];
@@ -55,22 +55,38 @@ export class GeneratorsGenerateComponent {
   }
   
   add(input: Input) {
-    if (typeof input.values[0] === "string") {
-      Array.prototype.push.apply(input.values, ['']);
-    }
-    else {
-      let values: InputObject[] | string[] = this.defaultValues(input);
-      Array.prototype.push.apply(input.values, values);
-    }
+    let values: InputObject[] | string[] = this.defaultValues(input);
+    Array.prototype.push.apply(input.values, values);
   }
 
   remove(input: Input, index: number) {
     input.values.splice(index, 1);
   }
 
+  toJObject(inputs: Input[]): JObject {
+    let jObject = new JObject();
+    for (let input of inputs) {
+      if (input.children) {
+        var objectValues: JObject[] = [];
+        for (let valueInputs of input.values) {
+          let args: Input[] = JSON.parse(JSON.stringify(valueInputs));
+          objectValues.push(this.toJObject(args));
+        }
+        jObject[input.name] = objectValues;
+      }
+      else {
+        var stringValues: string[] = [];
+        for (let valueInputs of input.values) {
+          stringValues.push(valueInputs.toString());
+        }
+        jObject[input.name] = stringValues;
+      }
+    }
+    return jObject;
+  }
+
   submit() {
-    let query = new JObject();
-    // TODO: data binding for api
+    let query = this.toJObject(this.inputs);
     this.http.post<GenerateResource[]>(
       '/api/generators/' + this.id + '/generate', query
     ).subscribe(res => {
