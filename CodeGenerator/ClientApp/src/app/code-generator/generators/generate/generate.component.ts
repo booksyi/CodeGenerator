@@ -29,28 +29,39 @@ export class GeneratorsGenerateComponent {
     ).subscribe(res => {
       this.inputs = res;
       for (let input of this.inputs) {
-        this.setDefaultValues(input);
+        input.values = this.defaultValues(input);
       }
     });
   }
 
-  setDefaultValues(input: Input) {
+  defaultValues(input: Input): InputObject[] | string[] {
     if (input.children && input.children.length) {
+      let childInputs: InputObject = [];
       for (let child of input.children) {
-        this.setDefaultValues(child);
+        childInputs.push(JSON.parse(JSON.stringify(child)));
+        for (let childInput of childInputs) {
+          childInput.values = this.defaultValues(child);
+        }
       }
+      return [childInputs];
     }
     else {
-      input.values = [''];
+      return [''];
     }
   }
 
   trackByFn(index: any, item: any) {
     return index;
   }
-
+  
   add(input: Input) {
-    input.values.push('');
+    if (typeof input.values[0] === "string") {
+      Array.prototype.push.apply(input.values, ['']);
+    }
+    else {
+      let values: InputObject[] | string[] = this.defaultValues(input);
+      Array.prototype.push.apply(input.values, values);
+    }
   }
 
   remove(input: Input, index: number) {
@@ -58,10 +69,8 @@ export class GeneratorsGenerateComponent {
   }
 
   submit() {
-    let query = new Dictionary();
-    for (let input of this.inputs) {
-      query[input.name] = input.values;
-    }
+    let query = new JObject();
+    // TODO: data binding for api
     this.http.post<GenerateResource[]>(
       '/api/generators/' + this.id + '/generate', query
     ).subscribe(res => {
@@ -78,16 +87,17 @@ export class GeneratorsGenerateComponent {
   }
 }
 
-class Dictionary {
-  [index: string]: string[];
+class JObject {
+  [index: string]: JObject[] | JObject | string[] | string;
 }
+type InputObject = Input[]
 
 class Input {
   public name: string;
   public description: string;
   public isMultiple: boolean;
   public children: Input[];
-  public values: string[];
+  public values: InputObject[] | string[];
   //public type: string;
   //public regex: string;
 }
