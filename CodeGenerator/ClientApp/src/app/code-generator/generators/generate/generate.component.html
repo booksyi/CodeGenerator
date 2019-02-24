@@ -6,10 +6,8 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-10">
-        <div class="md-form mt-0">
-          <input type="button" class="btn btn-primary" value="生成代碼" (click)="submit()" />
-          <input type="button" class="btn btn-secondary" value="返回列表" (click)="back()" />
-        </div>
+        <input type="button" class="btn btn-primary" value="生成代碼" (click)="submit()" />
+        <input type="button" class="btn btn-secondary" value="返回列表" (click)="back()" />
       </div>
     </div>
   </ng-template>
@@ -24,10 +22,8 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-10">
-        <div class="md-form mt-0">
-          <input type="button" class="btn btn-warning" value="重新生成" (click)="rollback()" />
-          <input type="button" class="btn btn-danger" value="離開" (click)="back()" />
-        </div>
+        <input type="button" class="btn btn-warning" value="重新生成" (click)="rollback()" />
+        <input type="button" class="btn btn-danger" value="離開" (click)="back()" />
       </div>
     </div>
   </ng-template>
@@ -42,52 +38,62 @@
     <label class="col-sm-2 col-form-label">{{input.name}}</label>
   </ng-template>
   <div class="col-sm-10">
-    <div class="md-form mt-0">
-      <ng-container *ngIf="input.isMultiple; then input_values else input_value"></ng-container>
-      <!-- Multiple -->
-      <ng-template #input_values>
-        <ng-container *ngIf="input.children; then input_objects else input_strings"></ng-container>
-        <!-- Multiple Object -->
-        <ng-template #input_objects>
-          <ng-container *ngFor="let valueInputs of input.values; let i = index">
+    <ng-container *ngIf="input.isMultiple; then input_values else input_value"></ng-container>
+    <!-- Multiple -->
+    <ng-template #input_values>
+      <ng-container *ngIf="input.children; then input_objects else input_strings"></ng-container>
+      <!-- Multiple Object -->
+      <ng-template #input_objects>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <button class="btn btn-success" type="button" (click)="add(input)">＋</button>
+          </div>
+        </div>
+        <ng-container *ngFor="let valueInputs of input.values; let i = index">
+          <div class="form-group row" *ngFor="let valueInput of valueInputs">
+            <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: valueInput}"></ng-container>
+          </div>
+          <div class="form-group row">
             <div class="col-sm-12">
-              <div class="md-form mt-0">
-                <div class="form-group row">
-                  <button *ngIf="i === 0" class="btn btn-success" type="button" (click)="add(input)">＋</button>
-                  <button *ngIf="i !== 0" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
-                </div>
-              </div>
+              <button *ngIf="!(i === 0 && input.isRequired)" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
+              <button *ngIf="i === 0 && input.isRequired" class="btn btn-danger" type="button" disabled>－</button>
             </div>
-            <div class="form-group row" *ngFor="let valueInput of valueInputs">
-              <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: valueInput}"></ng-container>
-            </div>
-          </ng-container>
-        </ng-template>
-        <!-- Multiple Value -->
-        <ng-template #input_strings>
+          </div>
+        </ng-container>
+      </ng-template>
+      <!-- Multiple Value -->
+      <ng-template #input_strings>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <button class="btn btn-success" type="button" (click)="add(input)">＋</button>
+          </div>
+        </div>
+        <div class="md-form mt-0">
           <div class="input-group mb-3" *ngFor="let value of input.values; let i = index; trackBy: trackByFn">
             <div class="input-group-prepend">
-              <button *ngIf="i === 0" class="btn btn-success" type="button" (click)="add(input)">＋</button>
-              <button *ngIf="i !== 0" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
+              <button *ngIf="!(i === 0 && input.isRequired)" class="btn btn-danger" type="button" (click)="remove(input, i)">－</button>
+              <button *ngIf="i === 0 && input.isRequired" class="btn btn-danger" type="button" disabled>－</button>
             </div>
             <input type="text" class="form-control" [(ngModel)]="input.values[i]" [ngModelOptions]="{standalone: true}">
           </div>
-        </ng-template>
+        </div>
       </ng-template>
-      <!-- Single -->
-      <ng-template #input_value>
-        <ng-container *ngIf="input.children; then input_object else input_string"></ng-container>
-        <!-- Single Object -->
-        <ng-template #input_object>
-          <div class="form-group row" *ngFor="let valueInput of input.values[0]">
-            <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: valueInput}"></ng-container>
-          </div>
-        </ng-template>
-        <!-- Single Value -->
-        <ng-template #input_string>
+    </ng-template>
+    <!-- Single -->
+    <ng-template #input_value>
+      <ng-container *ngIf="input.children; then input_object else input_string"></ng-container>
+      <!-- Single Object -->
+      <ng-template #input_object>
+        <div class="form-group row" *ngFor="let valueInput of input.values[0]">
+          <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: valueInput}"></ng-container>
+        </div>
+      </ng-template>
+      <!-- Single Value -->
+      <ng-template #input_string>
+        <div class="md-form mt-0">
           <input type="text" class="form-control" [(ngModel)]="input.values[0]" [ngModelOptions]="{standalone: true}">
-        </ng-template>
+        </div>
       </ng-template>
-    </div>
+    </ng-template>
   </div>
 </ng-template>

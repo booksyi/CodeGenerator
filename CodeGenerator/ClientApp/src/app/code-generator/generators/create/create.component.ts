@@ -104,7 +104,7 @@ export class GeneratorsCreateComponent {
     ).subscribe(res => {
       this.back();
     }, err => {
-      console.log(err)
+      console.log(err);
     });
   }
 
@@ -121,6 +121,7 @@ export class CodeTemplate {
 export class Input {
   public name: string;
   public description: string;
+  public isRequired: boolean;
   public isMultiple: boolean;
   public isSplit: boolean;
   public defaultValues: string[];

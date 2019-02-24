@@ -20,6 +20,10 @@ export class GeneratorsGenerateComponent {
     this.get(this.id);
   }
 
+  trackByFn(index: any, item: any) {
+    return index;
+  }
+
   inputs: Input[];
   resources: GenerateResource[];
 
@@ -48,10 +52,6 @@ export class GeneratorsGenerateComponent {
     else {
       return [''];
     }
-  }
-
-  trackByFn(index: any, item: any) {
-    return index;
   }
   
   add(input: Input) {
@@ -111,6 +111,7 @@ type InputObject = Input[]
 class Input {
   public name: string;
   public description: string;
+  public isRequired: boolean;
   public isMultiple: boolean;
   public children: Input[];
   public values: InputObject[] | string[];
