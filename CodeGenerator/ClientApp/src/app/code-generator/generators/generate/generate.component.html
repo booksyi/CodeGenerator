@@ -41,7 +41,7 @@
     <ng-container *ngIf="input.isMultiple; then input_values else input_value"></ng-container>
     <!-- Multiple -->
     <ng-template #input_values>
-      <ng-container *ngIf="input.children; then input_objects else input_strings"></ng-container>
+      <ng-container *ngIf="input.children && input.children.length; then input_objects else input_strings"></ng-container>
       <!-- Multiple Object -->
       <ng-template #input_objects>
         <div class="form-group row">
@@ -81,7 +81,7 @@
     </ng-template>
     <!-- Single -->
     <ng-template #input_value>
-      <ng-container *ngIf="input.children; then input_object else input_string"></ng-container>
+      <ng-container *ngIf="input.children && input.children.length; then input_object else input_string"></ng-container>
       <!-- Single Object -->
       <ng-template #input_object>
         <div class="form-group row" *ngFor="let valueInput of input.values[0]">

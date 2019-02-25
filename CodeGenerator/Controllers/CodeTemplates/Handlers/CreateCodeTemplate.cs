@@ -27,13 +27,18 @@ namespace CodeGenerator.Controllers.CodeTemplates.Handlers
 
             public async Task<DbCodeTemplate> Handle(Request request, CancellationToken token)
             {
-                DbCodeTemplate codeTemplate = new DbCodeTemplate()
+                string json = JsonConvert.SerializeObject(request.Template); // test
+                if (request.Template.Validate(out string[] errorMessages))
                 {
-                    Node = JsonConvert.SerializeObject(request.Template)
-                };
-                await context.CodeTemplates.AddAsync(codeTemplate);
-                await context.SaveChangesAsync();
-                return codeTemplate;
+                    DbCodeTemplate codeTemplate = new DbCodeTemplate()
+                    {
+                        Node = JsonConvert.SerializeObject(request.Template)
+                    };
+                    await context.CodeTemplates.AddAsync(codeTemplate);
+                    await context.SaveChangesAsync();
+                    return codeTemplate;
+                }
+                throw new Exception(string.Join("\r\n", errorMessages));
             }
         }
     }

@@ -13,10 +13,7 @@ export class GeneratorsCreateComponent {
   constructor(@Inject(HttpClient) private http: HttpClient,
     public router: Router) { }
 
-  codeTemplate: CodeTemplate = {
-    inputs: [],
-    templateNodes: []
-  };
+  codeTemplate: CodeTemplate = new CodeTemplate();
 
   addInput() {
     this.codeTemplate.inputs.push(new Input());
@@ -27,9 +24,6 @@ export class GeneratorsCreateComponent {
   }
 
   addProperty(input: Input) {
-    if (input.children == null) {
-      input.children = [];
-    }
     input.children.push(new Input());
   }
 
@@ -46,12 +40,7 @@ export class GeneratorsCreateComponent {
   }
 
   addTemplateRequest(template: TemplateNode) {
-    if (template.requestNodes == null) {
-      template.requestNodes = [];
-    }
-    let requestNode = new RequestNode();
-    requestNode.from = "value";
-    template.requestNodes.push(requestNode);
+    template.requestNodes.push(new RequestNode());
   }
 
   removeTemplateRequest(template: TemplateNode, index: number) {
@@ -59,12 +48,7 @@ export class GeneratorsCreateComponent {
   }
 
   addAdapterRequest(adapter: AdapterNode) {
-    if (adapter.requestNodes == null) {
-      adapter.requestNodes = [];
-    }
-    let requestNode = new RequestNode();
-    requestNode.from = "value";
-    adapter.requestNodes.push(requestNode);
+    adapter.requestNodes.push(new RequestNode());
   }
 
   removeAdapterRequest(adapter: AdapterNode, index: number) {
@@ -72,12 +56,7 @@ export class GeneratorsCreateComponent {
   }
 
   addAdapter(template: TemplateNode) {
-    if (template.adapterNodes == null) {
-      template.adapterNodes = [];
-    }
-    let adapterNode = new AdapterNode();
-    adapterNode.httpMethod = "get";
-    template.adapterNodes.push(adapterNode);
+    template.adapterNodes.push(new AdapterNode());
   }
 
   removeAdapter(template: TemplateNode, index: number) {
@@ -85,13 +64,7 @@ export class GeneratorsCreateComponent {
   }
 
   addParameter(template: TemplateNode) {
-    if (template.parameterNodes == null) {
-      template.parameterNodes = [];
-    }
-    let parameterNode = new ParameterNode();
-    parameterNode.from = "value";
-    parameterNode.templateNode = new TemplateNode();
-    template.parameterNodes.push(parameterNode);
+    template.parameterNodes.push(new ParameterNode());
   }
 
   removeParameter(template: TemplateNode, index: number) {
@@ -114,8 +87,8 @@ export class GeneratorsCreateComponent {
 }
 
 export class CodeTemplate {
-  public inputs: Input[];
-  public templateNodes: TemplateNode[];
+  public inputs: Input[] = [];
+  public templateNodes: TemplateNode[] = [];
 }
 
 export class Input {
@@ -125,12 +98,13 @@ export class Input {
   public isMultiple: boolean;
   public isSplit: boolean;
   public defaultValues: string[];
-  public children: Input[];
+  public children: Input[] = [];
 }
 
 export class RequestNode {
+  public guid: string = Guid.newGuid();
   public name: string;
-  public from: string; // enum
+  public from: "value" | "input" | "adapter" = "value";
   public value: string;
   public inputName: string;
   public inputProperty: string;
@@ -139,28 +113,39 @@ export class RequestNode {
 }
 
 export class ParameterNode {
+  public guid: string = Guid.newGuid();
   public name: string;
-  public from: string; // enum
+  public from: "value" | "input" | "adapter" | "template" = "value";
   public value: string;
   public inputName: string;
   public inputProperty: string;
   public adapterName: string;
   public adapterProperty: string;
-  public templateNode: TemplateNode;
+  public templateNode: TemplateNode = new TemplateNode();
 }
 
 export class AdapterNode {
+  public guid: string = Guid.newGuid();
   public name: string;
-  public httpMethod: string; // enum
+  public httpMethod: "get" | "post" = "get";
   public url: string;
-  public requestNodes: RequestNode[];
+  public requestNodes: RequestNode[] = [];
   public responseConfine: string;
   public isSplit: boolean;
 }
 
 export class TemplateNode {
   public url: string;
-  public requestNodes: RequestNode[];
-  public adapterNodes: AdapterNode[];
-  public parameterNodes: ParameterNode[];
+  public requestNodes: RequestNode[] = [];
+  public adapterNodes: AdapterNode[] = [];
+  public parameterNodes: ParameterNode[] = [];
+}
+
+class Guid {
+  static newGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 }

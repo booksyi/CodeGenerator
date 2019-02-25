@@ -146,19 +146,19 @@
     <div class="col-sm-10">
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="value" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'value'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
           值
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="input" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'input'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
           參數
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="adapter" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'adapter'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
           中繼器
         </label>
       </div>
@@ -220,13 +220,13 @@
     <div class="col-sm-10">
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="get" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{adapter.guid}}" [value]="'get'" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
           Get
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="post" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{adapter.guid}}" [value]="'post'" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
           Post
         </label>
       </div>
@@ -287,25 +287,25 @@
     <div class="col-sm-10">
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="value" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'value'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
           值
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="input" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'input'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
           參數
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="adapter" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'adapter'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
           中繼器
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" value="template" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
+          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'template'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
           樣板
         </label>
       </div>

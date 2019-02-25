@@ -66,7 +66,7 @@ export class GeneratorsGenerateComponent {
   toJObject(inputs: Input[]): JObject {
     let jObject = new JObject();
     for (let input of inputs) {
-      if (input.children) {
+      if (input.children && input.children.length) {
         var objectValues: JObject[] = [];
         for (let valueInputs of input.values) {
           let args: Input[] = JSON.parse(JSON.stringify(valueInputs));
