@@ -1,24 +1,23 @@
 ﻿using CodeGenerator.Data.Models;
-using HelpersForCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.Templates.Handlers
+namespace CodeGenerator.Controllers.Constants.Handlers
 {
-    public class DeleteTemplateById
+    public class UpdateConstantById
     {
-        public class Request : IRequest<uint>
+        public class Request : IRequest<Constant>
         {
             internal int Id { get; set; }
+            public string Result { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, uint>
+        public class Handler : IRequestHandler<Request, Constant>
         {
             private readonly CodeGeneratorContext context;
             public Handler(CodeGeneratorContext context)
@@ -26,12 +25,12 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                 this.context = context;
             }
 
-            public async Task<uint> Handle(Request request, CancellationToken token)
+            public async Task<Constant> Handle(Request request, CancellationToken token)
             {
-                Template template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
-                context.Templates.Remove(template);
+                Constant constant = await context.Constants.FirstOrDefaultAsync(x => x.Id == request.Id);
+                constant.Result = request.Result;
                 await context.SaveChangesAsync();
-                return 0;
+                return constant;
             }
         }
     }

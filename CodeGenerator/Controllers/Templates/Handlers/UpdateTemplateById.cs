@@ -13,7 +13,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 {
     public class UpdateTemplateById
     {
-        public class Request : IRequest<DbTemplate>
+        public class Request : IRequest<Template>
         {
             internal int Id { get; set; }
             public string Name { get; set; }
@@ -21,7 +21,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
             public string Context { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, DbTemplate>
+        public class Handler : IRequestHandler<Request, Template>
         {
             private readonly CodeGeneratorContext context;
             public Handler(CodeGeneratorContext context)
@@ -29,9 +29,9 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                 this.context = context;
             }
 
-            public async Task<DbTemplate> Handle(Request request, CancellationToken token)
+            public async Task<Template> Handle(Request request, CancellationToken token)
             {
-                DbTemplate template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
+                Template template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
                 template.Name = request.Name;
                 template.Description = request.Description;
                 template.Context = request.Context;

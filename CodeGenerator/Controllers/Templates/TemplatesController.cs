@@ -22,7 +22,7 @@ namespace CodeGenerator.Controllers.Templates
         [HttpPost("")]
         public async Task<ActionResult> CreateTemplate([FromBody] CreateTemplate.Request request)
         {
-            DbTemplate template = await mediator.Send(request);
+            Template template = await mediator.Send(request);
             return new OkObjectResult(template);
         }
 

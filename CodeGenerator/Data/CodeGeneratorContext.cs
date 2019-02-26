@@ -15,25 +15,25 @@ namespace CodeGenerator.Data.Models
         {
         }
 
-        public virtual DbSet<DbApiConstant> ApiConstants { get; set; }
-        public virtual DbSet<DbCodeTemplate> CodeTemplates { get; set; }
-        public virtual DbSet<DbTemplate> Templates { get; set; }
+        public virtual DbSet<Constant> Constants { get; set; }
+        public virtual DbSet<Generator> Generators { get; set; }
+        public virtual DbSet<Template> Templates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DbApiConstant>(entity =>
+            modelBuilder.Entity<Constant>(entity =>
             {
-                entity.ToTable("CodeGeneratorApiConstants");
+                entity.ToTable("CodeGeneratorConstants");
 
                 entity.Property(e => e.Result).IsRequired();
             });
 
-            modelBuilder.Entity<DbCodeTemplate>(entity =>
+            modelBuilder.Entity<Generator>(entity =>
             {
-                entity.ToTable("CodeGeneratorCodeTemplates");
+                entity.ToTable("CodeGeneratorGenerators");
             });
 
-            modelBuilder.Entity<DbTemplate>(entity =>
+            modelBuilder.Entity<Template>(entity =>
             {
                 entity.ToTable("CodeGeneratorTemplates");
 

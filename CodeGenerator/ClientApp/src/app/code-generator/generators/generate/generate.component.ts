@@ -29,7 +29,7 @@ export class GeneratorsGenerateComponent {
 
   get(id: number) {
     this.http.get<Input[]>(
-      '/api/codeTemplates/' + id + '/inputs'
+      '/api/generators/' + id + '/inputs'
     ).subscribe(res => {
       this.inputs = res;
       for (let input of this.inputs) {
