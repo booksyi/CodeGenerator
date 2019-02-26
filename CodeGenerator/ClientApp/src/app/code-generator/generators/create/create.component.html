@@ -1,360 +1,507 @@
-<form>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">參數</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addInput()">＋</button>
-      <ng-container *ngIf="codeTemplate.inputs">
-        <ng-container *ngFor="let input of codeTemplate.inputs; let i = index">
-          <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: input, isproperty: false}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeInput(i)">－</button>
-        </ng-container>
+<div class="form-group row">
+  <label class="col-sm-2 col-form-label">參數</label>
+  <div class="col-sm-10">
+    <ng-container *ngIf="codeTemplate.inputs">
+      <ng-container *ngFor="let input of codeTemplate.inputs; let i = index">
+        <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{parent: null, input: input, isproperty: false}"></ng-container>
       </ng-container>
-    </div>
+    </ng-container>
+    <button class="btn btn-success" type="button" (click)="addInput()">＋</button>
   </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">樣板</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addTemplate()">＋</button>
-      <ng-container *ngIf="codeTemplate.templateNodes">
-        <ng-container *ngFor="let templateNode of codeTemplate.templateNodes; let i = index">
-          <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{template: templateNode}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeTemplate(i)">－</button>
-        </ng-container>
+</div>
+<div class="form-group row">
+  <label class="col-sm-2 col-form-label">樣板</label>
+  <div class="col-sm-10">
+    <ng-container *ngIf="codeTemplate.templateNodes">
+      <ng-container *ngFor="let templateNode of codeTemplate.templateNodes; let i = index">
+        <ng-container [ngTemplateOutlet]="template_template" [ngTemplateOutletContext]="{parameter: null, template: templateNode}"></ng-container>
       </ng-container>
-    </div>
+    </ng-container>
+    <button class="btn btn-success" type="button" (click)="addTemplate()">＋</button>
   </div>
-  <div class="form-group row">
-    <div class="offset-sm-2 col-sm-10">
-      <input type="button" class="btn btn-primary" value="建立" (click)="create()" />
-      <input type="button" class="btn btn-secondary" value="返回" (click)="back()" />
-    </div>
+</div>
+<div class="form-group row">
+  <div class="offset-sm-2 col-sm-10">
+    <input type="button" class="btn btn-primary" value="建立" (click)="create()" />
+    <input type="button" class="btn btn-secondary" value="返回" (click)="back()" />
   </div>
-</form>
+</div>
 
-<ng-template #template_input let-input="input" let-isproperty="isproperty">
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="input.name" [ngModelOptions]="{standalone: true}">
+<ng-template #template_input let-parent="parent" let-input="input" let-isproperty="isproperty">
+  <div class="form-inline">
+    <div class="form-group">
+      <button *ngIf="!parent" class="btn btn-danger" type="button" (click)="removeInput(input)">－</button>
+      <button *ngIf="parent" class="btn btn-danger" type="button" (click)="removeProperty(parent, input)">－</button>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">名稱</span>
+        </div>
+        <input type="text" class="form-control" placeholder="只能輸入英文、數字及底線(_)" [(ngModel)]="input.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">描述</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">顯示名稱</span>
+        </div>
         <input type="text" class="form-control" [(ngModel)]="input.description" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">其他</label>
-    <div class="col-sm-10">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" [(ngModel)]="input.isRequired" [ngModelOptions]="{standalone: true}">
-          必填
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" [(ngModel)]="input.isMultiple" [ngModelOptions]="{standalone: true}">
-          允許多個值
-        </label>
-      </div>
-      <div *ngIf="!isproperty" class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" [(ngModel)]="input.isSplit" [ngModelOptions]="{standalone: true}">
-          把每個值分開處理
-        </label>
-      </div>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">成員</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addProperty(input)">＋</button>
-      <ng-container *ngIf="input.children">
-        <ng-container *ngFor="let child of input.children; let i = index">
-          <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: child, isproperty: true}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeProperty(input, i)">－</button>
-        </ng-container>
-      </ng-container>
+    <div class="form-group">
+      <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_input_modal, {input: input, isproperty: isproperty})">進階</button>
     </div>
   </div>
 </ng-template>
 
-<ng-template #template let-template="template">
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">網址</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
+<ng-template #template_template let-parameter="parameter" let-template="template">
+  <div class="form-inline">
+    <div *ngIf="!parameter" class="form-group">
+      <button class="btn btn-danger" type="button" (click)="removeTemplate(template)">－</button>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">網址</span>
+        </div>
         <input type="text" class="form-control" [(ngModel)]="template.url" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">網址參數</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addTemplateRequest(template)">＋</button>
-      <ng-container *ngIf="template.requestNodes">
-        <ng-container *ngFor="let requestNode of template.requestNodes">
-          <ng-container [ngTemplateOutlet]="template_request" [ngTemplateOutletContext]="{request: requestNode}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeTemplateRequest(template, i)">－</button>
-        </ng-container>
-      </ng-container>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">資料中繼器</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addAdapter(template)">＋</button>
-      <ng-container *ngIf="template.adapterNodes">
-        <ng-container *ngFor="let adapterNode of template.adapterNodes">
-          <ng-container [ngTemplateOutlet]="template_adapter" [ngTemplateOutletContext]="{adapter: adapterNode}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeAdapter(template, i)">－</button>
-        </ng-container>
-      </ng-container>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">樣板參數</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addParameter(template)">＋</button>
-      <ng-container *ngIf="template.parameterNodes">
-        <ng-container *ngFor="let parameterNode of template.parameterNodes">
-          <ng-container [ngTemplateOutlet]="template_parameter" [ngTemplateOutletContext]="{parameter: parameterNode}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeParameter(template, i)">－</button>
-        </ng-container>
-      </ng-container>
+    <div class="form-group">
+      <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_template_modal, {template: template})">進階</button>
     </div>
   </div>
 </ng-template>
 
-<ng-template #template_request let-request="request">
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
+<ng-template #template_request let-template="template" let-adapter="adapter" let-request="request">
+  <div class="form-inline">
+    <div class="form-group">
+      <button *ngIf="template" class="btn btn-danger" type="button" (click)="removeTemplateRequest(template, request)">－</button>
+      <button *ngIf="adapter" class="btn btn-danger" type="button" (click)="removeAdapterRequest(adapter, request)">－</button>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">名稱</span>
+        </div>
         <input type="text" class="form-control" [(ngModel)]="request.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">來源</label>
-    <div class="col-sm-10">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'value'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
-          值
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'input'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
-          參數
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{request.guid}}" [value]="'adapter'" [(ngModel)]="request.from" [ngModelOptions]="{standalone: true}">
-          中繼器
-        </label>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="request.from === 'value'" class="form-group row">
-    <label class="col-sm-2 col-form-label">值</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="request.value" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div *ngIf="request.from === 'input'" class="form-group row">
-    <label class="col-sm-2 col-form-label">參數名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="request.inputName" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div *ngIf="request.from === 'input'" class="form-group row">
-    <label class="col-sm-2 col-form-label">參數物件成員</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="request.inputProperty" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div *ngIf="request.from === 'adapter'" class="form-group row">
-    <label class="col-sm-2 col-form-label">中繼器名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="request.adapterName" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div *ngIf="request.from === 'adapter'" class="form-group row">
-    <label class="col-sm-2 col-form-label">中繼器物件成員</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="request.adapterProperty" [ngModelOptions]="{standalone: true}">
-      </div>
+    <div class="form-group">
+      <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_request_modal, {request: request})">進階</button>
     </div>
   </div>
 </ng-template>
 
-<ng-template #template_adapter let-adapter="adapter">
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
+<ng-template #template_adapter let-template="template" let-adapter="adapter">
+  <div class="form-inline">
+    <div class="form-group">
+      <button class="btn btn-danger" type="button" (click)="removeAdapter(template, adapter)">－</button>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">名稱</span>
+        </div>
         <input type="text" class="form-control" [(ngModel)]="adapter.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Http Method</label>
-    <div class="col-sm-10">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{adapter.guid}}" [value]="'get'" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
-          Get
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{adapter.guid}}" [value]="'post'" [(ngModel)]="adapter.httpMethod" [ngModelOptions]="{standalone: true}">
-          Post
-        </label>
-      </div>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">網址</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="adapter.url" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">網址參數</label>
-    <div class="col-sm-10">
-      <button class="btn btn-success" type="button" (click)="addAdapterRequest(adapter)">＋</button>
-      <ng-container *ngIf="adapter.requestNodes">
-        <ng-container *ngFor="let requestNode of adapter.requestNodes">
-          <ng-container [ngTemplateOutlet]="template_request" [ngTemplateOutletContext]="{request: requestNode}"></ng-container>
-          <button class="btn btn-danger" type="button" (click)="removeAdapterRequest(adapter, i)">－</button>
-        </ng-container>
-      </ng-container>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">物件成員限縮</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="adapter.responseConfine" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">其他</label>
-    <div class="col-sm-10">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" [(ngModel)]="adapter.isSplit" [ngModelOptions]="{standalone: true}">
-          把每個值分開處理
-        </label>
-      </div>
+    <div class="form-group">
+      <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_adapter_modal, {adapter: adapter})">進階</button>
     </div>
   </div>
 </ng-template>
 
-<ng-template #template_parameter let-parameter="parameter">
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
+<ng-template #template_parameter let-template="template" let-parameter="parameter">
+  <div class="form-inline">
+    <div class="form-group">
+      <button class="btn btn-danger" type="button" (click)="removeParameter(template, parameter)">－</button>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">名稱</span>
+        </div>
         <input type="text" class="form-control" [(ngModel)]="parameter.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
+    <div class="form-group">
+      <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_parameter_modal, {parameter: parameter})">進階</button>
+    </div>
   </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">來源</label>
-    <div class="col-sm-10">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'value'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
-          值
-        </label>
+</ng-template>
+
+<ng-template #template_input_modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">參數</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">名稱</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" [(ngModel)]="modalData.input.name" [ngModelOptions]="{standalone: true}">
       </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'input'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
-          參數
-        </label>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">顯示名稱</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" [(ngModel)]="modalData.input.description" [ngModelOptions]="{standalone: true}">
       </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'adapter'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
-          中繼器
-        </label>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">其他</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="modalData.input.isRequired" [ngModelOptions]="{standalone: true}">
+            必填
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="modalData.input.isMultiple" [ngModelOptions]="{standalone: true}">
+            允許多個值
+          </label>
+        </div>
+        <div *ngIf="!modalData.isproperty" class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="modalData.input.isSplit" [ngModelOptions]="{standalone: true}">
+            把每個值分開處理
+          </label>
+        </div>
       </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="{{parameter.guid}}" [value]="'template'" [(ngModel)]="parameter.from" [ngModelOptions]="{standalone: true}">
-          樣板
-        </label>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">成員</label>
+      <div class="col-sm-10">
+        <ng-container *ngIf="modalData.input.children">
+          <ng-container *ngFor="let child of modalData.input.children; let i = index">
+            <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{parent: modalData.input, input: child, isproperty: true}"></ng-container>
+          </ng-container>
+        </ng-container>
+        <button class="btn btn-success" type="button" (click)="addProperty(modalData.input)">＋</button>
       </div>
     </div>
   </div>
-  <div *ngIf="parameter.from === 'value'" class="form-group row">
-    <label class="col-sm-2 col-form-label">值</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="parameter.value" [ngModelOptions]="{standalone: true}">
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
+  </div>
+</ng-template>
+
+<ng-template #template_template_modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">樣板</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">網址</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.template.url" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">網址參數</label>
+      <div class="col-sm-10">
+        <ng-container *ngIf="modalData.template.requestNodes">
+          <ng-container *ngFor="let requestNode of modalData.template.requestNodes">
+            <ng-container [ngTemplateOutlet]="template_request" [ngTemplateOutletContext]="{template: modalData.template, adapter: null, request: requestNode}"></ng-container>
+          </ng-container>
+        </ng-container>
+        <button class="btn btn-success" type="button" (click)="addTemplateRequest(modalData.template)">＋</button>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">資料中繼器</label>
+      <div class="col-sm-10">
+        <ng-container *ngIf="modalData.template.adapterNodes">
+          <ng-container *ngFor="let adapterNode of modalData.template.adapterNodes">
+            <ng-container [ngTemplateOutlet]="template_adapter" [ngTemplateOutletContext]="{template: modalData.template, adapter: adapterNode}"></ng-container>
+          </ng-container>
+        </ng-container>
+        <button class="btn btn-success" type="button" (click)="addAdapter(modalData.template)">＋</button>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">樣板參數</label>
+      <div class="col-sm-10">
+        <ng-container *ngIf="modalData.template.parameterNodes">
+          <ng-container *ngFor="let parameterNode of modalData.template.parameterNodes">
+            <ng-container [ngTemplateOutlet]="template_parameter" [ngTemplateOutletContext]="{template: modalData.template, parameter: parameterNode}"></ng-container>
+          </ng-container>
+        </ng-container>
+        <button class="btn btn-success" type="button" (click)="addParameter(modalData.template)">＋</button>
       </div>
     </div>
   </div>
-  <div *ngIf="parameter.from === 'input'" class="form-group row">
-    <label class="col-sm-2 col-form-label">參數名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="parameter.inputName" [ngModelOptions]="{standalone: true}">
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
+  </div>
+</ng-template>
+
+<ng-template #template_request_modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">網址參數</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.name" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">來源</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.request.guid}}" [value]="'value'" [(ngModel)]="modalData.request.from" [ngModelOptions]="{standalone: true}">
+            值
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.request.guid}}" [value]="'input'" [(ngModel)]="modalData.request.from" [ngModelOptions]="{standalone: true}">
+            參數
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.request.guid}}" [value]="'adapter'" [(ngModel)]="modalData.request.from" [ngModelOptions]="{standalone: true}">
+            中繼器
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.request.from === 'value'" class="form-group row">
+      <label class="col-sm-2 col-form-label">值</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.value" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.request.from === 'input'" class="form-group row">
+      <label class="col-sm-2 col-form-label">參數名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.inputName" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.request.from === 'input'" class="form-group row">
+      <label class="col-sm-2 col-form-label">參數物件成員</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.inputProperty" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.request.from === 'adapter'" class="form-group row">
+      <label class="col-sm-2 col-form-label">中繼器名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.adapterName" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.request.from === 'adapter'" class="form-group row">
+      <label class="col-sm-2 col-form-label">中繼器物件成員</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.request.adapterProperty" [ngModelOptions]="{standalone: true}">
+        </div>
       </div>
     </div>
   </div>
-  <div *ngIf="parameter.from === 'input'" class="form-group row">
-    <label class="col-sm-2 col-form-label">參數物件成員</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="parameter.inputProperty" [ngModelOptions]="{standalone: true}">
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
+  </div>
+</ng-template>
+
+<ng-template #template_adapter_modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">資料中繼器</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.adapter.name" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Http Method</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.adapter.guid}}" [value]="'get'" [(ngModel)]="modalData.adapter.httpMethod" [ngModelOptions]="{standalone: true}">
+            Get
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.adapter.guid}}" [value]="'post'" [(ngModel)]="modalData.adapter.httpMethod" [ngModelOptions]="{standalone: true}">
+            Post
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">網址</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.adapter.url" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">網址參數</label>
+      <div class="col-sm-10">
+        <ng-container *ngIf="modalData.adapter.requestNodes">
+          <ng-container *ngFor="let requestNode of modalData.adapter.requestNodes">
+            <ng-container [ngTemplateOutlet]="template_request" [ngTemplateOutletContext]="{template: null, adapter: modalData.adapter, request: requestNode}"></ng-container>
+          </ng-container>
+        </ng-container>
+        <button class="btn btn-success" type="button" (click)="addAdapterRequest(modalData.adapter)">＋</button>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">物件成員限縮</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.adapter.responseConfine" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">其他</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="modalData.adapter.isSplit" [ngModelOptions]="{standalone: true}">
+            把每個值分開處理
+          </label>
+        </div>
       </div>
     </div>
   </div>
-  <div *ngIf="parameter.from === 'adapter'" class="form-group row">
-    <label class="col-sm-2 col-form-label">中繼器名稱</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="parameter.adapterName" [ngModelOptions]="{standalone: true}">
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
+  </div>
+</ng-template>
+
+<ng-template #template_parameter_modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">樣板參數</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.name" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">來源</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.parameter.guid}}" [value]="'value'" [(ngModel)]="modalData.parameter.from" [ngModelOptions]="{standalone: true}">
+            值
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.parameter.guid}}" [value]="'input'" [(ngModel)]="modalData.parameter.from" [ngModelOptions]="{standalone: true}">
+            參數
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.parameter.guid}}" [value]="'adapter'" [(ngModel)]="modalData.parameter.from" [ngModelOptions]="{standalone: true}">
+            中繼器
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{modalData.parameter.guid}}" [value]="'template'" [(ngModel)]="modalData.parameter.from" [ngModelOptions]="{standalone: true}">
+            樣板
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'value'" class="form-group row">
+      <label class="col-sm-2 col-form-label">值</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.value" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'input'" class="form-group row">
+      <label class="col-sm-2 col-form-label">參數名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.inputName" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'input'" class="form-group row">
+      <label class="col-sm-2 col-form-label">參數物件成員</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.inputProperty" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'adapter'" class="form-group row">
+      <label class="col-sm-2 col-form-label">中繼器名稱</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.adapterName" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'adapter'" class="form-group row">
+      <label class="col-sm-2 col-form-label">中繼器物件成員</label>
+      <div class="col-sm-10">
+        <div class="md-form mt-0">
+          <input type="text" class="form-control" [(ngModel)]="modalData.parameter.adapterProperty" [ngModelOptions]="{standalone: true}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="modalData.parameter.from === 'template'" class="form-group row">
+      <label class="col-sm-2 col-form-label">樣板</label>
+      <div class="col-sm-10">
+        <ng-container [ngTemplateOutlet]="template_template" [ngTemplateOutletContext]="{parameter: modalData.parameter, template: modalData.parameter.templateNode}"></ng-container>
       </div>
     </div>
   </div>
-  <div *ngIf="parameter.from === 'adapter'" class="form-group row">
-    <label class="col-sm-2 col-form-label">中繼器物件成員</label>
-    <div class="col-sm-10">
-      <div class="md-form mt-0">
-        <input type="text" class="form-control" [(ngModel)]="parameter.adapterProperty" [ngModelOptions]="{standalone: true}">
-      </div>
-    </div>
-  </div>
-  <div *ngIf="parameter.from === 'template'" class="form-group row">
-    <label class="col-sm-2 col-form-label">樣板</label>
-    <div class="col-sm-10">
-      <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{template: parameter.templateNode}"></ng-container>
-    </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
   </div>
 </ng-template>

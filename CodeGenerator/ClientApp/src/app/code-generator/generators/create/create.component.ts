@@ -1,6 +1,7 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, TemplateRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-generators-create',
@@ -11,15 +12,43 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class GeneratorsCreateComponent {
   /** create ctor */
   constructor(@Inject(HttpClient) private http: HttpClient,
+    private modalService: NgbModal,
     public router: Router) { }
 
   codeTemplate: CodeTemplate = new CodeTemplate();
+
+  modalData: any;
+  modalStack: ModalItem[] = [];
+  modalTab: boolean = false;
+  openModal(content, data) {
+    let component = this;
+    if (this.modalService.hasOpenModals()) {
+      this.modalTab = true;
+      this.modalService.dismissAll();
+    }
+    this.modalService.open(content).result.finally(function () {
+      if (component.modalTab) {
+        component.modalTab = false;
+      }
+      else {
+        component.modalStack.splice(-1, 1);
+        component.modalData = null;
+        if (component.modalStack.length) {
+          let lastModal = component.modalStack.pop();
+          component.openModal(lastModal.content, lastModal.data);
+        }
+      }
+    });
+    this.modalData = data;
+    this.modalStack.push({ content: content, data: data });
+  }
 
   addInput() {
     this.codeTemplate.inputs.push(new Input());
   }
 
-  removeInput(index: number) {
+  removeInput(input: Input) {
+    let index = this.codeTemplate.inputs.indexOf(input, 0);
     this.codeTemplate.inputs.splice(index, 1);
   }
 
@@ -27,15 +56,17 @@ export class GeneratorsCreateComponent {
     input.children.push(new Input());
   }
 
-  removeProperty(input: Input, index: number) {
-    input.children.splice(index, 1);
+  removeProperty(parent: Input, input: Input) {
+    let index = parent.children.indexOf(input, 0);
+    parent.children.splice(index, 1);
   }
 
   addTemplate() {
     this.codeTemplate.templateNodes.push(new TemplateNode());
   }
 
-  removeTemplate(index: number) {
+  removeTemplate(template: TemplateNode) {
+    let index = this.codeTemplate.templateNodes.indexOf(template, 0);
     this.codeTemplate.templateNodes.splice(index, 1);
   }
 
@@ -43,7 +74,8 @@ export class GeneratorsCreateComponent {
     template.requestNodes.push(new RequestNode());
   }
 
-  removeTemplateRequest(template: TemplateNode, index: number) {
+  removeTemplateRequest(template: TemplateNode, request: RequestNode) {
+    let index = template.requestNodes.indexOf(request, 0);
     template.requestNodes.splice(index, 1);
   }
 
@@ -51,7 +83,8 @@ export class GeneratorsCreateComponent {
     adapter.requestNodes.push(new RequestNode());
   }
 
-  removeAdapterRequest(adapter: AdapterNode, index: number) {
+  removeAdapterRequest(adapter: AdapterNode, request: RequestNode) {
+    let index = adapter.requestNodes.indexOf(request, 0);
     adapter.requestNodes.splice(index, 1);
   }
 
@@ -59,7 +92,8 @@ export class GeneratorsCreateComponent {
     template.adapterNodes.push(new AdapterNode());
   }
 
-  removeAdapter(template: TemplateNode, index: number) {
+  removeAdapter(template: TemplateNode, adapter: AdapterNode) {
+    let index = template.adapterNodes.indexOf(adapter, 0);
     template.adapterNodes.splice(index, 1);
   }
 
@@ -67,7 +101,8 @@ export class GeneratorsCreateComponent {
     template.parameterNodes.push(new ParameterNode());
   }
 
-  removeParameter(template: TemplateNode, index: number) {
+  removeParameter(template: TemplateNode, parameter: ParameterNode) {
+    let index = template.parameterNodes.indexOf(parameter, 0);
     template.parameterNodes.splice(index, 1);
   }
 
@@ -84,6 +119,11 @@ export class GeneratorsCreateComponent {
   back() {
     this.router.navigate(['generators/list']);
   }
+}
+
+class ModalItem {
+  public content: any;
+  public data: any;
 }
 
 export class CodeTemplate {
