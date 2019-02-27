@@ -2,7 +2,7 @@
   <label class="col-sm-2 col-form-label">參數</label>
   <div class="col-sm-10">
     <ng-container *ngIf="codeTemplate.inputs">
-      <ng-container *ngFor="let input of codeTemplate.inputs; let i = index">
+      <ng-container *ngFor="let input of codeTemplate.inputs">
         <div class="form-group">
           <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: input, isproperty: false}"></ng-container>
         </div>
@@ -17,7 +17,7 @@
   <label class="col-sm-2 col-form-label">樣板</label>
   <div class="col-sm-10">
     <ng-container *ngIf="codeTemplate.templateNodes">
-      <ng-container *ngFor="let templateNode of codeTemplate.templateNodes; let i = index">
+      <ng-container *ngFor="let templateNode of codeTemplate.templateNodes">
         <div class="form-group">
           <ng-container [ngTemplateOutlet]="template_template" [ngTemplateOutletContext]="{template: templateNode}"></ng-container>
         </div>

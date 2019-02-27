@@ -58,10 +58,15 @@ export class GeneratorsGenerateComponent {
   get(id: number) {
     this.http.get<Input[]>(
       '/api/generators/' + id + '/inputs'
-    ).subscribe(res => {
-      this.inputs = res;
-      for (let input of this.inputs) {
-        input.values = this.defaultValues(input);
+    ).subscribe(inputs => {
+      if (inputs) {
+        this.inputs = inputs;
+        for (let input of this.inputs) {
+          input.values = this.defaultValues(input);
+        }
+      }
+      else {
+        this.submit();
       }
     });
   }
@@ -118,7 +123,7 @@ export class GeneratorsGenerateComponent {
   }
 
   submit() {
-    let query = this.toJObject(this.inputs);
+    let query = this.inputs ? this.toJObject(this.inputs) : {};
     this.http.post<GenerateResource[]>(
       '/api/generators/' + this.id + '/generate', query
     ).subscribe(res => {
@@ -128,6 +133,9 @@ export class GeneratorsGenerateComponent {
 
   rollback() {
     this.resources = null;
+    if (!this.inputs) {
+      this.submit();
+    }
   }
 
   back() {
