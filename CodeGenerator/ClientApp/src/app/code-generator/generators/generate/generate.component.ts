@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -11,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class GeneratorsGenerateComponent {
   /** generate ctor */
   constructor(@Inject(HttpClient) private http: HttpClient,
+    private modalService: NgbModal,
     public route: ActivatedRoute,
     public router: Router) { }
 
@@ -18,6 +20,32 @@ export class GeneratorsGenerateComponent {
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     this.get(this.id);
+  }
+
+  bsModal: any;
+  bsModalStack: BsModal[] = [];
+  bsModalEventDismiss: boolean = false;
+  openModal(content, data) {
+    let component = this;
+    component.bsModal = data;
+    component.bsModalStack.push({ content: content, data: data });
+    if (this.modalService.hasOpenModals()) {
+      this.bsModalEventDismiss = true;
+      this.modalService.dismissAll();
+    }
+    this.modalService.open(content, { size: "lg" }).result.finally(function () {
+      if (component.bsModalEventDismiss) {
+        component.bsModalEventDismiss = false;
+      }
+      else {
+        component.bsModalStack.splice(-1, 1);
+        component.bsModal = null;
+        if (component.bsModalStack.length) {
+          let lastModal = component.bsModalStack.pop();
+          component.openModal(lastModal.content, lastModal.data);
+        }
+      }
+    });
   }
 
   trackByFn(index: any, item: any) {
@@ -85,6 +113,10 @@ export class GeneratorsGenerateComponent {
     return jObject;
   }
 
+  toJson(inputs: Input[]): string {
+    return JSON.stringify(this.toJObject(inputs));
+  }
+
   submit() {
     let query = this.toJObject(this.inputs);
     this.http.post<GenerateResource[]>(
@@ -101,6 +133,11 @@ export class GeneratorsGenerateComponent {
   back() {
     this.router.navigate(['generators/list']);
   }
+}
+
+class BsModal {
+  public content: any;
+  public data: any;
 }
 
 class JObject {
@@ -120,6 +157,6 @@ class Input {
 }
 
 class GenerateResource {
-  public path: string;
+  public name: string;
   public text: string;
 }

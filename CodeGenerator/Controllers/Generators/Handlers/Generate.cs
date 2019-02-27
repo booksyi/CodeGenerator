@@ -11,13 +11,19 @@ namespace CodeGenerator.Controllers.Generators.Handlers
 {
     public class Generate
     {
-        public class Request : IRequest<IEnumerable<GeneratorsResource>>
+        public class Request : IRequest<Response[]>
         {
             internal int Id { get; set; }
             public JObject Body { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<GeneratorsResource>>
+        public class Response
+        {
+            public string Name { get; set; }
+            public string Text { get; set; }
+        }
+
+        public class Handler : IRequestHandler<Request, Response[]>
         {
             private readonly IMediator mediator;
             private readonly SqlHelper sqlHelper;
@@ -27,7 +33,7 @@ namespace CodeGenerator.Controllers.Generators.Handlers
                 this.sqlHelper = sqlHelper;
             }
 
-            public async Task<IEnumerable<GeneratorsResource>> Handle(Request request, CancellationToken token)
+            public async Task<Response[]> Handle(Request request, CancellationToken token)
             {
                 var nodes = await mediator.Send(new ToGenerateNodes.Request()
                 {
@@ -35,14 +41,16 @@ namespace CodeGenerator.Controllers.Generators.Handlers
                     Body = request.Body
                 });
 
-                List<GeneratorsResource> resources = new List<GeneratorsResource>();
+                List<Response> resources = new List<Response>();
                 foreach (var node in nodes)
                 {
-                    string text = await node.GenerateAsync();
-                    resources.Add(new GeneratorsResource("", text));
+                    resources.Add(new Response()
+                    {
+                        Name = node.ApplyKey,
+                        Text = await node.GenerateAsync()
+                    });
                 }
-
-                return resources;
+                return resources.ToArray();
             }
         }
     }

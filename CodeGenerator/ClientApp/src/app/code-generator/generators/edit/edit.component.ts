@@ -20,44 +20,53 @@ export class GeneratorsEditComponent {
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (this.id > 0) {
-      this.get(this.id);
+      this.get();
     }
   }
 
   codeTemplate: CodeTemplate = new CodeTemplate();
+  templates: Template[];
 
-  get(id: number) {
+  get() {
     this.http.get<CodeTemplate>(
-      '/api/generators/' + id + '/codeTemplate'
+      '/api/generators/' + this.id + '/codeTemplate'
     ).subscribe(codeTemplate => {
       this.codeTemplate = codeTemplate;
     });
   }
 
-  modalData: any;
-  modalStack: ModalItem[] = [];
-  modalTab: boolean = false;
+  getTemplates() {
+    this.http.get<Template[]>(
+      '/api/templates'
+    ).subscribe(templates => {
+      this.templates = templates.map(x => Object.assign(new Template(), x));
+    });
+  }
+
+  bsModal: any;
+  bsModalStack: BsModal[] = [];
+  bsModalEventDismiss: boolean = false;
   openModal(content, data) {
     let component = this;
+    component.bsModal = data;
+    component.bsModalStack.push({ content: content, data: data });
     if (this.modalService.hasOpenModals()) {
-      this.modalTab = true;
+      this.bsModalEventDismiss = true;
       this.modalService.dismissAll();
     }
-    this.modalService.open(content).result.finally(function () {
-      if (component.modalTab) {
-        component.modalTab = false;
+    this.modalService.open(content, { size: "lg" }).result.finally(function () {
+      if (component.bsModalEventDismiss) {
+        component.bsModalEventDismiss = false;
       }
       else {
-        component.modalStack.splice(-1, 1);
-        component.modalData = null;
-        if (component.modalStack.length) {
-          let lastModal = component.modalStack.pop();
+        component.bsModalStack.splice(-1, 1);
+        component.bsModal = null;
+        if (component.bsModalStack.length) {
+          let lastModal = component.bsModalStack.pop();
           component.openModal(lastModal.content, lastModal.data);
         }
       }
     });
-    this.modalData = data;
-    this.modalStack.push({ content: content, data: data });
   }
 
   addInput() {
@@ -70,6 +79,9 @@ export class GeneratorsEditComponent {
   }
 
   addProperty(input: Input) {
+    if (input.children == null) {
+      input.children = [];
+    }
     input.children.push(new Input());
   }
 
@@ -148,7 +160,7 @@ export class GeneratorsEditComponent {
   }
 }
 
-class ModalItem {
+class BsModal {
   public content: any;
   public data: any;
 }
@@ -202,10 +214,19 @@ export class AdapterNode {
 }
 
 export class TemplateNode {
+  public name: string;
   public url: string;
   public requestNodes: RequestNode[] = [];
   public adapterNodes: AdapterNode[] = [];
   public parameterNodes: ParameterNode[] = [];
+}
+
+export class Template {
+  public id: number;
+  public name: string;
+  public get url(): string {
+    return "/api/templates/" + this.id + "/context";
+  }
 }
 
 class Guid {
