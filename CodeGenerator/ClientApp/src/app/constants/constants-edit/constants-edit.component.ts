@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ConstantsService, Constant } from '../constants.service';
 
 @Component({
   selector: 'app-constants-edit',
@@ -9,51 +9,32 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ConstantsEditComponent implements OnInit {
   constructor(
-    @Inject(HttpClient) private http: HttpClient,
-    public route: ActivatedRoute,
-    public router: Router) { }
+    private route: ActivatedRoute,
+    private service: ConstantsService) { }
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (this.id > 0) {
-      this.get(this.id);
+      this.get();
     }
   }
 
-  public id: number;
+  id: number;
   constant: Constant = new Constant();
 
-  get(id: number) {
-    this.http.get<Constant>(
-      '/api/constants/' + id
-    ).subscribe(constant => {
-      Object.assign(this.constant, constant);
-    });
+  get() {
+    this.service.get(this.id).subscribe(constant => this.constant = constant);
   }
 
   create() {
-    this.http.post<Constant>(
-      '/api/constants', this.constant
-    ).subscribe(constant => {
-      this.constant = constant;
-      this.back();
-    });
+    this.service.create(this.constant).subscribe(() => this.back());
   }
 
-  edit() {
-    this.http.put<Constant>(
-      '/api/constants/' + this.id, this.constant
-    ).subscribe(constant => {
-      this.constant = constant;
-      this.back();
-    });
+  update() {
+    this.service.update(this.id, this.constant).subscribe(() => this.back());
   }
 
   back() {
-    this.router.navigate(['constants/list']);
+    this.service.redirectToList();
   }
-}
-
-export class Constant {
-  result: string;
 }

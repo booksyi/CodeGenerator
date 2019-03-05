@@ -1,7 +1,6 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ConstantsService, Constant } from '../constants.service';
 
 @Component({
   selector: 'app-constants-list',
@@ -10,49 +9,34 @@ import { Router } from '@angular/router';
 })
 export class ConstantsListComponent implements OnInit {
   constructor(
-    @Inject(HttpClient) private http: HttpClient,
     private modalService: NgbModal,
-    public router: Router) { }
+    private service: ConstantsService) { }
 
   ngOnInit() {
     this.list();
   }
 
   constants: Constant[];
-  confirmItem: Constant;
+  confirmIndex: number = 0;
 
   list() {
-    this.http.get<Constant[]>(
-      '/api/constants'
-    ).subscribe(constants => {
-      this.constants = constants;
-    });
+    this.service.list().subscribe(constants => this.constants = constants);
   }
 
   create() {
-    this.router.navigate(['constants/create']);
+    this.service.redirectToCreate();
   }
-
+  
   edit(id: number) {
-    this.router.navigate(['constants/edit/' + id]);
+    this.service.redirectToEdit(id);
   }
 
   confirm(id: number, content) {
-    this.confirmItem = this.constants.filter(e => e.id === id)[0];
+    this.confirmIndex = this.constants.findIndex(e => e.id === id);
     this.modalService.open(content);
   }
 
   delete(id: number) {
-    this.http.delete(
-      '/api/constants/' + id
-    ).subscribe(() => {
-      this.confirmItem = null;
-      this.list();
-    });
+    this.service.delete(id).subscribe(() => this.list());
   }
-}
-
-export class Constant {
-  id: number;
-  result: string;
 }

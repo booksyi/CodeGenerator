@@ -47,7 +47,7 @@
             <div *ngIf="input.children && input.children.length" class="input-group">
               <input type="text" class="form-control" value="{{toJson(value)}}" readonly>
               <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" (click)="openModal(template_input_modal, {input: input, index: i});">編輯</button>
+                <button class="btn btn-outline-secondary" type="button" (click)="open(template_input_modal, {input: input, index: i});">編輯</button>
               </div>
             </div>
           </div>
@@ -62,14 +62,14 @@
 
 <ng-template #template_input_modal let-modal>
   <div class="modal-header">
-    <h4 *ngIf="bsModal.input.description" class="modal-title">{{bsModal.input.description}}</h4>
-    <h4 *ngIf="!bsModal.input.description" class="modal-title">{{bsModal.input.name}}</h4>
+    <h4 *ngIf="currentModal.input.description" class="modal-title">{{currentModal.input.description}}</h4>
+    <h4 *ngIf="!currentModal.input.description" class="modal-title">{{currentModal.input.name}}</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    <ng-container *ngFor="let valueInput of bsModal.input.values[bsModal.index]">
+    <ng-container *ngFor="let valueInput of currentModal.input.values[currentModal.index]">
       <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: valueInput}"></ng-container>
     </ng-container>
   </div>

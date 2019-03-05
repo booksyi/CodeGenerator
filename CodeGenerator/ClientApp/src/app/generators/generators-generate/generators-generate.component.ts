@@ -1,7 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { NgbModalStack } from '@app/shared/ng-bootstrap-custom.service';
+import { GeneratorsService, GenerateResource } from '../generators.service';
+import { trackByFn } from '@app/shared/functions';
 
 @Component({
   selector: 'app-generators-generate',
@@ -9,65 +10,24 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./generators-generate.component.scss']
 })
 export class GeneratorsGenerateComponent implements OnInit {
-  constructor(@Inject(HttpClient) private http: HttpClient,
-    private modalService: NgbModal,
-    public route: ActivatedRoute,
-    public router: Router) { }
+  constructor(
+    private route: ActivatedRoute,
+    private modalStackService: NgbModalStack,
+    private service: GeneratorsService) { }
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.get(this.id);
+    this.get();
   }
 
-  bsModal: any;
-  bsModalStack: BsModal[] = [];
-  bsModalEventDismiss: boolean = false;
-  openModal(content, data) {
-    let component = this;
-    component.bsModal = data;
-    component.bsModalStack.push({ content: content, data: data });
-    if (this.modalService.hasOpenModals()) {
-      this.bsModalEventDismiss = true;
-      this.modalService.dismissAll();
-    }
-    this.modalService.open(content, { size: "lg" }).result.finally(function () {
-      if (component.bsModalEventDismiss) {
-        component.bsModalEventDismiss = false;
-      }
-      else {
-        component.bsModalStack.splice(-1, 1);
-        component.bsModal = null;
-        if (component.bsModalStack.length) {
-          let lastModal = component.bsModalStack.pop();
-          component.openModal(lastModal.content, lastModal.data);
-        }
-      }
-    });
-  }
-
-  trackByFn(index: any, item: any) {
-    return index;
-  }
-
-  public id: number;
+  id: number;
   inputs: Input[];
   resources: GenerateResource[];
-
-  get(id: number) {
-    this.http.get<Input[]>(
-      '/api/generators/' + id + '/inputs'
-    ).subscribe(inputs => {
-      if (inputs) {
-        this.inputs = inputs;
-        for (let input of this.inputs) {
-          input.values = this.defaultValues(input);
-        }
-      }
-      else {
-        this.submit();
-      }
-    });
+  get currentModal(): any {
+    return this.modalStackService.data;
   }
+
+  trackByFn = trackByFn;
 
   defaultValues(input: Input): InputObject[] | string[] {
     if (input.children && input.children.length) {
@@ -83,15 +43,6 @@ export class GeneratorsGenerateComponent implements OnInit {
     else {
       return [''];
     }
-  }
-
-  add(input: Input) {
-    let values: InputObject[] | string[] = this.defaultValues(input);
-    Array.prototype.push.apply(input.values, values);
-  }
-
-  remove(input: Input, index: number) {
-    input.values.splice(index, 1);
   }
 
   toJObject(inputs: Input[]): JObject {
@@ -120,12 +71,37 @@ export class GeneratorsGenerateComponent implements OnInit {
     return JSON.stringify(this.toJObject(inputs));
   }
 
+  add(input: Input) {
+    let values: InputObject[] | string[] = this.defaultValues(input);
+    Array.prototype.push.apply(input.values, values);
+  }
+
+  remove(input: Input, index: number) {
+    input.values.splice(index, 1);
+  }
+
+  get() {
+    this.service.getInputs(this.id).subscribe(inputs => {
+      if (inputs) {
+        this.inputs = inputs.map(input => Object.assign(new Input(), input));
+        for (let input of this.inputs) {
+          input.values = this.defaultValues(input);
+        }
+      }
+      else {
+        this.submit();
+      }
+    });
+  }
+
+  open(content, data) {
+    this.modalStackService.open(content, data);
+  }
+
   submit() {
-    let query = this.inputs ? this.toJObject(this.inputs) : {};
-    this.http.post<GenerateResource[]>(
-      '/api/generators/' + this.id + '/generate', query
-    ).subscribe(res => {
-      this.resources = res;
+    let jObject = this.inputs ? this.toJObject(this.inputs) : {};
+    this.service.generate(this.id, jObject).subscribe(resources => {
+      this.resources = resources;
     });
   }
 
@@ -137,13 +113,8 @@ export class GeneratorsGenerateComponent implements OnInit {
   }
 
   back() {
-    this.router.navigate(['generators/list']);
+    this.service.redirectToList();
   }
-}
-
-class BsModal {
-  public content: any;
-  public data: any;
 }
 
 class JObject {
@@ -158,11 +129,4 @@ class Input {
   public isMultiple: boolean;
   public children: Input[];
   public values: InputObject[] | string[];
-  //public type: string;
-  //public regex: string;
-}
-
-class GenerateResource {
-  public name: string;
-  public text: string;
 }

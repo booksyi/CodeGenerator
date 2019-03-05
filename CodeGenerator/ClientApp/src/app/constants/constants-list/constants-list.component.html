@@ -24,10 +24,10 @@
     </button>
   </div>
   <div class="modal-body">
-    <p *ngIf="confirmItem">確定要刪除 constant: {{confirmItem.id}} 嗎？</p>
+    <p *ngIf="constants[confirmIndex]">確定要刪除 constant: {{constants[confirmIndex].id}} 嗎？</p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-danger" (click)="modal.close('Delete'); delete(confirmItem.id);">刪除</button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('Delete'); delete(constants[confirmIndex].id);">刪除</button>
     <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">取消</button>
   </div>
 </ng-template>

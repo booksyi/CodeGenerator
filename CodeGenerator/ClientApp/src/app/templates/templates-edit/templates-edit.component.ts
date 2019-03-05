@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { TemplatesService, Template } from '../templates.service';
 
 @Component({
   selector: 'app-templates-edit',
@@ -9,50 +9,32 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class TemplatesEditComponent implements OnInit {
   constructor(
-    @Inject(HttpClient) private http: HttpClient,
-    public route: ActivatedRoute,
-    public router: Router) { }
+    private route: ActivatedRoute,
+    private service: TemplatesService) { }
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.get(this.id);
+    if (this.id > 0) {
+      this.get(this.id);
+    }
   }
 
-  public id: number;
+  id: number;
   template: Template = new Template();
 
   get(id: number) {
-    this.http.get<Template>(
-      '/api/templates/' + id
-    ).subscribe(template => {
-      Object.assign(this.template, template);
-    });
+    this.service.get(id).subscribe(template => this.template = template);
   }
 
   create() {
-    this.http.post<Template>(
-      '/api/templates', this.template
-    ).subscribe(template => {
-      this.back();
-    }, err => {
-      console.log(err)
-    });
+    this.service.create(this.template).subscribe(() => this.back());
   }
 
-  edit() {
-    this.http.put<Template>(
-      '/api/templates/' + this.id, this.template
-    ).subscribe(template => {
-      this.back();
-    });
+  update() {
+    this.service.update(this.id, this.template).subscribe(() => this.back());
   }
 
   back() {
-    this.router.navigate(['templates/list']);
+    this.service.redirectToList();
   }
-}
-
-export class Template {
-  name: string;
-  content: string;
 }
