@@ -1,0 +1,40 @@
+<input type="button" class="btn btn-success mb-3" value="新增" (click)="create()" />
+
+<table class="table">
+  <tr>
+    <th>Id</th>
+    <th>名稱</th>
+    <th>樣板</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let generator of generators">
+    <td>{{generator.id}}</td>
+    <td>{{generator.name}}</td>
+    <td>
+      <div *ngFor="let template of generator.templates">
+        <a href="{{template}}" target="_blank">{{template}}</a>
+      </div>
+    </td>
+    <td>
+      <input type="button" class="btn btn-secondary" value="編輯" (click)="edit(generator.id)" />
+      <input type="button" class="btn btn-danger" value="刪除" (click)="confirm(generator.id, content)" />
+      <input type="button" class="btn btn-warning" value="生成代碼" (click)="generate(generator.id)" />
+    </td>
+  </tr>
+</table>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">刪除 Generator</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p *ngIf="confirmItem">確定要刪除 generator: {{confirmItem.id}} 嗎？</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Delete'); delete(confirmItem.id);">刪除</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">取消</button>
+  </div>
+</ng-template>

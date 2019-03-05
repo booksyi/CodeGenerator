@@ -15,8 +15,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
         public class Request : IRequest<Template>
         {
             public string Name { get; set; }
-            public string Description { get; set; }
-            public string Context { get; set; }
+            public string Content { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, Template>
@@ -34,8 +33,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
                     Template template = new Template()
                     {
                         Name = request.Name,
-                        Description = request.Description,
-                        Context = request.Context,
+                        Content = request.Content,
                         CreateDate = DateTime.Now
                     };
                     await context.Templates.AddAsync(template);

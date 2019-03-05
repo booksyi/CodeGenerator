@@ -1,0 +1,34 @@
+<input type="button" class="btn btn-success mb-3" value="新增" (click)="create()" />
+
+<table class="table">
+  <tr>
+    <th>Id</th>
+    <th>名稱</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let template of templates">
+    <td>{{template.id}}</td>
+    <td>{{template.name}}</td>
+    <td>
+      <a class="btn btn-info" href="/api/templates/{{template.id}}/content" target="_blank">查看</a>
+      <input type="button" class="btn btn-secondary" value="編輯" (click)="edit(template.id)" />
+      <input type="button" class="btn btn-danger" value="刪除" (click)="confirm(template.id, content)" />
+    </td>
+  </tr>
+</table>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">刪除 Template</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p *ngIf="confirmItem">確定要刪除 {{confirmItem.name}} 嗎？</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Delete'); delete(confirmItem.id);">刪除</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">取消</button>
+  </div>
+</ng-template>

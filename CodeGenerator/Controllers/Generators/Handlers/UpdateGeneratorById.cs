@@ -16,6 +16,7 @@ namespace CodeGenerator.Controllers.Generators.Handlers
         public class Request : IRequest<Generator>
         {
             internal int Id { get; set; }
+            public string Name { get; set; }
             public CodeTemplate CodeTemplate { get; set; }
         }
 
@@ -30,6 +31,7 @@ namespace CodeGenerator.Controllers.Generators.Handlers
             public async Task<Generator> Handle(Request request, CancellationToken token)
             {
                 Generator generator = await context.Generators.FirstOrDefaultAsync(x => x.Id == request.Id);
+                generator.Name = request.Name;
                 generator.Json = JsonConvert.SerializeObject(request.CodeTemplate);
                 await context.SaveChangesAsync();
                 return generator;

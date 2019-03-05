@@ -31,7 +31,7 @@ namespace CodeGenerator.Controllers.Generators
                 Body = Request.Query.ToJObject()
             };
             var nodes = await mediator.Send(request);
-            return new OkObjectResult(nodes);
+            return Ok(nodes);
         }
 
         // /api/Generators/{int}/ToGenerateNodes
@@ -44,37 +44,29 @@ namespace CodeGenerator.Controllers.Generators
                 request.Body = await Request.Body.ToJObjectAsync();
             }
             var nodes = await mediator.Send(request);
-            return new OkObjectResult(nodes);
+            return Ok(nodes);
         }
 
         [HttpPost("")]
-        public async Task<ActionResult> CreateGenerator([FromBody] CodeTemplate codeTemplate)
+        public async Task<ActionResult> CreateGenerator([FromBody] CreateGenerator.Request request)
         {
-            CreateGenerator.Request request = new CreateGenerator.Request()
-            {
-                CodeTemplate = codeTemplate
-            };
             Generator generator = await mediator.Send(request);
-            return new OkObjectResult(generator);
+            return Ok(generator);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateGeneratorById([FromRoute] int id, [FromBody] CodeTemplate codeTemplate)
+        public async Task<ActionResult> UpdateGeneratorById([FromRoute] int id, [FromBody] UpdateGeneratorById.Request request)
         {
-            UpdateGeneratorById.Request request = new UpdateGeneratorById.Request()
-            {
-                Id = id,
-                CodeTemplate = codeTemplate
-            };
+            request.Id = id;
             Generator generator = await mediator.Send(request);
-            return new OkObjectResult(generator);
+            return Ok(generator);
         }
 
         [HttpGet("")]
         public async Task<ActionResult> GetGenerators([FromQuery] GetGenerators.Request request)
         {
             Generator[] generators = await mediator.Send(request);
-            return new OkObjectResult(generators);
+            return Ok(generators);
         }
 
         [HttpGet("{id:int}")]
@@ -85,7 +77,7 @@ namespace CodeGenerator.Controllers.Generators
                 Id = id
             };
             Generator generator = await mediator.Send(request);
-            return new OkObjectResult(generator);
+            return Ok(generator);
         }
 
         [HttpGet("{id:int}/codeTemplate")]
@@ -97,7 +89,7 @@ namespace CodeGenerator.Controllers.Generators
             };
             Generator generator = await mediator.Send(request);
             CodeTemplate codeTemplate = JsonConvert.DeserializeObject<CodeTemplate>(generator.Json);
-            return new OkObjectResult(codeTemplate);
+            return Ok(codeTemplate);
         }
 
         [HttpGet("{id:int}/inputs")]
@@ -109,7 +101,7 @@ namespace CodeGenerator.Controllers.Generators
             };
             Generator generator = await mediator.Send(request);
             CodeTemplate codeTemplate = JsonConvert.DeserializeObject<CodeTemplate>(generator.Json);
-            return new OkObjectResult(codeTemplate.Inputs);
+            return Ok(codeTemplate.Inputs);
         }
 
         [HttpGet("{id:int}/templates")]
@@ -121,7 +113,7 @@ namespace CodeGenerator.Controllers.Generators
             };
             Generator generator = await mediator.Send(request);
             CodeTemplate codeTemplate = JsonConvert.DeserializeObject<CodeTemplate>(generator.Json);
-            return new OkObjectResult(codeTemplate.GetTemplateUris());
+            return Ok(codeTemplate.GetTemplateUris());
         }
 
         [HttpDelete("{id:int}")]
@@ -139,7 +131,7 @@ namespace CodeGenerator.Controllers.Generators
         [HttpPost("generate")]
         public async Task<ActionResult> GenerateByNode([FromBody] GenerateNode node)
         {
-            return new OkObjectResult(await node.GenerateAsync());
+            return Ok(await node.GenerateAsync());
         }
 
         // /api/Generators/{int}/Generate
@@ -152,7 +144,7 @@ namespace CodeGenerator.Controllers.Generators
                 Body = Request.Query.ToJObject()
             };
             var resources = await mediator.Send(request);
-            return new OkObjectResult(resources);
+            return Ok(resources);
         }
 
         // /api/Generators/{int}/Generate
@@ -165,7 +157,7 @@ namespace CodeGenerator.Controllers.Generators
                 request.Body = await Request.Body.ToJObjectAsync();
             }
             var resources = await mediator.Send(request);
-            return new OkObjectResult(resources);
+            return Ok(resources);
         }
 
         [HttpPost("generate/download")]
@@ -220,7 +212,7 @@ namespace CodeGenerator.Controllers.Generators
         [HttpPost("tree")]
         public async Task<ActionResult> GetTreeByNode([FromBody] GenerateNode node)
         {
-            return new OkObjectResult(await node.ToJTokenForReadAsync());
+            return Ok(await node.ToJTokenForReadAsync());
         }
 
         // /api/Generators/{int}/Tree
@@ -234,7 +226,7 @@ namespace CodeGenerator.Controllers.Generators
             };
             var nodes = await mediator.Send(request);
             var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenForReadAsync()));
-            return new OkObjectResult(result);
+            return Ok(result);
         }
 
         // /api/Generators/{int}/Tree
@@ -248,7 +240,7 @@ namespace CodeGenerator.Controllers.Generators
             }
             var nodes = await mediator.Send(request);
             var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenForReadAsync()));
-            return new OkObjectResult(result);
+            return Ok(result);
         }
     }
 }

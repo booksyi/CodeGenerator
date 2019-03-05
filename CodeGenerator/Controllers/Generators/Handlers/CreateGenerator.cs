@@ -14,6 +14,7 @@ namespace CodeGenerator.Controllers.Generators.Handlers
     {
         public class Request : IRequest<Generator>
         {
+            public string Name { get; set; }
             public CodeTemplate CodeTemplate { get; set; }
         }
 
@@ -27,11 +28,11 @@ namespace CodeGenerator.Controllers.Generators.Handlers
 
             public async Task<Generator> Handle(Request request, CancellationToken token)
             {
-                string json = JsonConvert.SerializeObject(request.CodeTemplate); // test
                 if (request.CodeTemplate.Validate(out string[] errorMessages))
                 {
                     Generator generator = new Generator()
                     {
+                        Name = request.Name,
                         Json = JsonConvert.SerializeObject(request.CodeTemplate)
                     };
                     await context.Generators.AddAsync(generator);

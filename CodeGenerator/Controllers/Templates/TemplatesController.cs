@@ -23,15 +23,15 @@ namespace CodeGenerator.Controllers.Templates
         public async Task<ActionResult> CreateTemplate([FromBody] CreateTemplate.Request request)
         {
             Template template = await mediator.Send(request);
-            return new OkObjectResult(template);
+            return Ok(template);
         }
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateTemplateById([FromRoute] int id, [FromBody] UpdateTemplateById.Request request)
         {
             request.Id = id;
-            await mediator.Send(request);
-            return new OkResult();
+            Template template = await mediator.Send(request);
+            return Ok(template);
         }
 
         [HttpGet("")]
@@ -52,7 +52,7 @@ namespace CodeGenerator.Controllers.Templates
             return new OkObjectResult(template);
         }
 
-        [HttpGet("{id:int}/context")]
+        [HttpGet("{id:int}/content")]
         public async Task<ActionResult> GetTemplateContextById([FromRoute] int id)
         {
             GetTemplateById.Request request = new GetTemplateById.Request()
@@ -60,7 +60,7 @@ namespace CodeGenerator.Controllers.Templates
                 Id = id
             };
             var template = await mediator.Send(request);
-            return Content(template.Context);
+            return Content(template.Content);
         }
 
         [HttpDelete("{id:int}")]

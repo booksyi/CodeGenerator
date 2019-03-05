@@ -31,6 +31,10 @@ namespace CodeGenerator.Data.Models
             modelBuilder.Entity<Generator>(entity =>
             {
                 entity.ToTable("CodeGeneratorGenerators");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<Template>(entity =>
@@ -40,8 +44,6 @@ namespace CodeGenerator.Data.Models
                 entity.Property(e => e.CreateDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Description).HasMaxLength(500);
 
                 entity.Property(e => e.Name)
                     .IsRequired()

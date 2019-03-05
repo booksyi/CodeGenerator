@@ -17,8 +17,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
         {
             internal int Id { get; set; }
             public string Name { get; set; }
-            public string Description { get; set; }
-            public string Context { get; set; }
+            public string Content { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, Template>
@@ -33,8 +32,7 @@ namespace CodeGenerator.Controllers.Templates.Handlers
             {
                 Template template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
                 template.Name = request.Name;
-                template.Description = request.Description;
-                template.Context = request.Context;
+                template.Content = request.Content;
                 template.UpdateDate = DateTime.Now;
                 await context.SaveChangesAsync();
                 return template;
