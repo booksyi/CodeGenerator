@@ -309,9 +309,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.name" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div class="form-group row">
@@ -340,9 +338,7 @@
     <div *ngIf="currentModal.request.from === 'value'" class="form-group row">
       <label class="col-sm-2 col-form-label">值</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.value" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.value" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div *ngIf="currentModal.request.from === 'input'" class="form-group row">
@@ -359,25 +355,24 @@
     <div *ngIf="currentModal.request.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數物件成員</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputProperty" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputProperty" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div *ngIf="currentModal.request.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器名稱</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
+        <div class="input-group mb-3">
           <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterName" [ngModelOptions]="{standalone: true}">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" (click)="open(template_adapters_selector, {request: currentModal.request, adapters: getMergeAdapters(currentModal.request) })">選擇</button>
+          </div>
         </div>
       </div>
     </div>
     <div *ngIf="currentModal.request.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器物件成員</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterProperty" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterProperty" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
   </div>
@@ -397,9 +392,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.name" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div class="form-group row">
@@ -434,9 +427,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">物件成員限縮</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.responseConfine" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.responseConfine" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div class="form-group row">
@@ -467,9 +458,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.name" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.name" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div class="form-group row">
@@ -504,9 +493,7 @@
     <div *ngIf="currentModal.parameter.from === 'value'" class="form-group row">
       <label class="col-sm-2 col-form-label">值</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.value" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.value" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'input'" class="form-group row">
@@ -523,25 +510,24 @@
     <div *ngIf="currentModal.parameter.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數物件成員</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputProperty" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputProperty" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器名稱</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
+        <div class="input-group mb-3">
           <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterName" [ngModelOptions]="{standalone: true}">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" (click)="open(template_adapters_selector, {parameter: currentModal.parameter, adapters: getMergeAdapters(currentModal.parameter) })">選擇</button>
+          </div>
         </div>
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器物件成員</label>
       <div class="col-sm-10">
-        <div class="md-form mt-0">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterProperty" [ngModelOptions]="{standalone: true}">
-        </div>
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterProperty" [ngModelOptions]="{standalone: true}">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'template'" class="form-group row">
@@ -558,7 +544,7 @@
 
 <ng-template #template_inputs_selector let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">選擇參數名稱</h4>
+    <h4 class="modal-title">選擇參數</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -567,26 +553,64 @@
     <ng-container *ngIf="generator.codeTemplate.inputs">
       <ng-container *ngFor="let input of generator.codeTemplate.inputs">
         <ng-container *ngIf="input.name && input.name.trim().length > 0">
-          <div class="form-inline">
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">名稱</span>
+          <div class="form-group">
+            <div class="form-inline">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">名稱</span>
+                  </div>
+                  <input type="text" class="form-control" value="{{input.name}}" readonly>
                 </div>
-                <input type="text" class="form-control" value="{{input.name}}" readonly>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">顯示名稱</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="{{input.name}}" value="{{input.description}}" readonly>
+                </div>
+              </div>
+              <div class="form-group">
+                <input *ngIf="currentModal.request" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.request.inputName = input.name; modal.close('Close');" />
+                <input *ngIf="currentModal.parameter" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.parameter.inputName = input.name; modal.close('Close');" />
               </div>
             </div>
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">顯示名稱</span>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Close');">返回</button>
+  </div>
+</ng-template>
+
+<ng-template #template_adapters_selector let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">選擇中繼器</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ng-container *ngIf="currentModal.adapters">
+      <ng-container *ngFor="let adapter of currentModal.adapters">
+        <ng-container *ngIf="adapter.name && adapter.name.trim().length > 0">
+          <div class="form-group">
+            <div class="form-inline">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">名稱</span>
+                  </div>
+                  <input type="text" class="form-control" value="{{adapter.name}}" readonly>
                 </div>
-                <input type="text" class="form-control" placeholder="{{input.name}}" value="{{input.description}}" readonly>
               </div>
-            </div>
-            <div class="form-group">
-              <input *ngIf="currentModal.request" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.request.inputName = input.name; modal.close('Close');" />
-              <input *ngIf="currentModal.parameter" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.parameter.inputName = input.name; modal.close('Close');" />
+              <div class="form-group">
+                <input *ngIf="currentModal.request" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.request.adapterName = adapter.name; modal.close('Close');" />
+                <input *ngIf="currentModal.parameter" type="button" class="btn btn-outline-secondary" value="選擇" (click)="currentModal.parameter.adapterName = adapter.name; modal.close('Close');" />
+              </div>
             </div>
           </div>
         </ng-container>

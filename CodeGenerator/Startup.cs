@@ -28,7 +28,9 @@ namespace CodeGenerator
             services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("CodeGeneratorContext")));
             services.AddEntityFrameworkSqlServer().AddDbContext<CodeGeneratorContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("CodeGeneratorContext"));
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("CodeGeneratorContext"),
+                    x => x.MigrationsHistoryTable("CodeGeneratorMigrationsHistory"));
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

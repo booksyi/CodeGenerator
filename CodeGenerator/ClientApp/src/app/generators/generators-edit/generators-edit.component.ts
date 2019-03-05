@@ -55,6 +55,75 @@ export class GeneratorsEditComponent implements OnInit {
     this.service.redirectToList();
   }
 
+  // 找出包含 RequestNode 一整串的 TemplateNode
+  getRequestElders(request: RequestNode, elders: TemplateNode[] = null): TemplateNode[] {
+    if (elders && elders.length) {
+      let last = elders[elders.length - 1];
+      if (last.requestNodes.concat(
+        last.adapterNodes.some(x => x.requestNodes != null && x.requestNodes.length > 0) ?
+          last.adapterNodes
+            .map(x => x.requestNodes)
+            .reduce((x, y) => x.concat(y)) : []).includes(request)) {
+        return elders;
+      }
+      else if (last.parameterNodes.some(x => x.from === "template")) {
+        return last.parameterNodes
+          .map(x => this.getRequestElders(request, elders.concat(x.templateNode)))
+          .reduce((x, y) => x.concat(y));
+      }
+      return [];
+    }
+    return this.generator.codeTemplate.templateNodes
+      .map(x => this.getRequestElders(request, [x]))
+      .reduce((x, y) => x.concat(y));
+  }
+
+  // 找出包含 ParameterNode 一整串的 TemplateNode
+  getParameterElders(parameter: ParameterNode, elders: TemplateNode[] = null): TemplateNode[] {
+    if (elders && elders.length) {
+      let last = elders[elders.length - 1];
+      if (last.parameterNodes.includes(parameter)) {
+        return elders;
+      }
+      else if (last.parameterNodes.some(x => x.from === "template")) {
+        return last.parameterNodes
+          .map(x => this.getParameterElders(parameter, elders.concat(x.templateNode)))
+          .reduce((x, y) => x.concat(y));
+      }
+      return [];
+    }
+    return this.generator.codeTemplate.templateNodes
+      .map(x => this.getParameterElders(parameter, [x]))
+      .reduce((x, y) => x.concat(y));
+  }
+
+  // 找出 RequestNode 或 ParameterNode 在執行階段可以取得資料的 AdapterNode
+  getMergeAdapters(node: RequestNode | ParameterNode): AdapterNode[] {
+    if (node instanceof RequestNode) {
+      let elders = this.getRequestElders(node);
+      if (elders.length) {
+        let last = elders[elders.length - 1];
+        let index = last.adapterNodes.findIndex(x => x.requestNodes.includes(node));
+        if (index >= 0) {
+          // 如果 RequestNode 是 AdapterNode 裡面的
+          // 則只能看到同一個樣板在這個 AdapterNode 之前的 AdapterNode
+          return elders.slice(0, -1).map(x => x.adapterNodes).concat(
+            last.adapterNodes.filter((x, y) => y < index)
+          ).reduce((x, y) => x.concat(y));
+        }
+        return elders
+          .map(x => x.adapterNodes)
+          .reduce((x, y) => x.concat(y));
+      }
+    }
+    else if (node instanceof ParameterNode) {
+      return this.getParameterElders(node)
+        .map(x => x.adapterNodes)
+        .reduce((x, y) => x.concat(y));
+    }
+    return [];
+  }
+
   getTemplates() {
     this.templatesService.list().subscribe(templates =>
       this.templates = templates.map(x => Object.assign(new Template(), x)));
