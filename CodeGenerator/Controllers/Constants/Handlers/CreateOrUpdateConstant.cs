@@ -1,5 +1,6 @@
 ﻿using CodeGenerator.Data.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Constants.Handlers
 {
-    public class CreateConstant
+    public class CreateOrUpdateConstant
     {
         public class Request : IRequest<Constant>
         {
+            internal int Id { get; set; }
             public string Result { get; set; }
         }
 
@@ -25,11 +27,20 @@ namespace CodeGenerator.Controllers.Constants.Handlers
 
             public async Task<Constant> Handle(Request request, CancellationToken token)
             {
-                Constant constant = new Constant()
+                Constant constant;
+                if (request.Id == 0)
                 {
-                    Result = request.Result
-                };
-                await context.Constants.AddAsync(constant);
+                    constant = new Constant()
+                    {
+                        Result = request.Result
+                    };
+                    await context.Constants.AddAsync(constant);
+                }
+                else
+                {
+                    constant = await context.Constants.FirstOrDefaultAsync(x => x.Id == request.Id);
+                    constant.Result = request.Result;
+                }
                 await context.SaveChangesAsync();
                 return constant;
             }

@@ -20,14 +20,8 @@ namespace CodeGenerator.Controllers.Templates
         }
 
         [HttpPost("")]
-        public async Task<ActionResult> CreateTemplate([FromBody] CreateTemplate.Request request)
-        {
-            Template template = await mediator.Send(request);
-            return Ok(template);
-        }
-
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateTemplateById([FromRoute] int id, [FromBody] UpdateTemplateById.Request request)
+        public async Task<ActionResult> CreateOrUpdateTemplate([FromRoute] int id, [FromBody] CreateOrUpdateTemplate.Request request)
         {
             request.Id = id;
             Template template = await mediator.Send(request);

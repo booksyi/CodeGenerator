@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Generators.Handlers
 {
-    public class UpdateGeneratorById
+    public class CreateOrUpdateGenerator
     {
         public class Request : IRequest<Generator>
         {
@@ -30,9 +30,26 @@ namespace CodeGenerator.Controllers.Generators.Handlers
 
             public async Task<Generator> Handle(Request request, CancellationToken token)
             {
-                Generator generator = await context.Generators.FirstOrDefaultAsync(x => x.Id == request.Id);
-                generator.Name = request.Name;
-                generator.Json = JsonConvert.SerializeObject(request.CodeTemplate);
+                Generator generator;
+                if (request.Id == 0)
+                {
+                    if (request.CodeTemplate.Validate(out string[] errorMessages) == false)
+                    {
+                        throw new Exception(string.Join("\r\n", errorMessages));
+                    }
+                    generator = new Generator()
+                    {
+                        Name = request.Name,
+                        Json = JsonConvert.SerializeObject(request.CodeTemplate)
+                    };
+                    await context.Generators.AddAsync(generator);
+                }
+                else
+                {
+                    generator = await context.Generators.FirstOrDefaultAsync(x => x.Id == request.Id);
+                    generator.Name = request.Name;
+                    generator.Json = JsonConvert.SerializeObject(request.CodeTemplate);
+                }
                 await context.SaveChangesAsync();
                 return generator;
             }

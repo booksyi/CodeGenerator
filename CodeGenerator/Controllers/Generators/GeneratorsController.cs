@@ -21,41 +21,9 @@ namespace CodeGenerator.Controllers.Generators
             this.mediator = mediator;
         }
 
-        // /api/Generators/{int}/ToGenerateNodes
-        [HttpGet("{id:int}/toGenerateNodes")]
-        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id)
-        {
-            ToGenerateNodes.Request request = new ToGenerateNodes.Request()
-            {
-                Id = id,
-                Body = Request.Query.ToJObject()
-            };
-            var nodes = await mediator.Send(request);
-            return Ok(nodes);
-        }
-
-        // /api/Generators/{int}/ToGenerateNodes
-        [HttpPost("{id:int}/toGenerateNodes")]
-        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id, [FromBody] ToGenerateNodes.Request request)
-        {
-            request.Id = id;
-            if (request.Body == null)
-            {
-                request.Body = await Request.Body.ToJObjectAsync();
-            }
-            var nodes = await mediator.Send(request);
-            return Ok(nodes);
-        }
-
         [HttpPost("")]
-        public async Task<ActionResult> CreateGenerator([FromBody] CreateGenerator.Request request)
-        {
-            Generator generator = await mediator.Send(request);
-            return Ok(generator);
-        }
-
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateGeneratorById([FromRoute] int id, [FromBody] UpdateGeneratorById.Request request)
+        public async Task<ActionResult> CreateOrUpdateGenerator([FromRoute] int id, [FromBody] CreateOrUpdateGenerator.Request request)
         {
             request.Id = id;
             Generator generator = await mediator.Send(request);
@@ -125,6 +93,32 @@ namespace CodeGenerator.Controllers.Generators
             };
             await mediator.Send(request);
             return NoContent();
+        }
+
+        // /api/Generators/{int}/ToGenerateNodes
+        [HttpGet("{id:int}/toGenerateNodes")]
+        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id)
+        {
+            ToGenerateNodes.Request request = new ToGenerateNodes.Request()
+            {
+                Id = id,
+                Body = Request.Query.ToJObject()
+            };
+            var nodes = await mediator.Send(request);
+            return Ok(nodes);
+        }
+
+        // /api/Generators/{int}/ToGenerateNodes
+        [HttpPost("{id:int}/toGenerateNodes")]
+        public async Task<ActionResult> ToGenerateNodes([FromRoute] int id, [FromBody] ToGenerateNodes.Request request)
+        {
+            request.Id = id;
+            if (request.Body == null)
+            {
+                request.Body = await Request.Body.ToJObjectAsync();
+            }
+            var nodes = await mediator.Send(request);
+            return Ok(nodes);
         }
 
         // /api/Generators/Generate

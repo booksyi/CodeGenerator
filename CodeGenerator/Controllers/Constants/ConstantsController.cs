@@ -22,25 +22,19 @@ namespace CodeGenerator.Controllers.Constants
         }
 
         [HttpPost("")]
-        public async Task<ActionResult> CreateConstant([FromBody] CreateConstant.Request request)
-        {
-            Constant apiConstant = await mediator.Send(request);
-            return new OkObjectResult(apiConstant);
-        }
-
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateConstantById([FromRoute] int id, [FromBody] UpdateConstantById.Request request)
+        public async Task<ActionResult> CreateOrUpdateConstant([FromRoute] int id, [FromBody] CreateOrUpdateConstant.Request request)
         {
             request.Id = id;
-            Constant apiConstant = await mediator.Send(request);
-            return new OkObjectResult(apiConstant);
+            Constant constant = await mediator.Send(request);
+            return Ok(constant);
         }
 
         [HttpGet("")]
         public async Task<ActionResult> GetConstants([FromQuery] GetConstants.Request request)
         {
-            Constant[] apiConstants = await mediator.Send(request);
-            return new OkObjectResult(apiConstants);
+            Constant[] constants = await mediator.Send(request);
+            return Ok(constants);
         }
 
         [HttpGet("{id:int}")]
@@ -50,8 +44,8 @@ namespace CodeGenerator.Controllers.Constants
             {
                 Id = id
             };
-            Constant apiConstant = await mediator.Send(request);
-            return new OkObjectResult(apiConstant);
+            Constant constant = await mediator.Send(request);
+            return Ok(constant);
         }
 
         [HttpGet("{id:int}/result")]
@@ -62,8 +56,8 @@ namespace CodeGenerator.Controllers.Constants
             {
                 Id = id
             };
-            Constant apiConstant = await mediator.Send(request);
-            return Content(apiConstant.Result);
+            Constant constant = await mediator.Send(request);
+            return Content(constant.Result);
         }
 
         [HttpDelete("{id:int}")]

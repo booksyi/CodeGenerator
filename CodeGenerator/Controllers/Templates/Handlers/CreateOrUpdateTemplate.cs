@@ -1,19 +1,19 @@
 ﻿using CodeGenerator.Data.Models;
-using HelpersForCore;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Templates.Handlers
 {
-    public class CreateTemplate
+    public class CreateOrUpdateTemplate
     {
         public class Request : IRequest<Template>
         {
+            internal int Id { get; set; }
             public string Name { get; set; }
             public string Content { get; set; }
         }
@@ -28,23 +28,27 @@ namespace CodeGenerator.Controllers.Templates.Handlers
 
             public async Task<Template> Handle(Request request, CancellationToken token)
             {
-                try
+                Template template;
+                if (request.Id == 0)
                 {
-                    Template template = new Template()
+                    template = new Template()
                     {
                         Name = request.Name,
                         Content = request.Content,
                         CreateDate = DateTime.Now
                     };
                     await context.Templates.AddAsync(template);
-                    await context.SaveChangesAsync();
-                    return template;
                 }
-                catch (Exception e)
+                else
                 {
-                    string a = e.Message;
+                    template = await context.Templates.FirstOrDefaultAsync(x => x.Id == request.Id);
+                    template.Name = request.Name;
+                    template.Content = request.Content;
+                    template.UpdateDate = DateTime.Now;
                 }
-                return null;
+                await context.SaveChangesAsync();
+                return template;
+
             }
         }
     }
