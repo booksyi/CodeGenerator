@@ -54,14 +54,24 @@ export class GeneratorsGenerateComponent implements OnInit {
           let args: Input[] = JSON.parse(JSON.stringify(valueInputs));
           objectValues.push(this.toJObject(args));
         }
-        jObject[input.name] = objectValues;
+        if (input.isMultiple) {
+          jObject[input.name] = objectValues;
+        }
+        else if (objectValues.length) {
+          jObject[input.name] = objectValues[0];
+        }
       }
       else {
         var stringValues: string[] = [];
         for (let valueInputs of input.values) {
           stringValues.push(valueInputs.toString());
         }
-        jObject[input.name] = stringValues;
+        if (input.isMultiple) {
+          jObject[input.name] = stringValues;
+        }
+        else if (stringValues.length) {
+          jObject[input.name] = stringValues[0];
+        }
       }
     }
     return jObject;
