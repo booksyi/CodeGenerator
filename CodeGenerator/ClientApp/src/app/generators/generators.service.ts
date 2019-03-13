@@ -17,11 +17,13 @@ export class GeneratorsService {
   list(): Observable<Generator[]> {
     return this.http.get<Generator[]>(
       '/api/generators'
-    ).pipe(map(generators => generators.map(generator => {
-      this.getTemplates(generator.id)
-        .subscribe(templates => generator.templates = templates);
-      return generator;
-    })));
+    ).pipe(map(generators => {
+      for (let generator of generators) {
+        this.getTemplates(generator.id)
+          .subscribe(templates => generator.templates = templates);
+      }
+      return generators;
+    }));
   }
 
   get(id: number): Observable<Generator> {

@@ -24,14 +24,14 @@ namespace CodeGenerator.Controllers.Testers
         public async Task<ActionResult> Test()
         {
             var response = await mediator.Send(new Test.Request());
-            return new OkObjectResult(response.Result);
+            return Ok(response.Result);
         }
 
         [HttpGet("{tester}")]
         public async Task<ActionResult> Test(string tester)
         {
             var response = await mediator.Send(new Test.Request() { Tester = tester });
-            return new OkObjectResult(response.Result);
+            return Ok(response.Result);
         }
 
         [HttpGet("templates/{tester}/{template}")]
@@ -65,7 +65,7 @@ namespace CodeGenerator.Controllers.Testers
                 request.Query = await Request.Body.ToJObjectAsync();
             }
             JToken result = await mediator.Send(request);
-            return new OkObjectResult(result);
+            return Ok(result);
         }
     }
 }
