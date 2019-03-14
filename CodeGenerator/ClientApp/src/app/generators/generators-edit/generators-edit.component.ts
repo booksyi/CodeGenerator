@@ -107,9 +107,14 @@ export class GeneratorsEditComponent implements OnInit {
         if (index >= 0) {
           // 如果 RequestNode 是 AdapterNode 裡面的
           // 則只能看到同一個樣板在這個 AdapterNode 之前的 AdapterNode
-          return elders.slice(0, -1).map(x => x.adapterNodes).concat(
-            last.adapterNodes.filter((x, y) => y < index)
-          ).reduce((x, y) => x.concat(y));
+          if (elders.length == 1) {
+            return last.adapterNodes.filter((x, y) => y < index);
+          }
+          else {
+            return elders.slice(0, -1).map(x => x.adapterNodes).concat(
+              last.adapterNodes.filter((x, y) => y < index)
+            ).reduce((x, y) => x.concat(y));
+          }
         }
         return elders
           .map(x => x.adapterNodes)
