@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModalStack } from '@app/shared/ng-bootstrap-custom.service';
 import { GeneratorsService, GenerateResource } from '../generators.service';
+import { Guid } from '@app/shared/guid';
 import { trackByFn } from '@app/shared/functions';
 
 @Component({
@@ -133,10 +134,12 @@ class JObject {
 type InputObject = Input[]
 
 class Input {
-  public name: string;
-  public description: string;
-  public isRequired: boolean;
-  public isMultiple: boolean;
-  public children: Input[];
-  public values: InputObject[] | string[];
+  guid: string = Guid.newGuid();
+  name: string;
+  displayName: string;
+  inputType: "textbox" | "textarea" | "truefalse" = "textbox";
+  isRequired: boolean;
+  isMultiple: boolean;
+  children: Input[];
+  values: InputObject[] | string[];
 }

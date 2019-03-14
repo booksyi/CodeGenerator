@@ -53,7 +53,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">名稱</span>
         </div>
-        <input type="text" class="form-control" placeholder="只能輸入英文、數字及底線(_)" [(ngModel)]="input.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" placeholder="只能輸入英文、數字及底線(_)" [(ngModel)]="input.name">
       </div>
     </div>
     <div class="form-group">
@@ -61,7 +61,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">顯示名稱</span>
         </div>
-        <input type="text" class="form-control" placeholder="{{input.name}}" [(ngModel)]="input.description" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" placeholder="{{input.name}}" [(ngModel)]="input.displayName">
       </div>
     </div>
     <div class="form-group">
@@ -80,7 +80,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">名稱</span>
         </div>
-        <input type="text" class="form-control" [(ngModel)]="template.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="template.name">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" (click)="getTemplates(); open(templates_selector, {template: template});">選擇</button>
         </div>
@@ -91,7 +91,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">網址</span>
         </div>
-        <input type="text" class="form-control" [(ngModel)]="template.url" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="template.url">
       </div>
     </div>
     <div class="form-group">
@@ -111,7 +111,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">名稱</span>
         </div>
-        <input type="text" class="form-control" [(ngModel)]="request.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="request.name">
       </div>
     </div>
     <div class="form-group">
@@ -130,7 +130,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">名稱</span>
         </div>
-        <input type="text" class="form-control" [(ngModel)]="adapter.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="adapter.name">
       </div>
     </div>
     <div class="form-group">
@@ -149,7 +149,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">名稱</span>
         </div>
-        <input type="text" class="form-control" [(ngModel)]="parameter.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="parameter.name">
       </div>
     </div>
     <div class="form-group">
@@ -169,13 +169,36 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.input.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.input.name">
       </div>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">顯示名稱</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.input.description" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.input.displayName">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">輸入框類型</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{currentModal.input.guid}}" [value]="'textbox'" [(ngModel)]="currentModal.input.inputType">
+            文字輸入框
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{currentModal.input.guid}}" [value]="'textarea'" [(ngModel)]="currentModal.input.inputType">
+            多行文字輸入框
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="{{currentModal.input.guid}}" [value]="'truefalse'" [(ngModel)]="currentModal.input.inputType">
+            是與否選項
+          </label>
+        </div>
       </div>
     </div>
     <div class="form-group row">
@@ -183,19 +206,19 @@
       <div class="col-sm-10">
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isRequired" [ngModelOptions]="{standalone: true}">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isRequired">
             必填
           </label>
         </div>
-        <div class="form-check form-check-inline">
+        <div *ngIf="currentModal.input.inputType !== 'truefalse'" class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isMultiple" [ngModelOptions]="{standalone: true}">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isMultiple">
             允許多個值
           </label>
         </div>
-        <div *ngIf="!currentModal.isproperty" class="form-check form-check-inline">
+        <div *ngIf="!currentModal.isproperty && currentModal.input.isMultiple" class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isSplit" [ngModelOptions]="{standalone: true}">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.input.isSplit">
             把每個值分開處理
           </label>
         </div>
@@ -234,7 +257,7 @@
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
         <div class="input-group">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.template.name" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.template.name">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="getTemplates(); open(templates_selector, {template: currentModal.template});">選擇</button>
           </div>
@@ -244,7 +267,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">網址</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.template.url" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.template.url">
       </div>
     </div>
     <div class="form-group row">
@@ -309,7 +332,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.request.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.name">
       </div>
     </div>
     <div class="form-group row">
@@ -317,19 +340,19 @@
       <div class="col-sm-10">
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'value'" [(ngModel)]="currentModal.request.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'value'" [(ngModel)]="currentModal.request.from">
             值
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'input'" [(ngModel)]="currentModal.request.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'input'" [(ngModel)]="currentModal.request.from">
             參數
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'adapter'" [(ngModel)]="currentModal.request.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.request.guid}}" [value]="'adapter'" [(ngModel)]="currentModal.request.from">
             中繼器
           </label>
         </div>
@@ -338,14 +361,14 @@
     <div *ngIf="currentModal.request.from === 'value'" class="form-group row">
       <label class="col-sm-2 col-form-label">值</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.request.value" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.value">
       </div>
     </div>
     <div *ngIf="currentModal.request.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數名稱</label>
       <div class="col-sm-10">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputName" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputName">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="open(template_inputs_selector, {request: currentModal.request})">選擇</button>
           </div>
@@ -355,14 +378,14 @@
     <div *ngIf="currentModal.request.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數物件成員</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputProperty" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.inputProperty">
       </div>
     </div>
     <div *ngIf="currentModal.request.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器名稱</label>
       <div class="col-sm-10">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterName" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterName">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="open(template_adapters_selector, {request: currentModal.request, adapters: getMergeAdapters(currentModal.request) })">選擇</button>
           </div>
@@ -372,7 +395,7 @@
     <div *ngIf="currentModal.request.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器物件成員</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterProperty" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.request.adapterProperty">
       </div>
     </div>
   </div>
@@ -392,7 +415,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.name">
       </div>
     </div>
     <div class="form-group row">
@@ -405,7 +428,7 @@
               <option [value]="'post'">Post</option>
             </select>
           </div>
-          <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.url" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.url">
         </div>
       </div>
     </div>
@@ -427,7 +450,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">物件成員限縮</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.responseConfine" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.adapter.responseConfine">
       </div>
     </div>
     <div class="form-group row">
@@ -435,7 +458,7 @@
       <div class="col-sm-10">
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.adapter.isSplit" [ngModelOptions]="{standalone: true}">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="currentModal.adapter.isSplit">
             把每個值分開處理
           </label>
         </div>
@@ -458,7 +481,7 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">名稱</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.name" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.name">
       </div>
     </div>
     <div class="form-group row">
@@ -466,25 +489,25 @@
       <div class="col-sm-10">
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'value'" [(ngModel)]="currentModal.parameter.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'value'" [(ngModel)]="currentModal.parameter.from">
             值
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'input'" [(ngModel)]="currentModal.parameter.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'input'" [(ngModel)]="currentModal.parameter.from">
             參數
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'adapter'" [(ngModel)]="currentModal.parameter.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'adapter'" [(ngModel)]="currentModal.parameter.from">
             中繼器
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'template'" [(ngModel)]="currentModal.parameter.from" [ngModelOptions]="{standalone: true}">
+            <input type="radio" class="form-check-input" name="{{currentModal.parameter.guid}}" [value]="'template'" [(ngModel)]="currentModal.parameter.from">
             樣板
           </label>
         </div>
@@ -493,14 +516,14 @@
     <div *ngIf="currentModal.parameter.from === 'value'" class="form-group row">
       <label class="col-sm-2 col-form-label">值</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.value" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.value">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數名稱</label>
       <div class="col-sm-10">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputName" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputName">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="open(template_inputs_selector, {parameter: currentModal.parameter})">選擇</button>
           </div>
@@ -510,14 +533,14 @@
     <div *ngIf="currentModal.parameter.from === 'input'" class="form-group row">
       <label class="col-sm-2 col-form-label">參數物件成員</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputProperty" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.inputProperty">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器名稱</label>
       <div class="col-sm-10">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterName" [ngModelOptions]="{standalone: true}">
+          <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterName">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="open(template_adapters_selector, {parameter: currentModal.parameter, adapters: getMergeAdapters(currentModal.parameter) })">選擇</button>
           </div>
@@ -527,7 +550,7 @@
     <div *ngIf="currentModal.parameter.from === 'adapter'" class="form-group row">
       <label class="col-sm-2 col-form-label">中繼器物件成員</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterProperty" [ngModelOptions]="{standalone: true}">
+        <input type="text" class="form-control" [(ngModel)]="currentModal.parameter.adapterProperty">
       </div>
     </div>
     <div *ngIf="currentModal.parameter.from === 'template'" class="form-group row">
@@ -568,7 +591,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text">顯示名稱</span>
                   </div>
-                  <input type="text" class="form-control" placeholder="{{input.name}}" value="{{input.description}}" readonly>
+                  <input type="text" class="form-control" placeholder="{{input.name}}" value="{{input.displayName}}" readonly>
                 </div>
               </div>
               <div class="form-group">

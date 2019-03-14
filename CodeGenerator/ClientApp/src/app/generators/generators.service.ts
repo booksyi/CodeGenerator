@@ -109,8 +109,10 @@ export class CodeTemplate {
 }
 
 export class Input {
+  guid: string = Guid.newGuid();
   name: string;
-  description: string;
+  displayName: string;
+  inputType: "textbox" | "textarea" | "truefalse" = "textbox";
   isRequired: boolean;
   isMultiple: boolean;
   isSplit: boolean;

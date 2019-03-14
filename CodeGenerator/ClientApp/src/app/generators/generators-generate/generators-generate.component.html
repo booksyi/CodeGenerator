@@ -28,13 +28,8 @@
 
 <ng-template #template_input let-input="input">
   <div class="form-group row">
-    <ng-container *ngIf="input.description; then template_description else template_name"></ng-container>
-    <ng-template #template_description>
-      <label class="col-sm-2 col-form-label">{{input.description}}</label>
-    </ng-template>
-    <ng-template #template_name>
-      <label class="col-sm-2 col-form-label">{{input.name}}</label>
-    </ng-template>
+    <label *ngIf="!input.displayName" class="col-sm-2 col-form-label">{{input.name}}</label>
+    <label *ngIf="input.displayName" class="col-sm-2 col-form-label">{{input.displayName}}</label>
     <div class="col-sm-10">
       <div class="form-group" *ngFor="let value of input.values; let i = index; trackBy: trackByFn">
         <div class="form-inline">
@@ -43,7 +38,26 @@
             <button *ngIf="i === 0 && input.isRequired" class="btn btn-danger" type="button" disabled>－</button>
           </div>
           <div class="form-group">
-            <input *ngIf="!input.children || !input.children.length" type="text" class="form-control" [(ngModel)]="input.values[i]" [ngModelOptions]="{standalone: true}">
+            <!-- 非物件的輸入框 -->
+            <ng-container *ngIf="!input.children || !input.children.length" [ngSwitch]="input.inputType">
+              <input *ngSwitchCase="'textbox'" type="text" class="form-control" [(ngModel)]="input.values[i]">
+              <textarea *ngSwitchCase="'textarea'" class="form-control" [(ngModel)]="input.values[i]"></textarea>
+              <ng-container *ngSwitchCase="'truefalse'">
+                <div class="form-check form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="{{input.guid}}" [value]="true" [(ngModel)]="input.values[i]">
+                    是
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="{{input.guid}}" [value]="false" [(ngModel)]="input.values[i]">
+                    否
+                  </label>
+                </div>
+              </ng-container>
+            </ng-container>
+            <!-- 物件的輸入框 (readonly) -->
             <div *ngIf="input.children && input.children.length" class="input-group">
               <input type="text" class="form-control" value="{{toJson(value)}}" readonly>
               <div class="input-group-append">
@@ -62,8 +76,8 @@
 
 <ng-template #template_input_modal let-modal>
   <div class="modal-header">
-    <h4 *ngIf="currentModal.input.description" class="modal-title">{{currentModal.input.description}}</h4>
-    <h4 *ngIf="!currentModal.input.description" class="modal-title">{{currentModal.input.name}}</h4>
+    <h4 *ngIf="currentModal.input.displayName" class="modal-title">{{currentModal.input.displayName}}</h4>
+    <h4 *ngIf="!currentModal.input.displayName" class="modal-title">{{currentModal.input.name}}</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross')">
       <span aria-hidden="true">&times;</span>
     </button>
