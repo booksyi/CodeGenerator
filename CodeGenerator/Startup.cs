@@ -1,8 +1,11 @@
+using CodeGenerator.Data.Authentication;
+using CodeGenerator.Data.Configs;
 using CodeGenerator.Data.Models;
 using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +27,11 @@ namespace CodeGenerator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
+            services.Configure<SecurityConfig>(Configuration.GetSection("SecurityConfig"));
+
             services.AddScoped<Pluralize.NET.Core.Pluralizer>();
+            services.AddScoped<JwtBuilder>();
             services.AddScoped(x => new SqlHelper(Configuration.GetConnectionString("CodeGeneratorContext")));
             services.AddEntityFrameworkSqlServer().AddDbContext<CodeGeneratorContext>(options =>
             {
@@ -32,6 +39,17 @@ namespace CodeGenerator
                     Configuration.GetConnectionString("CodeGeneratorContext"),
                     x => x.MigrationsHistoryTable("CodeGeneratorMigrationsHistory"));
             });
+
+            services.AddDefaultIdentity<ApplicationUser>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.User.RequireUniqueEmail = true;
+            })
+                .AddEntityFrameworkStores<CodeGeneratorContext>()
+                .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddHttpContextAccessor();
@@ -67,6 +85,7 @@ namespace CodeGenerator
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseAuthentication();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 

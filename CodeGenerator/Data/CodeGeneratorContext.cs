@@ -1,10 +1,13 @@
 ﻿using System;
+using CodeGenerator.Data.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CodeGenerator.Data.Models
 {
-    public partial class CodeGeneratorContext : DbContext
+    public partial class CodeGeneratorContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public CodeGeneratorContext()
         {
@@ -21,6 +24,16 @@ namespace CodeGenerator.Data.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>().ToTable("CodeGeneratorUsers");
+            modelBuilder.Entity<IdentityRole<Guid>>().ToTable("CodeGeneratorRoles");
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("CodeGeneratorRoleClaims");
+            modelBuilder.Entity<IdentityUserRole<Guid>>().ToTable("CodeGeneratorUserRoles");
+            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("CodeGeneratorUserLogins");
+            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("CodeGeneratorUserClaims");
+            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("CodeGeneratorUserTokens");
+
             modelBuilder.Entity<Constant>(entity =>
             {
                 entity.ToTable("CodeGeneratorConstants");
