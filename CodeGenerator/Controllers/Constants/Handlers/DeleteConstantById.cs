@@ -1,4 +1,5 @@
-﻿using CodeGenerator.Data.Models;
+﻿using CodeGenerator.Data;
+using CodeGenerator.Data.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;

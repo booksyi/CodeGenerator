@@ -1,3 +1,4 @@
+using CodeGenerator.Data;
 using CodeGenerator.Data.Authentication;
 using CodeGenerator.Data.Configs;
 using CodeGenerator.Data.Models;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSwag.AspNetCore;
+using System;
 
 namespace CodeGenerator
 {
@@ -27,8 +29,10 @@ namespace CodeGenerator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region appsettings.json configs
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
             services.Configure<SecurityConfig>(Configuration.GetSection("SecurityConfig"));
+            #endregion
 
             services.AddScoped<Pluralize.NET.Core.Pluralizer>();
             services.AddScoped<JwtBuilder>();
@@ -40,16 +44,27 @@ namespace CodeGenerator
                     x => x.MigrationsHistoryTable("CodeGeneratorMigrationsHistory"));
             });
 
-            services.AddDefaultIdentity<ApplicationUser>(options =>
+            #region Identity
+            services.AddDefaultIdentity<ApplicationUser>()
+                .AddEntityFrameworkStores<CodeGeneratorContext>()
+                .AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
                 options.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<CodeGeneratorContext>()
-                .AddDefaultTokenProviders();
+            });
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = false;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.LoginPath = "/users/login";
+                options.AccessDeniedPath = "/users/accessDenied";
+                options.SlidingExpiration = true;
+            });
+            #endregion
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddHttpContextAccessor();
@@ -84,6 +99,7 @@ namespace CodeGenerator
             {
                 app.UseExceptionHandler("/Error");
             }
+            app.UseExceptionHandler("/api/Error");
 
             app.UseAuthentication();
             app.UseStaticFiles();

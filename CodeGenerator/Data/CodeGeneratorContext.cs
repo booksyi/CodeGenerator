@@ -1,11 +1,12 @@
 ﻿using System;
 using CodeGenerator.Data.Authentication;
+using CodeGenerator.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace CodeGenerator.Data.Models
+namespace CodeGenerator.Data
 {
     public partial class CodeGeneratorContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {

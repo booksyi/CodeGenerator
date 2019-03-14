@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CodeGenerator.Controllers.Users.Hendlers;
+using CodeGenerator.Data;
 using CodeGenerator.Data.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -30,18 +32,51 @@ namespace CodeGenerator.Controllers.Users
             this.signInManager = signInManager;
         }
 
-        public async Task<ActionResult> Login(string email, string password)
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Register([FromBody]Register.Request request, string returnUrl)
         {
-            var user = await userManager.Users.FirstOrDefaultAsync(e => e.NormalizedEmail.Equals(email, StringComparison.CurrentCultureIgnoreCase));
-            var result = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                if (await mediator.Send(request))
+                {
+                    if (string.IsNullOrWhiteSpace(returnUrl))
+                    {
+                        return Redirect("~/");
+                    }
+                    return Redirect(returnUrl);
+                }
+            }
+            return Ok(
+                ModelState
+                    .Where(x => x.Value.Errors.Any())
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Value.Errors));
         }
 
-        public async Task<ActionResult> Info()
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Login([FromBody]Login.Request request, string returnUrl)
         {
-            var email = Request.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-            return Content(email);
+            if (ModelState.IsValid)
+            {
+                // 驗證登入
+                if (await mediator.Send(request))
+                {
+                    // 登入成功轉址
+                    if (string.IsNullOrWhiteSpace(returnUrl))
+                    {
+                        return Redirect("~/");
+                    }
+                    return Redirect(returnUrl);
+                }
+                return Unauthorized();
+            }
+            return Ok(
+                ModelState
+                    .Where(x => x.Value.Errors.Any())
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Value.Errors));
         }
-
     }
 }
