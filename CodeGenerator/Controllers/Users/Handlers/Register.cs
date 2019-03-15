@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.Controllers.Users.Hendlers
+namespace CodeGenerator.Controllers.Users.Handlers
 {
     public class Register
     {

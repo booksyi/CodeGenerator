@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using CodeGenerator.Controllers.Users.Hendlers;
+using CodeGenerator.Controllers.Users.Handlers;
 using CodeGenerator.Data;
 using CodeGenerator.Data.Authentication;
 using MediatR;

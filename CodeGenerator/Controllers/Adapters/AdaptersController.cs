@@ -22,6 +22,26 @@ namespace CodeGenerator.Controllers.Adapters
             this.mediator = mediator;
         }
 
+        [HttpGet("pipe")]
+        [HttpPost("pipe")]
+        public async Task<ActionResult> Pipe()
+        {
+            Newtonsoft.Json.Linq.JToken result = null;
+            if (Request.Method == "GET")
+            {
+                result = Request.Query.ToJObject();
+            }
+            if (Request.Method == "POST")
+            {
+                result = await Request.Body.ToJTokenAsync();
+            }
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return Ok();
+        }
+
         [HttpGet("db/table")]
         public async Task<ActionResult> DatabaseGetTable([FromQuery] GetTable.Request request)
         {
