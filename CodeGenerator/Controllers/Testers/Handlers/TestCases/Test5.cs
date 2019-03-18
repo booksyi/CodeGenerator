@@ -15,7 +15,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
     /// </summary>
     public class Test5
     {
-        public class Request : IRequest<Test.TestCase>
+        public class Request : IRequest<uint>
         {
         }
 
@@ -40,7 +40,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
             }
         }
 
-        public class Handler : IRequestHandler<Request, Test.TestCase>
+        public class Handler : IRequestHandler<Request, uint>
         {
             private readonly IHttpContextAccessor httpContextAccessor;
             public Handler(IHttpContextAccessor httpContextAccessor)
@@ -133,23 +133,13 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 return result[0] == "123";
             }
 
-            public async Task<Test.TestCase> Handle(Request request, CancellationToken token)
+            public async Task<uint> Handle(Request request, CancellationToken token)
             {
-                Test.TestCase testCase = new Test.TestCase() { Tester = this.GetType().ReflectedType.Name };
-                try
+                if (await Test(request) == false)
                 {
-                    if (await Test(request) == false)
-                    {
-                        throw new Exception("測試結果不如預期");
-                    }
-                    testCase.Pass = true;
+                    throw new Exception("測試結果不如預期");
                 }
-                catch (Exception ex)
-                {
-                    testCase.Pass = false;
-                    testCase.Exception = ex;
-                }
-                return testCase;
+                return 0;
             }
         }
     }

@@ -8,6 +8,7 @@ using HelpersForCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CodeGenerator.Controllers.Generators
 {
@@ -115,7 +116,7 @@ namespace CodeGenerator.Controllers.Generators
             request.Id = id;
             if (request.Body == null)
             {
-                request.Body = await Request.Body.ToJObjectAsync();
+                request.Body = await Request.Body.ToJTokenAsync<JObject>();
             }
             var nodes = await mediator.Send(request);
             return Ok(nodes);
@@ -148,7 +149,7 @@ namespace CodeGenerator.Controllers.Generators
             request.Id = id;
             if (request.Body == null)
             {
-                request.Body = await Request.Body.ToJObjectAsync();
+                request.Body = await Request.Body.ToJTokenAsync<JObject>();
             }
             var resources = await mediator.Send(request);
             return Ok(resources);
@@ -190,7 +191,7 @@ namespace CodeGenerator.Controllers.Generators
             request.Id = id;
             if (request.Body == null)
             {
-                request.Body = await Request.Body.ToJObjectAsync();
+                request.Body = await Request.Body.ToJTokenAsync<JObject>();
             }
             var resources = await mediator.Send(request);
             string text = resources.FirstOrDefault().Text;  // TODO: 支援下載所有檔案
@@ -230,7 +231,7 @@ namespace CodeGenerator.Controllers.Generators
             request.Id = id;
             if (request.Body == null)
             {
-                request.Body = await Request.Body.ToJObjectAsync();
+                request.Body = await Request.Body.ToJTokenAsync<JObject>();
             }
             var nodes = await mediator.Send(request);
             var result = await Task.WhenAll(nodes.Select(async x => await x.ToJTokenForReadAsync()));

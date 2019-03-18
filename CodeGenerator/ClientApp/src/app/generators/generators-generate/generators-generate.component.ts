@@ -24,6 +24,7 @@ export class GeneratorsGenerateComponent implements OnInit {
   id: number;
   inputs: Input[];
   resources: GenerateResource[];
+  error: Error;
   get currentModal(): any {
     return this.modalStackService.data;
   }
@@ -93,7 +94,7 @@ export class GeneratorsGenerateComponent implements OnInit {
 
   get() {
     this.service.getInputs(this.id).subscribe(inputs => {
-      if (inputs) {
+      if (inputs && inputs.length) {
         this.inputs = inputs.map(input => Object.assign(new Input(), input));
         for (let input of this.inputs) {
           input.values = this.defaultValues(input);
@@ -113,11 +114,15 @@ export class GeneratorsGenerateComponent implements OnInit {
     let jObject = this.inputs ? this.toJObject(this.inputs) : {};
     this.service.generate(this.id, jObject).subscribe(resources => {
       this.resources = resources;
+    }, error => {
+      this.error = new Error();
+      Object.assign(this.error, error.error);
     });
   }
 
   rollback() {
     this.resources = null;
+    this.error = null;
     if (!this.inputs) {
       this.submit();
     }
@@ -142,4 +147,9 @@ class Input {
   isMultiple: boolean;
   children: Input[];
   values: InputObject[] | string[];
+}
+
+class Error {
+  message: string;
+  detail: string;
 }

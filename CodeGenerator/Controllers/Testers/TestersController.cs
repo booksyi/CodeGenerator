@@ -58,11 +58,11 @@ namespace CodeGenerator.Controllers.Testers
             };
             if (Request.Method == "GET")
             {
-                request.Query = Request.Query.ToJObject();
+                request.InputData = Request.Query.ToJObject();
             }
             else if (Request.Method.In("POST", "PUT"))
             {
-                request.Query = await Request.Body.ToJObjectAsync();
+                request.InputData = await Request.Body.ToJTokenAsync();
             }
             JToken result = await mediator.Send(request);
             return Ok(result);

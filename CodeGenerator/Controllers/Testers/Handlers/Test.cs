@@ -3,6 +3,7 @@ using MediatR;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers
         public class TestCase
         {
             public string Tester { get; set; }
-            public bool Pass { get; set; } = false;
+            public bool Pass { get; set; } = true;
 
             [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
             public Exception Exception { get; set; } = null;
@@ -56,9 +57,26 @@ namespace CodeGenerator.Controllers.Testers.Handlers
                 {
                     if (string.IsNullOrWhiteSpace(request.Tester) || request.Tester == tester.Name)
                     {
+                        Type testerType = assembly.GetType(tester.FullName);
                         Type testerRequestType = assembly.GetType($"{tester.FullName}+Request");
-                        IRequest<TestCase> testerRequest = Activator.CreateInstance(testerRequestType) as IRequest<TestCase>;
-                        cases.Add(await mediator.Send(testerRequest));
+                        TestCase testCase = new TestCase() { Tester = testerType.Name };
+                        DescriptionAttribute descAttr = testerType.GetCustomAttribute<DescriptionAttribute>();
+                        if (descAttr != null)
+                        {
+                            testCase.Tester = $"{testCase.Tester} ({descAttr.Description})";
+                        }
+                        try
+                        {
+                            IRequest<uint> testerRequest = Activator.CreateInstance(testerRequestType) as IRequest<uint>;
+                            await mediator.Send(testerRequest);
+                            testCase.Pass = true;
+                        }
+                        catch (Exception exception)
+                        {
+                            testCase.Pass = false;
+                            testCase.Exception = exception;
+                        }
+                        cases.Add(testCase);
                     }
                 }
 

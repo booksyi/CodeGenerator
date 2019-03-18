@@ -1,4 +1,6 @@
-<ng-container *ngIf="resources; then template_codes else template_inputs"></ng-container>
+<ng-container *ngIf="!resources && !error; then template_inputs"></ng-container>
+<ng-container *ngIf="resources; then template_codes"></ng-container>
+<ng-container *ngIf="error; then template_error"></ng-container>
 <ng-template #template_inputs>
   <ng-container *ngFor="let input of inputs">
     <ng-container [ngTemplateOutlet]="template_input" [ngTemplateOutletContext]="{input: input}"></ng-container>
@@ -15,12 +17,38 @@
     <label *ngIf="resource.name && resource.name.length" class="col-sm-2 col-form-label">{{resource.name}}</label>
     <label *ngIf="!resource.name || !resource.name.length" class="col-sm-2 col-form-label">(沒有命名)</label>
     <div class="col-sm-10">
-      <textarea class="form-control" rows="7" readonly="readonly">{{resource.text}}</textarea>
+      <div class="alert alert-info">
+        {{resource.text}}
+      </div>
     </div>
   </div>
   <div class="form-group row">
     <div class="offset-sm-2 col-sm-10">
       <input type="button" class="btn btn-warning" value="重新生成" (click)="rollback()" />
+      <input type="button" class="btn btn-danger" value="離開" (click)="back()" />
+    </div>
+  </div>
+</ng-template>
+<ng-template #template_error>
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">錯誤訊息</label>
+    <div class="col-sm-10">
+      <div class="alert alert-danger">
+        {{error.message}}
+      </div>
+    </div>
+  </div>
+  <div class="form-group row" *ngIf="error.detail">
+    <label class="col-sm-2 col-form-label">詳細資訊</label>
+    <div class="col-sm-10">
+      <div class="alert alert-danger">
+        {{error.detail}}
+      </div>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="offset-sm-2 col-sm-10">
+      <input type="button" class="btn btn-warning" value="重試" (click)="rollback()" />
       <input type="button" class="btn btn-danger" value="離開" (click)="back()" />
     </div>
   </div>

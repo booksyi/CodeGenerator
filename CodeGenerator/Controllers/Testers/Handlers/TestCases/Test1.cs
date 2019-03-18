@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試樣板參數 陣列 與 分隔符號
-    /// </summary>
+    [Description("測試樣板參數 陣列 與 分隔符號")]
     public class Test1
     {
-        public class Request : IRequest<Test.TestCase>
+        public class Request : IRequest<uint>
         {
         }
 
@@ -35,7 +35,7 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
             }
         }
 
-        public class Handler : IRequestHandler<Request, Test.TestCase>
+        public class Handler : IRequestHandler<Request, uint>
         {
             private readonly IHttpContextAccessor httpContextAccessor;
             public Handler(IHttpContextAccessor httpContextAccessor)
@@ -80,23 +80,13 @@ namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
                 return result[0] == "AA+BB+CC";
             }
 
-            public async Task<Test.TestCase> Handle(Request request, CancellationToken token)
+            public async Task<uint> Handle(Request request, CancellationToken token)
             {
-                Test.TestCase testCase = new Test.TestCase() { Tester = this.GetType().ReflectedType.Name };
-                try
+                if (await Test(request) == false)
                 {
-                    if (await Test(request) == false)
-                    {
-                        throw new Exception("測試結果不如預期");
-                    }
-                    testCase.Pass = true;
+                    throw new Exception("測試結果不如預期");
                 }
-                catch (Exception ex)
-                {
-                    testCase.Pass = false;
-                    testCase.Exception = ex;
-                }
-                return testCase;
+                return 0;
             }
         }
     }
