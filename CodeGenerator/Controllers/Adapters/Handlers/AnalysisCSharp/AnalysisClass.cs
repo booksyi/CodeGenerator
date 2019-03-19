@@ -10,20 +10,20 @@ namespace CodeGenerator.Controllers.Adapters.Handlers.AnalysisCSharp
 {
     public class AnalysisClass
     {
-        public class Request : IRequest<CsSchemaClass>
+        public class Request : IRequest<CsSchema.Class>
         {
             public string ProgramText { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, CsSchemaClass>
+        public class Handler : IRequestHandler<Request, CsSchema.Class>
         {
             public Handler()
             {
             }
 
-            public async Task<CsSchemaClass> Handle(Request request, CancellationToken token)
+            public async Task<CsSchema.Class> Handle(Request request, CancellationToken token)
             {
-                CsSchemaClass classSchema = CodingHelper.AnalysisClass(request.ProgramText);
+                CsSchema.Class classSchema = CodingHelper.AnalysisClass(request.ProgramText);
                 return classSchema;
             }
         }

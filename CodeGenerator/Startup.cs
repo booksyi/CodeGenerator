@@ -1,3 +1,4 @@
+using AutoMapper;
 using CodeGenerator.Data;
 using CodeGenerator.Data.Authentication;
 using CodeGenerator.Data.Configs;
@@ -44,6 +45,7 @@ namespace CodeGenerator
                     x => x.MigrationsHistoryTable("CodeGeneratorMigrationsHistory"));
             });
 
+            services.AddAutoMapper();
             #region Identity
             services.AddDefaultIdentity<ApplicationUser>()
                 .AddEntityFrameworkStores<CodeGeneratorContext>()

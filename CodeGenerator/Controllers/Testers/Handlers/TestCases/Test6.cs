@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試 Input 的物件型態與 Split
-    /// </summary>
+    [Description("測試 Input 的物件型態與 Split")]
     public class Test6
     {
         public class Request : IRequest<uint>

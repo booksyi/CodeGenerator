@@ -10,21 +10,21 @@ namespace CodeGenerator.Controllers.Adapters.Handlers.Database
 {
     public class GetTableFields
     {
-        public class Request : IRequest<IEnumerable<DbSchemaField>>
+        public class Request : IRequest<IEnumerable<DbSchema.Field>>
         {
             public string ConnectionString { get; set; }
             public string TableName { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, IEnumerable<DbSchemaField>>
+        public class Handler : IRequestHandler<Request, IEnumerable<DbSchema.Field>>
         {
             public Handler()
             {
             }
 
-            public async Task<IEnumerable<DbSchemaField>> Handle(Request request, CancellationToken token)
+            public async Task<IEnumerable<DbSchema.Field>> Handle(Request request, CancellationToken token)
             {
-                DbSchemaTable tableSchema =
+                DbSchema.Table tableSchema =
                     CodingHelper.GetDbTableSchema(
                         request.ConnectionString,
                         request.TableName);

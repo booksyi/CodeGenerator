@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試 AdapterNode 的 ResponseConfine 與 ResponseSplit
-    /// </summary>
+    [Description("測試 AdapterNode 的 ResponseConfine 與 ResponseSplit")]
     public class Test3
     {
         public class Request : IRequest<uint>

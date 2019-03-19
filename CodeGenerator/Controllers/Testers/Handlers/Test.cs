@@ -27,8 +27,9 @@ namespace CodeGenerator.Controllers.Testers.Handlers
             public Exception Exception { get; set; } = null;
         }
 
-        public class Response : MultiResponse<TestCase>
+        public class Response
         {
+            public IEnumerable<TestCase> Result { get; set; }
         }
 
         public class Handler : IRequestHandler<Request, Response>

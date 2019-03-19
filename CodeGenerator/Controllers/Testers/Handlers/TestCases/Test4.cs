@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試 Adapter 串接 TemplateNode 的 Url 參數
-    /// </summary>
+    [Description("測試 Adapter 串接 TemplateNode 的 Url 參數")]
     public class Test4
     {
         public class Request : IRequest<uint>

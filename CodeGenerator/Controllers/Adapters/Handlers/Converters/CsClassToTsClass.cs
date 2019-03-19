@@ -1,4 +1,5 @@
-﻿using HelpersForCore;
+﻿using AutoMapper;
+using HelpersForCore;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,22 @@ namespace CodeGenerator.Controllers.Adapters.Handlers.Converters
 {
     public class CsClassToTsClass
     {
-        public class Request : IRequest<TsSchemaClass>
+        public class Request : IRequest<TsSchema.Class>
         {
-            public CsSchemaClass CsClass { get; set; }
+            public CsSchema.Class CsClass { get; set; }
         }
 
-        public class Handler : IRequestHandler<Request, TsSchemaClass>
+        public class Handler : IRequestHandler<Request, TsSchema.Class>
         {
-            public Handler()
+            private readonly IMapper mapper;
+            public Handler(IMapper mapper)
             {
+                this.mapper = mapper;
             }
 
-            public async Task<TsSchemaClass> Handle(Request request, CancellationToken token)
+            public async Task<TsSchema.Class> Handle(Request request, CancellationToken token)
             {
-                return request.CsClass.ToTsClass();
+                return mapper.Map<TsSchema.Class>(request.CsClass);
             }
         }
     }

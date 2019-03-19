@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試多層的 Adapter
-    /// </summary>
+    [Description("測試多層的 Adapter")]
     public class Test5
     {
         public class Request : IRequest<uint>

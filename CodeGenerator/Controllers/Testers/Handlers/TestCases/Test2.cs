@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -11,9 +12,7 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.Controllers.Testers.Handlers.TestCases
 {
-    /// <summary>
-    /// 測試從 HttpRequest 取值及串流 Adapter
-    /// </summary>
+    [Description("測試從 HttpRequest 取值及串流 Adapter")]
     public class Test2
     {
         public class Request : IRequest<uint>
